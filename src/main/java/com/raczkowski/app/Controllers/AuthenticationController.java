@@ -1,7 +1,8 @@
 package com.raczkowski.app.Controllers;
 
 import com.raczkowski.app.Config.JwtUtil;
-import com.raczkowski.app.dao.UserDao;
+
+import com.raczkowski.app.User.UserService;
 import com.raczkowski.app.dto.AuthenticationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
-    private final UserDao userDao;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticate(@RequestBody AuthenticationRequest request){
+    public ResponseEntity<String> authenticate(@RequestBody AuthenticationRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        final UserDetails userDetails = userDao.findUserByEmail(request.getEmail());
-        if(userDetails!=null){
-            return ResponseEntity.ok(jwtUtil.generateToken(userDetails));
+        final UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
+        if (userDetails != null) {
+            String token = jwtUtil.generateToken(userDetails);
+            return ResponseEntity.ok(token);
         }
         return ResponseEntity.status(400).body("Some error");
     }

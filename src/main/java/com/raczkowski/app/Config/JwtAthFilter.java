@@ -1,6 +1,7 @@
 package com.raczkowski.app.Config;
 
-import com.raczkowski.app.dao.UserDao;
+
+import com.raczkowski.app.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +21,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequiredArgsConstructor
 public class JwtAthFilter extends OncePerRequestFilter {
 
-    private final UserDao userDao;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -40,8 +41,7 @@ public class JwtAthFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7);
         userEmail = jwtUtil.extractUsername(jwtToken);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDao.findUserByEmail(userEmail);
-
+            UserDetails userDetails = userService.loadUserByUsername(userEmail);
             if (jwtUtil.validateToken(jwtToken,userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
