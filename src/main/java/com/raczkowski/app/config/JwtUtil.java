@@ -1,4 +1,4 @@
-package com.raczkowski.app.Config;
+package com.raczkowski.app.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

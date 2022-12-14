@@ -1,6 +1,6 @@
-package com.raczkowski.app.Controllers;
+package com.raczkowski.app.controllers;
 
-import com.raczkowski.app.Config.JwtUtil;
+import com.raczkowski.app.config.JwtUtil;
 
 import com.raczkowski.app.User.UserService;
 import com.raczkowski.app.dto.AuthenticationRequest;

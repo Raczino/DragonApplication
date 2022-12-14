@@ -1,4 +1,4 @@
-package com.raczkowski.app.Controllers;
+package com.raczkowski.app.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
