@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -30,19 +30,24 @@ public class Article {
     private String title;
     @Column(nullable = false)
     private String content;
-    private LocalDate postedDate;
+    private ZonedDateTime postedDate;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(
             nullable = false,
             name = "app_user_id"
     )
     private AppUser appUser;
 
-    public Article(String title, String content, LocalDate postedDate, AppUser sessionUser) {
+    public Article(
+            String title,
+            String content,
+            ZonedDateTime postedDate,
+            AppUser appUser
+    ) {
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
-        this.appUser = sessionUser;
+        this.appUser = appUser;
     }
 }

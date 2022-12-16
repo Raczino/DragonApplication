@@ -1,19 +1,18 @@
 package com.raczkowski.app.User;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-    private final static String USER_NOT_FIND_MESSAGE = "user with email %s not found";
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -39,5 +38,9 @@ public class UserService implements UserDetailsService {
         //TODO: SEND EMAIL
 
         return token;
+    }
+
+    public List<AppUser> loadAllUser() {
+        return userRepository.findAll();
     }
 }

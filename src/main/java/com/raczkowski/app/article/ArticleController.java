@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.dto.ArticleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,13 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.create(request));
     }
 
-    @GetMapping("get/all")
-    ResponseEntity<List<Article>> getAllArticles(){
+    @GetMapping("/get/all")
+    ResponseEntity<List<ArticleDto>> getAllArticles(){
         return ResponseEntity.ok(articleService.getAllArticles());
+    }
+
+    @GetMapping("/get")
+    ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam(value = "id") Long id){
+        return ResponseEntity.ok(articleService.getArticlesFromUser(id));
     }
 }

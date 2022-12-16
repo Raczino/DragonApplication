@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class AppUserDao {
+public class AppUserDto {
     private Long id;
     private String firstName;
     private String lastName;
