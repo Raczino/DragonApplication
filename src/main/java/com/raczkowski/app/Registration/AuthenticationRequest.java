@@ -1,4 +1,4 @@
-package com.raczkowski.app.dto;
+package com.raczkowski.app.Registration;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

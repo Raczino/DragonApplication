@@ -28,9 +28,4 @@ public class ArticleController {
     ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam(value = "id") Long id){
         return ResponseEntity.ok(articleService.getArticlesFromUser(id));
     }
-
-    @GetMapping("/get/all")
-    ResponseEntity<String> getAll(){
-        return ResponseEntity.ok("ok");
-    }
 }

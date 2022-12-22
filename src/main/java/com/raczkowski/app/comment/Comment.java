@@ -1,6 +1,7 @@
-package com.raczkowski.app.article;
+package com.raczkowski.app.comment;
 
 import com.raczkowski.app.User.AppUser;
+import com.raczkowski.app.article.Article;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,22 +15,21 @@ import java.time.ZonedDateTime;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-public class Article {
+public class Comment {
     @SequenceGenerator(
-            name = "article_sequence",
-            sequenceName = "article_sequence",
+            name = "comment_sequence",
+            sequenceName = "comment_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "article_sequence"
+            generator = "comment_sequence"
     )
     private Long id;
     @Column(nullable = false)
-    private String title;
-    @Column(nullable = false)
     private String content;
+
     private ZonedDateTime postedDate;
 
     @OneToOne
@@ -39,15 +39,16 @@ public class Article {
     )
     private AppUser appUser;
 
-    public Article(
-            String title,
-            String content,
-            ZonedDateTime postedDate,
-            AppUser appUser
-    ) {
-        this.title = title;
+
+    private Long articleId;
+
+    private int likesNumber=0;
+
+
+    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Long articleId){
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
+        this.articleId= articleId;
     }
 }

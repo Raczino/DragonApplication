@@ -3,7 +3,7 @@ package com.raczkowski.app.controllers;
 import com.raczkowski.app.config.JwtUtil;
 
 import com.raczkowski.app.User.UserService;
-import com.raczkowski.app.dto.AuthenticationRequest;
+import com.raczkowski.app.Registration.AuthenticationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

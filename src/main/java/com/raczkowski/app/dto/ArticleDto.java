@@ -1,12 +1,13 @@
 package com.raczkowski.app.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
 
-@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class ArticleDto {
@@ -15,12 +16,4 @@ public class ArticleDto {
     String content;
     ZonedDateTime postedDate;
     UserDto userDto;
-
-    public ArticleDto(Long id, String title, String content, ZonedDateTime postedDate, UserDto userDto) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.postedDate = postedDate;
-        this.userDto = userDto;
-    }
 }
