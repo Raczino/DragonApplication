@@ -25,7 +25,7 @@ public class CommentService {
 
     public List<CommentDto> getAllComments(Long id){
         return commentRepository.findAll().stream()
-                .filter(comment -> comment.getArticleId().equals(id))
+                .filter(comment -> comment.getAppUser().getId().equals(id))
                 .map(DtoMapper::commentDtoMapper)
                 .collect(Collectors.toList());
     }
@@ -37,17 +37,19 @@ public class CommentService {
                         .getAuthentication()
                         .getName());
 
-        if(!userRepository.existsById(commentRequest.getIdOfArticle())){
+        if(!userRepository.existsById(commentRequest.getId())){
             throw new IllegalArgumentException("Article with this id doesnt exists");
-        }
+        }else {
+            Article article = articleRepository.findArticleById(commentRequest.getId());
 
-        System.out.println(commentRequest.getIdOfArticle());
-        commentRepository.save(new Comment(
-                commentRequest.getContent(),
-                ZonedDateTime.now(ZoneOffset.UTC),
-                appUser,
-                commentRequest.getIdOfArticle()
-        ));
+            commentRepository.save(new Comment(
+                    commentRequest.getContent(),
+                    ZonedDateTime.now(ZoneOffset.UTC),
+                    appUser,
+                    article,
+                    commentRequest.getLikesNumber()
+            ));
+        }
         return "Added";
     }
 }

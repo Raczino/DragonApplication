@@ -10,6 +10,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class CommentRequest {
-    private Long idOfArticle;
+    private Long id;
     private String content;
+
+    private int likesNumber;
 }

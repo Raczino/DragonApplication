@@ -33,7 +33,7 @@ public class DtoMapper {
                         comment.getAppUser().getEmail(),
                         comment.getAppUser().getUserRole()
                 ),
-                comment.getArticleId(),
+                comment.getArticle().getId(),
                 comment.getLikesNumber());
     }
 }

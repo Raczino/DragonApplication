@@ -39,16 +39,21 @@ public class Comment {
     )
     private AppUser appUser;
 
-
-    private Long articleId;
+    @OneToOne
+    @JoinColumn(
+            nullable = false,
+            name = "article_id"
+    )
+    private Article article;
 
     private int likesNumber=0;
 
 
-    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Long articleId){
+    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Article article,int likesNumber){
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
-        this.articleId= articleId;
+        this.article= article;
+        this.likesNumber = likesNumber;
     }
 }
