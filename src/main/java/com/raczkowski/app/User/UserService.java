@@ -1,5 +1,6 @@
 package com.raczkowski.app.User;
 
+import com.raczkowski.app.exceptions.EmailException;
 import com.raczkowski.app.exceptions.UserAlreadyExists;
 import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class UserService implements UserDetailsService {
 
     public String signUpUser(AppUser appUser) {
         if (userRepository.findByEmail(appUser.getEmail())!=null) {
-            throw new UserAlreadyExists();
+            throw new EmailException("User already exists");
         }
 
         if(appUser.getPassword().length()<8){
