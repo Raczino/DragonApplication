@@ -1,7 +1,6 @@
 package com.raczkowski.app.User;
 
 import com.raczkowski.app.exceptions.EmailException;
-import com.raczkowski.app.exceptions.UserAlreadyExists;
 import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

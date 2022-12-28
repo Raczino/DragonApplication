@@ -5,14 +5,14 @@ import com.raczkowski.app.User.AppUser;
 import com.raczkowski.app.User.UserRepository;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DtoMapper;
+import com.raczkowski.app.exceptions.ArticleException;
 import lombok.AllArgsConstructor;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +23,15 @@ public class ArticleService {
     private final UserRepository userRepository;
 
     public String create(ArticleRequest request) {
+        if(request.getTitle().equals("") || request.getContent().equals("")){
+            throw  new ArticleException("Title or content can't be empty");
+        }
         AppUser appUser = userRepository.findByEmail(
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication()
                         .getName());
+        appUser.incrementArticlesCount();
         articleRepository.save(new Article(
                 request.getTitle(),
                 request.getContent(),

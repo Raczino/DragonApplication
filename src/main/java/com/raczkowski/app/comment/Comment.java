@@ -49,11 +49,14 @@ public class Comment {
     private int likesNumber=0;
 
 
-    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Article article,int likesNumber){
+    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Article article){
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.article= article;
-        this.likesNumber = likesNumber;
+    }
+
+    public void likesIncrement(){
+        this.likesNumber = likesNumber + 1;
     }
 }

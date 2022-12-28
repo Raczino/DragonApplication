@@ -17,7 +17,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EmailException.class)
     public ResponseEntity<ApiException> handleUserAlreadyExists(EmailException emailException){
         ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
                 emailException.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
@@ -27,8 +27,18 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseEntity<ApiException> handleWrongPasswordError(WrongPasswordException wrongPasswordException){
         ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
                 wrongPasswordException.getMessage(),
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ArticleException.class)
+    public ResponseEntity<ApiException> handleArticleException(ArticleException articleException){
+        ApiException error = new ApiException(
+                HttpStatus.BAD_REQUEST.value(),
+                articleException.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

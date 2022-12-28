@@ -17,7 +17,9 @@ public class DtoMapper {
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
                         article.getAppUser().getEmail(),
-                        article.getAppUser().getUserRole()
+                        article.getAppUser().getUserRole(),
+                        article.getAppUser().getArticlesCount(),
+                        article.getAppUser().getCommentsCount()
                 ));
     }
 
@@ -31,7 +33,9 @@ public class DtoMapper {
                         comment.getAppUser().getFirstName(),
                         comment.getAppUser().getLastName(),
                         comment.getAppUser().getEmail(),
-                        comment.getAppUser().getUserRole()
+                        comment.getAppUser().getUserRole(),
+                        comment.getAppUser().getArticlesCount(),
+                        comment.getAppUser().getCommentsCount()
                 ),
                 comment.getArticle().getId(),
                 comment.getLikesNumber());

@@ -19,11 +19,24 @@ public class UserDto {
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
-    public UserDto(Long id, String firstName, String lastName, String email, UserRole role) {
+    private int articlesCount;
+
+    private int commentsCount;
+
+    public UserDto(
+            Long id,
+            String firstName,
+            String lastName,
+            String email,
+            UserRole role,
+            int articlesCount,
+            int commentsCount) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.role = role;
+        this.articlesCount = articlesCount;
+        this.commentsCount = commentsCount;
     }
 }

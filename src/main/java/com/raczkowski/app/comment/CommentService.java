@@ -6,6 +6,8 @@ import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dto.DtoMapper;
+import com.raczkowski.app.exceptions.ArticleException;
+import com.sun.xml.bind.v2.model.core.ID;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -35,9 +37,9 @@ public class CommentService {
                         .getContext()
                         .getAuthentication()
                         .getName());
-
+        appUser.incrementCommentsCount();
         if(!userRepository.existsById(commentRequest.getId())){
-            throw new IllegalArgumentException("Article with this id doesnt exists");
+            throw new ArticleException("Article with this id doesnt exists");
         }else {
             Article article = articleRepository.findArticleById(commentRequest.getId());
 
@@ -45,10 +47,14 @@ public class CommentService {
                     commentRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC),
                     appUser,
-                    article,
-                    commentRequest.getLikesNumber()
+                    article
             ));
         }
         return "Added";
+    }
+
+    public String likeComment(Long id) {
+        commentRepository.getById(id).likesIncrement();  //TODO: Implement comment liking method
+        return "liked";
     }
 }

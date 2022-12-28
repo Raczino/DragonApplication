@@ -1,4 +1,4 @@
-package com.raczkowski.app.Registration;
+package com.raczkowski.app.authentication;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -39,15 +40,23 @@ public class AppUser implements UserDetails {
     private Boolean locked = false;
     private Boolean enabled = false;
 
+    private int articlesCount = 0;
+
+    private int commentsCount = 0;
+
+    private ZonedDateTime registrationDate;
+
     public AppUser(String firstName,
                    String lastName,
                    String email,
-                   String password
+                   String password,
+                   ZonedDateTime registrationDate
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.registrationDate=registrationDate;
     }
 
     public AppUser(String firstName,
@@ -63,6 +72,22 @@ public class AppUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
         return Collections.singletonList(authority);
+    }
+
+    public int getArticlesCount() {
+        return articlesCount;
+    }
+
+    public void incrementArticlesCount() {
+        this.articlesCount = articlesCount + 1;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void incrementCommentsCount() {
+        this.commentsCount = commentsCount + 1;
     }
 
     @Override

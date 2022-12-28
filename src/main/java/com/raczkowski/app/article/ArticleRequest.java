@@ -7,6 +7,8 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class ArticleRequest {
+    @NonNull
     private String title;
+    @NonNull
     private String content;
 }

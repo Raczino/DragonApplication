@@ -1,4 +1,4 @@
-package com.raczkowski.app.Registration;
+package com.raczkowski.app.registration;
 
 
 import lombok.AllArgsConstructor;
