@@ -1,5 +1,7 @@
 package com.raczkowski.app.User;
 
+import com.raczkowski.app.exceptions.UserAlreadyExists;
+import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,7 +25,11 @@ public class UserService implements UserDetailsService {
 
     public String signUpUser(AppUser appUser) {
         if (userRepository.findByEmail(appUser.getEmail())!=null) {
-            throw new IllegalStateException("Email already registered");
+            throw new UserAlreadyExists();
+        }
+
+        if(appUser.getPassword().length()<8){
+            throw new WrongPasswordException();
         }
 
         String encodedPassword = bCryptPasswordEncoder
@@ -33,11 +39,9 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(appUser);
 
-        String token = UUID.randomUUID().toString();
-
         //TODO: SEND EMAIL
 
-        return token;
+        return UUID.randomUUID().toString();
     }
 
     public List<AppUser> loadAllUser() {
