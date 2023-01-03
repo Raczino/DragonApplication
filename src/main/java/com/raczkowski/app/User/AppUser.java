@@ -56,7 +56,7 @@ public class AppUser implements UserDetails {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.registrationDate=registrationDate;
+        this.registrationDate = registrationDate;
     }
 
     public AppUser(String firstName,

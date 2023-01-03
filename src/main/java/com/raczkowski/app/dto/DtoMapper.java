@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DtoMapper {
-    public static ArticleDto articleDtoMapper(Article article){
+    public static ArticleDto articleDtoMapper(Article article) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
@@ -23,7 +23,7 @@ public class DtoMapper {
                 ));
     }
 
-    public static CommentDto commentDtoMapper(Comment comment){
+    public static CommentDto commentDtoMapper(Comment comment) {
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),

@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class AuthenticationService{
+public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    public String authenticate(AuthenticationRequest request){
+    public String authenticate(AuthenticationRequest request) {
         final UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
         if (userDetails != null) {
             authenticationManager.authenticate(
@@ -24,6 +24,6 @@ public class AuthenticationService{
             );
             return jwtUtil.generateToken(userDetails);
         }
-        throw  new EmailException("User with this email doesn't exists");
+        throw new EmailException("User with this email doesn't exists");
     }
 }

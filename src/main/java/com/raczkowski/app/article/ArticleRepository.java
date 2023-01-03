@@ -9,7 +9,8 @@ import java.util.Optional;
 
 @Repository
 @Transactional(readOnly = true)
-public interface ArticleRepository extends JpaRepository<Article,Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findAll();
+
     Article findArticleById(Long id);
 }

@@ -8,6 +8,7 @@ public class ApiException {
     private final int status;
     private final String description;
     private final ZonedDateTime timestamp;
+
     public ApiException(int status, String description, ZonedDateTime timestamp) {
         this.status = status;
         this.description = description;

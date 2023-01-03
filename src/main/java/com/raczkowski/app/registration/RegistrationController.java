@@ -13,7 +13,7 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public ResponseEntity<String> register(@RequestBody RegistrationRequest request){
+    public ResponseEntity<String> register(@RequestBody RegistrationRequest request) {
         return ResponseEntity.ok(registrationService.register(request));
     }
 
