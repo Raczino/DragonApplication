@@ -2,6 +2,7 @@ package com.raczkowski.app.comment;
 
 import com.raczkowski.app.User.AppUser;
 import com.raczkowski.app.User.UserRepository;
+import com.raczkowski.app.User.UserService;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
@@ -25,6 +26,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final CommentComparator commentComparator;
+    private final UserService userService;
 
     public List<CommentDto> getAllComments(Long id) {
         return commentRepository.findAll().stream()
@@ -64,5 +66,14 @@ public class CommentService {
         comment.get().likesIncrement();
         commentRepository.updateComment(comment.get().getLikesNumber(), id);
         return "Liked";
+    }
+
+    public String removeComment(Long id) {
+        Optional<Comment> comment = commentRepository.findById(id);
+        if (comment.isPresent() && !comment.get().getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+            throw new ArticleException("User doesn't have permission to remove this article");
+        }
+        commentRepository.deleteById(id);
+        return "Removed";
     }
 }

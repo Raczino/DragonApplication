@@ -15,17 +15,22 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping("/add")
-    ResponseEntity<String> create(@RequestBody ArticleRequest request){
+    ResponseEntity<String> create(@RequestBody ArticleRequest request) {
         return ResponseEntity.ok(articleService.create(request));
     }
 
     @GetMapping("/get/all")
-    ResponseEntity<List<ArticleDto>> getAllArticles(){
+    ResponseEntity<List<ArticleDto>> getAllArticles() {
         return ResponseEntity.ok(articleService.getAllArticles());
     }
 
     @GetMapping("/get")
-    ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam(value = "id") Long id){
+    ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam Long id) {
         return ResponseEntity.ok(articleService.getArticlesFromUser(id));
+    }
+
+    @DeleteMapping("/delete")
+    ResponseEntity<String> removeArticle(@RequestParam Long id) {
+        return ResponseEntity.ok(articleService.removeArticle(id));
     }
 }

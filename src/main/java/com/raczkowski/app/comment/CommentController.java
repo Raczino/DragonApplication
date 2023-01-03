@@ -15,17 +15,22 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/add")
-    ResponseEntity<String> addComment(@RequestBody CommentRequest commentRequest){
+    ResponseEntity<String> addComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(commentService.addComment(commentRequest));
     }
 
     @GetMapping()
-     ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id){
+    ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
         return ResponseEntity.ok(commentService.getAllComments(id));
     }
 
     @PostMapping("/like")
-    ResponseEntity<String> likeComment(@RequestParam Long id){
+    ResponseEntity<String> likeComment(@RequestParam Long id) {
         return ResponseEntity.ok(commentService.likeComment(id));
+    }
+
+    @DeleteMapping("/delete")
+    ResponseEntity<String> removeComment(@RequestParam Long id) {
+        return ResponseEntity.ok(commentService.removeComment(id));
     }
 }

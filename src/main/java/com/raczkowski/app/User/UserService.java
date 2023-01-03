@@ -3,6 +3,7 @@ package com.raczkowski.app.User;
 import com.raczkowski.app.exceptions.EmailException;
 import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,11 +25,11 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(AppUser appUser) {
-        if (userRepository.findByEmail(appUser.getEmail())!=null) {
+        if (userRepository.findByEmail(appUser.getEmail()) != null) {
             throw new EmailException("User already exists");
         }
 
-        if(appUser.getPassword().length()<8){
+        if (appUser.getPassword().length() < 8) {
             throw new WrongPasswordException();
         }
 
@@ -46,5 +47,13 @@ public class UserService implements UserDetailsService {
 
     public List<AppUser> loadAllUser() {
         return userRepository.findAll();
+    }
+
+    public AppUser getLoggedUser() {
+        return userRepository.findByEmail(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName());
     }
 }
