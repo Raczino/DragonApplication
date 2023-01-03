@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EmailException.class)
-    public ResponseEntity<ApiException> handleUserAlreadyExists(EmailException emailException){
+    public ResponseEntity<ApiException> handleUserAlreadyExists(EmailException emailException) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
                 emailException.getMessage(),
@@ -25,7 +25,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(WrongPasswordException.class)
-    public ResponseEntity<ApiException> handleWrongPasswordError(WrongPasswordException wrongPasswordException){
+    public ResponseEntity<ApiException> handleWrongPasswordError(WrongPasswordException wrongPasswordException) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
                 wrongPasswordException.getMessage(),
@@ -35,10 +35,20 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ArticleException.class)
-    public ResponseEntity<ApiException> handleArticleException(ArticleException articleException){
+    public ResponseEntity<ApiException> handleArticleException(ArticleException articleException) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
                 articleException.getMessage(),
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommentException.class)
+    public ResponseEntity<ApiException> handleArticleException(CommentException commentException) {
+        ApiException error = new ApiException(
+                HttpStatus.BAD_REQUEST.value(),
+                commentException.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

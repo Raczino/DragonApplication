@@ -7,7 +7,7 @@ import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dto.DtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
-import com.sun.xml.bind.v2.model.core.ID;
+import com.raczkowski.app.exceptions.CommentException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -23,10 +24,12 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final CommentComparator commentComparator;
 
-    public List<CommentDto> getAllComments(Long id){
+    public List<CommentDto> getAllComments(Long id) {
         return commentRepository.findAll().stream()
-                .filter(comment -> comment.getAppUser().getId().equals(id))
+                .filter(comment -> comment.getArticle().getId().equals(id))
+                .sorted(commentComparator)
                 .map(DtoMapper::commentDtoMapper)
                 .collect(Collectors.toList());
     }
@@ -38,9 +41,9 @@ public class CommentService {
                         .getAuthentication()
                         .getName());
         appUser.incrementCommentsCount();
-        if(!userRepository.existsById(commentRequest.getId())){
+        if (!userRepository.existsById(commentRequest.getId())) {
             throw new ArticleException("Article with this id doesnt exists");
-        }else {
+        } else {
             Article article = articleRepository.findArticleById(commentRequest.getId());
 
             commentRepository.save(new Comment(
@@ -54,7 +57,12 @@ public class CommentService {
     }
 
     public String likeComment(Long id) {
-        commentRepository.getById(id).likesIncrement();  //TODO: Implement comment liking method
-        return "liked";
+        Optional<Comment> comment = commentRepository.findById(id);
+        if (comment.isEmpty()) {
+            throw new CommentException("Comment doesnt exists");
+        }
+        comment.get().likesIncrement();
+        commentRepository.updateComment(comment.get().getLikesNumber(), id);
+        return "Liked";
     }
 }

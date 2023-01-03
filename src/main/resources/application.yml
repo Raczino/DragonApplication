@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    password: Tajfun
+    password: Hasl0123
     url: jdbc:postgresql://localhost:5432/app
     username: postgres
   jpa:

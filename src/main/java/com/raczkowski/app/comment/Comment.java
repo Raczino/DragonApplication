@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 
 @Getter
 @Setter
@@ -46,17 +47,17 @@ public class Comment {
     )
     private Article article;
 
-    private int likesNumber=0;
+    private int likesNumber = 0;
 
 
-    public Comment(String content, ZonedDateTime postedDate, AppUser appUser,Article article){
+    public Comment(String content, ZonedDateTime postedDate, AppUser appUser, Article article) {
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
-        this.article= article;
+        this.article = article;
     }
 
-    public void likesIncrement(){
+    public void likesIncrement() {
         this.likesNumber = likesNumber + 1;
     }
 }

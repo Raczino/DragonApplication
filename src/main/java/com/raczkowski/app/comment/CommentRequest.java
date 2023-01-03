@@ -12,6 +12,4 @@ import lombok.ToString;
 public class CommentRequest {
     private Long id;
     private String content;
-
-    private int likesNumber;
 }

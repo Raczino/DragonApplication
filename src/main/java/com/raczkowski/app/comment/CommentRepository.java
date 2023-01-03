@@ -1,11 +1,19 @@
 package com.raczkowski.app.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment,Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAll();
 
-    Comment getById(Long id);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Comment c " +
+            "SET c.likesNumber = ?1 " +
+            "WHERE c.id = ?2")
+    void updateComment(int likesNumber, Long id);
 }
