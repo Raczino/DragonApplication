@@ -21,7 +21,7 @@ public class CommentController {
 
     @GetMapping()
     ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
-        return ResponseEntity.ok(commentService.getAllComments(id));
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id));
     }
 
     @PostMapping("/like")

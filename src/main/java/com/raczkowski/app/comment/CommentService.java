@@ -28,7 +28,7 @@ public class CommentService {
     private final CommentComparator commentComparator;
     private final UserService userService;
 
-    public List<CommentDto> getAllComments(Long id) {
+    public List<CommentDto> getAllCommentsFromArticle(Long id) {
         return commentRepository.findAll().stream()
                 .filter(comment -> comment.getArticle().getId().equals(id))
                 .sorted(commentComparator)
