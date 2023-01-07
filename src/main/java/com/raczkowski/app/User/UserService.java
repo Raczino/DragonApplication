@@ -40,8 +40,6 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(appUser);
 
-        //TODO: SEND EMAIL
-
         return UUID.randomUUID().toString();
     }
 
