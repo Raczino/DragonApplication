@@ -1,0 +1,3 @@
+GET localhost:8080/v2/api-docs
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYWN6a293c2tpLmJhcnRla0BnbWFpbC5jb20iLCJleHAiOjE3MDEwMzY0NzUsImlhdCI6MTcwMTAwMDQ3NX0.lA0B69bievEXORZ4PkdzMeaiL97C_Pkgx75MD2SUAHM

@@ -30,15 +30,32 @@ public class SecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
 
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-ui.html**",
+            "/swagger-resources/**",
+            "/v2/api-docs**",
+            "/webjars/**",
+            ///
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "**/swagger-ui/**",
+            "/**/auth/**",
+            "/**/registration/**"
+    };
+
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**/auth/**")
-                .permitAll()
-                .antMatchers("/**/registration/**")
+                .antMatchers(AUTH_WHITELIST)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
