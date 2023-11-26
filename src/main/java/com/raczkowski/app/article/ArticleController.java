@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/articles")
@@ -24,9 +25,14 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.getAllArticles());
     }
 
-    @GetMapping("/get")
+    @GetMapping("/get/from")
     ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam Long id) {
         return ResponseEntity.ok(articleService.getArticlesFromUser(id));
+    }
+
+    @GetMapping("/get")
+    ResponseEntity<Optional<ArticleDto>> getArticleByID(@RequestParam Long id) {
+        return ResponseEntity.ok(articleService.getArticleByID(id));
     }
 
     @DeleteMapping("/delete")

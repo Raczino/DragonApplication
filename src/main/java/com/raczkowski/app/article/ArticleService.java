@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,9 +46,9 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
-    public List<ArticleDto> getArticlesFromUser(Long id) {
+    public List<ArticleDto> getArticlesFromUser(Long userID) {
         return articleRepository.findAll().stream()
-                .filter(article -> article.getAppUser().getId().equals(id))
+                .filter(article -> article.getAppUser().getId().equals(userID))
                 .map(DtoMapper::articleDtoMapper)
                 .collect(Collectors.toList());
     }
@@ -66,5 +67,17 @@ public class ArticleService {
         }
         articleRepository.deleteById(id);
         return "Removed";
+    }
+    public Optional<ArticleDto> getArticleByID(Long id) {
+        Optional<ArticleDto> articleDto =  articleRepository.findAll()
+                .stream()
+                .filter(article -> article.getId().equals(id))
+                .map(DtoMapper::articleDtoMapper)
+                .findAny();
+
+        if(articleDto.isEmpty()){
+            throw new ArticleException("There is no article with provided id");
+        }
+        return articleDto;
     }
 }
