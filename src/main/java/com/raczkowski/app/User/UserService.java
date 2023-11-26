@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
         }
 
         if (appUser.getPassword().length() < 8) {
-            throw new WrongPasswordException();
+            throw new WrongPasswordException("Shorter than minimum length 8");
         }
 
         String encodedPassword = bCryptPasswordEncoder
