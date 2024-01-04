@@ -39,4 +39,9 @@ public class ArticleController {
     ResponseEntity<String> removeArticle(@RequestParam Long id) {
         return ResponseEntity.ok(articleService.removeArticle(id));
     }
+
+    @PostMapping("/like")
+    void likeArticle(@RequestParam Long id) {
+        articleService.likeArticle(id);
+    }
 }

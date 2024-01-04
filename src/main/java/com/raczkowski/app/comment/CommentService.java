@@ -40,12 +40,9 @@ public class CommentService {
     }
 
     public String addComment(CommentRequest commentRequest) {
-        AppUser appUser = userRepository.findByEmail(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName());
-        appUser.incrementCommentsCount();
+        AppUser user = userService.getLoggedUser();
+
+        user.incrementCommentsCount();
         if (!articleRepository.existsById(commentRequest.getId())) {
             throw new ArticleException("Article with this id doesnt exists");
         } else {
@@ -54,29 +51,26 @@ public class CommentService {
             commentRepository.save(new Comment(
                     commentRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC),
-                    appUser,
+                    user,
                     article
             ));
         }
         return "Added";
     }
 
-    public String likeComment(Long id) {
-        AppUser user = userRepository.findByEmail(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName());
+    public void likeComment(Long id) {
+        AppUser user = userService.getLoggedUser();
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             throw new CommentException("Comment doesnt exists");
         }
 
-        if(!commentLikeRepository.existsAllByAppUser(user)){
+        if (!commentLikeRepository.existsAllByAppUser(user)) {
             commentLikeRepository.save(new CommentLike(user, comment.get(), true));
             commentRepository.updateComment(id);
+        } else {
+            throw new CommentException("Already liked");
         }
-        return "Liked";
     }
 
     public String removeComment(Long id) {

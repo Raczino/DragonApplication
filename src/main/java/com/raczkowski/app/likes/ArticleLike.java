@@ -47,9 +47,13 @@ public class ArticleLike {
     )
     private boolean isLiked;
 
-    @JoinColumn(
-            nullable = false,
-            name = "isDisliked"
-    )
-    private boolean isdisliked;
+    public ArticleLike(
+            AppUser appUser,
+            Article article,
+            boolean isLiked
+    ) {
+        this.appUser = appUser;
+        this.article = article;
+        this.isLiked = isLiked;
+    }
 }
