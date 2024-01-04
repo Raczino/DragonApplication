@@ -9,6 +9,8 @@ import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dto.DtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
 import com.raczkowski.app.exceptions.CommentException;
+import com.raczkowski.app.likes.CommentLike;
+import com.raczkowski.app.likes.CommentLikeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final CommentComparator commentComparator;
     private final UserService userService;
+    private final CommentLikeRepository commentLikeRepository;
 
     public List<CommentDto> getAllCommentsFromArticle(Long id) {
         return commentRepository.findAll().stream()
@@ -59,12 +62,20 @@ public class CommentService {
     }
 
     public String likeComment(Long id) {
+        AppUser user = userRepository.findByEmail(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName());
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             throw new CommentException("Comment doesnt exists");
         }
-        //TODO: need connect likes to user
-        commentRepository.updateComment(id);
+
+        if(!commentLikeRepository.existsAllByAppUser(user)){
+            commentLikeRepository.save(new CommentLike(user, comment.get(), true));
+            commentRepository.updateComment(id);
+        }
         return "Liked";
     }
 

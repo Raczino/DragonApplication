@@ -36,7 +36,7 @@ public class AppUser implements UserDetails {
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.USER;
+    private UserRole userRole = UserRole.USER; //TODO: ADD SERVICE TO CONNECT ROLE WITH USER
     private Boolean locked = false;
     private Boolean enabled = false;
 
