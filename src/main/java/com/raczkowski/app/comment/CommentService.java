@@ -43,7 +43,7 @@ public class CommentService {
                         .getAuthentication()
                         .getName());
         appUser.incrementCommentsCount();
-        if (!userRepository.existsById(commentRequest.getId())) {
+        if (!articleRepository.existsById(commentRequest.getId())) {
             throw new ArticleException("Article with this id doesnt exists");
         } else {
             Article article = articleRepository.findArticleById(commentRequest.getId());
@@ -63,8 +63,8 @@ public class CommentService {
         if (comment.isEmpty()) {
             throw new CommentException("Comment doesnt exists");
         }
-        comment.get().likesIncrement();
-        commentRepository.updateComment(comment.get().getLikesNumber(), id);
+        //TODO: need connect likes to user
+        commentRepository.updateComment(id);
         return "Liked";
     }
 

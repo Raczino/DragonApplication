@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Comment c " +
-            "SET c.likesNumber = ?1 " +
-            "WHERE c.id = ?2")
-    void updateComment(int likesNumber, Long id);
+            "SET c.likesNumber = c.likesNumber + 1 " +
+            "WHERE c.id = ?1")
+    void updateComment(Long id);
 }

@@ -1,9 +1,7 @@
 package com.raczkowski.app.dto;
 
-import com.raczkowski.app.article.Article;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
@@ -13,6 +11,7 @@ import java.time.ZonedDateTime;
 @Setter
 public class CommentDto {
     private Long id;
+
     private String content;
 
     private ZonedDateTime postedDate;

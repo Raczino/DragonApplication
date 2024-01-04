@@ -12,8 +12,12 @@ import java.time.ZonedDateTime;
 @Setter
 public class ArticleDto {
     Long id;
+
     String title;
+
     String content;
+
     ZonedDateTime postedDate;
-    UserDto userDto;
+
+    UserDto user;
 }
