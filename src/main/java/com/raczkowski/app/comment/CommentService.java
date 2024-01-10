@@ -65,7 +65,7 @@ public class CommentService {
             throw new CommentException("Comment doesnt exists");
         }
 
-        if (!commentLikeRepository.existsAllByAppUser(user)) {
+        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(user,comment)) {
             commentLikeRepository.save(new CommentLike(user, comment.get(), true));
             commentRepository.updateComment(id);
         } else {

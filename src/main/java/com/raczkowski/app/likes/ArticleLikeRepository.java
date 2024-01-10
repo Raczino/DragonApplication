@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface ArticleLikeRepository extends JpaRepository<ArticleLike, Long> {
 
-    boolean existsArticleByAppUser(AppUser user, Article article);
+    boolean existsArticleLikesByAppUserAndArticle(AppUser user, Optional<Article> article);
+
 }
-//TODO: naprawic sprawdzanie polubionych komentarzy u artykułów w bazie przez usera

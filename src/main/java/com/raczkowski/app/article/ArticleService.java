@@ -7,12 +7,9 @@ import com.raczkowski.app.comment.CommentRepository;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
-import com.raczkowski.app.exceptions.CommentException;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
-import com.raczkowski.app.likes.CommentLike;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
@@ -96,8 +93,8 @@ public class ArticleService {
         if (article.isEmpty()) {
             throw new ArticleException("Article doesnt exists");
         }
-        Article article1 = articleRepository.findArticleById(id);
-        if (!articleLikeRepository.existsArticleByAppUser(user, article1)) {
+
+        if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article.get(), true));
             articleRepository.updateArticle(id);
         } else {
