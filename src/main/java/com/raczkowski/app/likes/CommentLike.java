@@ -1,36 +1,32 @@
-package com.raczkowski.app.comment;
+package com.raczkowski.app.likes;
 
 import com.raczkowski.app.User.AppUser;
 import com.raczkowski.app.article.Article;
+import com.raczkowski.app.comment.Comment;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-public class Comment {
+public class CommentLike {
     @SequenceGenerator(
-            name = "comment_sequence",
-            sequenceName = "comment_sequence",
+            name = "like_sequence",
+            sequenceName = "like_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "comment_sequence"
+            generator = "like_sequence"
     )
     private Long id;
-    @Column(nullable = false)
-    private String content;
-
-    private ZonedDateTime postedDate;
 
     @OneToOne
     @JoinColumn(
@@ -42,21 +38,20 @@ public class Comment {
     @OneToOne
     @JoinColumn(
             nullable = false,
-            name = "article_id"
+            name = "comment_id"
     )
-    private Article article;
+    private Comment comment;
 
-    private int likesNumber = 0;
+    @JoinColumn(
+            nullable = false,
+            name = "isLiked"
+    )
+    private boolean isLiked;
 
-    public Comment(
-            String content,
-            ZonedDateTime postedDate,
-            AppUser appUser,
-            Article article
-    ) {
-        this.content = content;
-        this.postedDate = postedDate;
+
+    public CommentLike(AppUser appUser, Comment comment, boolean isLiked) {
         this.appUser = appUser;
-        this.article = article;
+        this.comment = comment;
+        this.isLiked = isLiked;
     }
 }

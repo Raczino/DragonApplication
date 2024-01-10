@@ -1,11 +1,14 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.User.AppUser;
 import com.raczkowski.app.User.UserService;
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentRepository;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
+import com.raczkowski.app.likes.ArticleLike;
+import com.raczkowski.app.likes.ArticleLikeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ public class ArticleService {
     private final UserService userService;
     private final CommentRepository commentRepository;
     private final ArticleComparator articleComparator;
+    private final ArticleLikeRepository articleLikeRepository;
 
     public String create(ArticleRequest request) {
         if (request.getTitle().equals("") || request.getContent().equals("")) {
@@ -68,16 +72,33 @@ public class ArticleService {
         articleRepository.deleteById(id);
         return "Removed";
     }
+
     public Optional<ArticleDto> getArticleByID(Long id) {
-        Optional<ArticleDto> articleDto =  articleRepository.findAll()
+        Optional<ArticleDto> articleDto = articleRepository.findAll()
                 .stream()
                 .filter(article -> article.getId().equals(id))
                 .map(DtoMapper::articleDtoMapper)
                 .findAny();
 
-        if(articleDto.isEmpty()){
+        if (articleDto.isEmpty()) {
             throw new ArticleException("There is no article with provided id");
         }
         return articleDto;
+    }
+
+    public void likeArticle(Long id) {
+        AppUser user = userService.getLoggedUser();
+
+        Optional<Article> article = articleRepository.findById(id);
+        if (article.isEmpty()) {
+            throw new ArticleException("Article doesnt exists");
+        }
+
+        if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
+            articleLikeRepository.save(new ArticleLike(user, article.get(), true));
+            articleRepository.updateArticle(id);
+        } else {
+            throw new ArticleException("Already liked");
+        }
     }
 }

@@ -39,6 +39,8 @@ public class Article {
     )
     private AppUser appUser;
 
+    private int likesNumber;
+
     public Article(
             String title,
             String content,
