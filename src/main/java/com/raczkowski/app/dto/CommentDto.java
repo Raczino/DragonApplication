@@ -16,9 +16,10 @@ public class CommentDto {
 
     private ZonedDateTime postedDate;
 
-    private UserDto author;
-
     private Long ArticleId;
 
     private int likesNumber;
+
+    private UserDto author;
+
 }

@@ -10,6 +10,8 @@ public class CommentDtoMapper {
                 comment.getId(),
                 comment.getContent(),
                 comment.getPostedDate(),
+                comment.getArticle().getId(),
+                comment.getLikesNumber(),
                 new UserDto(
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
@@ -18,8 +20,7 @@ public class CommentDtoMapper {
                         comment.getAppUser().getUserRole(),
                         comment.getAppUser().getArticlesCount(),
                         comment.getAppUser().getCommentsCount()
-                ),
-                comment.getArticle().getId(),
-                comment.getLikesNumber());
+                )
+        );
     }
 }

@@ -50,7 +50,7 @@ public class CommentService {
                     user,
                     articleRepository.findArticleById(commentRequest.getId()
                     )));
-            user.incrementCommentsCount();
+            user.incrementCommentsCount();  //TODO: Fix comments and articles counter
         }
         return "Added";
     }
