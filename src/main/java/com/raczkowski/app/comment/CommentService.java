@@ -1,9 +1,5 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserRepository;
-import com.raczkowski.app.user.UserService;
-import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dto.CommentDtoMapper;
@@ -11,20 +7,20 @@ import com.raczkowski.app.exceptions.ArticleException;
 import com.raczkowski.app.exceptions.CommentException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
+import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final CommentComparator commentComparator;
     private final UserService userService;
