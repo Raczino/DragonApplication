@@ -13,6 +13,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllById(Comment comment);
 
+    Comment findCommentById(Long id);
+
     Comment deleteCommentByArticle(Article article);
 
     @Transactional

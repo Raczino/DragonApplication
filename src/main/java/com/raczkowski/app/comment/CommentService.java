@@ -41,31 +41,29 @@ public class CommentService {
     public String addComment(CommentRequest commentRequest) {
         AppUser user = userService.getLoggedUser();
 
-        user.incrementCommentsCount();
         if (!articleRepository.existsById(commentRequest.getId())) {
             throw new ArticleException("Article with this id doesnt exists");
         } else {
-            Article article = articleRepository.findArticleById(commentRequest.getId());
-
             commentRepository.save(new Comment(
                     commentRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC),
                     user,
-                    article
-            ));
+                    articleRepository.findArticleById(commentRequest.getId()
+                    )));
+            user.incrementCommentsCount();
         }
         return "Added";
     }
 
     public void likeComment(Long id) {
         AppUser user = userService.getLoggedUser();
-        Optional<Comment> comment = commentRepository.findById(id);
-        if (comment.isEmpty()) {
+        Comment comment = commentRepository.findCommentById(id);
+        if (comment == null) {
             throw new CommentException("Comment doesnt exists");
         }
 
-        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(user,comment)) {
-            commentLikeRepository.save(new CommentLike(user, comment.get(), true));
+        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment)) {
+            commentLikeRepository.save(new CommentLike(user, comment, true));
             commentRepository.updateComment(id);
         } else {
             throw new CommentException("Already liked");
@@ -73,8 +71,8 @@ public class CommentService {
     }
 
     public String removeComment(Long id) {
-        Optional<Comment> comment = commentRepository.findById(id);
-        if (comment.isPresent() && !comment.get().getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+        Comment comment = commentRepository.findCommentById(id);
+        if (comment != null && !comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
             throw new ArticleException("User doesn't have permission to remove this article");
         }
         commentRepository.deleteById(id);
