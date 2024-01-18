@@ -1,7 +1,8 @@
 package com.raczkowski.app.config;
 
 
-import com.raczkowski.app.User.UserService;
+import com.raczkowski.app.user.UserService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,8 +29,8 @@ public class JwtAthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader(AUTHORIZATION);
         final String userEmail;

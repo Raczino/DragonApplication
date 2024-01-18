@@ -1,4 +1,4 @@
-package com.raczkowski.app.User;
+package com.raczkowski.app.user;
 
 import com.raczkowski.app.exceptions.EmailException;
 import com.raczkowski.app.exceptions.WrongPasswordException;

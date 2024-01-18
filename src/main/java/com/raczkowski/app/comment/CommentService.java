@@ -1,18 +1,17 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.User.AppUser;
-import com.raczkowski.app.User.UserRepository;
-import com.raczkowski.app.User.UserService;
+import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.user.UserRepository;
+import com.raczkowski.app.user.UserService;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
-import com.raczkowski.app.dto.DtoMapper;
+import com.raczkowski.app.dto.CommentDtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
 import com.raczkowski.app.exceptions.CommentException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
@@ -35,7 +34,7 @@ public class CommentService {
         return commentRepository.findAll().stream()
                 .filter(comment -> comment.getArticle().getId().equals(id))
                 .sorted(commentComparator)
-                .map(DtoMapper::commentDtoMapper)
+                .map(CommentDtoMapper::commentDtoMapper)
                 .collect(Collectors.toList());
     }
 

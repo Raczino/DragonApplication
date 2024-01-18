@@ -19,5 +19,7 @@ public class ArticleDto {
 
     ZonedDateTime postedDate;
 
+    int likesCount;
+
     UserDto user;
 }

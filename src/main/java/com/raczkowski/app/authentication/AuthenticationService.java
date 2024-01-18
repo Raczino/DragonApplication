@@ -1,6 +1,6 @@
 package com.raczkowski.app.authentication;
 
-import com.raczkowski.app.User.UserService;
+import com.raczkowski.app.user.UserService;
 import com.raczkowski.app.config.JwtUtil;
 import com.raczkowski.app.dto.TokenDto;
 import com.raczkowski.app.exceptions.EmailException;

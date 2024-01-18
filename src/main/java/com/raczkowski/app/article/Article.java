@@ -1,6 +1,6 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.User.AppUser;
+import com.raczkowski.app.user.AppUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +39,7 @@ public class Article {
     )
     private AppUser appUser;
 
-    private int likesNumber;
+    private int likesNumber=0;
 
     public Article(
             String title,

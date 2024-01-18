@@ -1,4 +1,4 @@
-package com.raczkowski.app.User;
+package com.raczkowski.app.user;
 
 public enum UserRole {
     ADMIN,

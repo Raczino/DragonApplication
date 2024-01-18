@@ -1,7 +1,7 @@
 package com.raczkowski.app.registration;
 
-import com.raczkowski.app.User.AppUser;
-import com.raczkowski.app.User.UserService;
+import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.user.UserService;
 import com.raczkowski.app.exceptions.EmailException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

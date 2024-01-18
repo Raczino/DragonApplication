@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     password: Hasl0123
-    url: jdbc:postgresql://localhost:5432/app
+    url: jdbc:postgresql://localhost:5432/dragon
     username: postgres
   jpa:
     hibernate:

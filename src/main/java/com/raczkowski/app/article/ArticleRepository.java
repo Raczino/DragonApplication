@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.user.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findAll();
 
     Article findArticleById(Long id);
+
+    List<Article> findAllByAppUser(Optional<AppUser> appUser);
 
     @Transactional
     @Modifying

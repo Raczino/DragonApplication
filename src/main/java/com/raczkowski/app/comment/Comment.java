@@ -1,6 +1,6 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.User.AppUser;
+import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.article.Article;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.raczkowski.app.config;
 
 
-import com.raczkowski.app.User.UserService;
+import com.raczkowski.app.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;

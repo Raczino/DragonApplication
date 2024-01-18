@@ -1,4 +1,4 @@
-package com.raczkowski.app.User;
+package com.raczkowski.app.user;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
