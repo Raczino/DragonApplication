@@ -31,7 +31,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Article c " +
-            "SET c.title = :title, c.content = :content, c.updatedAt = :zonedDateTime WHERE c.id = :id")
+            "SET c.title = :title, c.content = :content, c.updatedAt = :zonedDateTime, c.isUpdated = true WHERE c.id = :id")
     void updateArticle(@Param("id") Long id, @Param("title") String tile, @Param("content") String content, ZonedDateTime zonedDateTime);
 
 }

@@ -20,7 +20,9 @@ public class CommentDto {
 
     private int likesNumber;
 
-    private UserDto author;
+    private authorDto author;
 
     private ZonedDateTime updatedAt;
+
+    private boolean isUpdated;
 }

@@ -29,6 +29,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Comment c " +
-            "SET c.content = :content, c.updatedAt = :zonedDateTime WHERE c.id = :id")
+            "SET c.content = :content, c.updatedAt = :zonedDateTime, c.isUpdated = true WHERE c.id = :id")
     void updateCommentContent(@Param("id") Long id, @Param("content") String content, ZonedDateTime zonedDateTime);
 }

@@ -39,9 +39,11 @@ public class Article {
     )
     private AppUser appUser;
 
-    private int likesNumber=0;
+    private int likesNumber = 0;
 
     private ZonedDateTime updatedAt;
+
+    private boolean isUpdated = false;
 
     public Article(
             String title,

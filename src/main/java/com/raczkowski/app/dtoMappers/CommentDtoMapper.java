@@ -1,6 +1,8 @@
-package com.raczkowski.app.dto;
+package com.raczkowski.app.dtoMappers;
 
 import com.raczkowski.app.comment.Comment;
+import com.raczkowski.app.dto.CommentDto;
+import com.raczkowski.app.dto.authorDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,16 +14,14 @@ public class CommentDtoMapper {
                 comment.getPostedDate(),
                 comment.getArticle().getId(),
                 comment.getLikesNumber(),
-                new UserDto(
+                new authorDto(
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
                         comment.getAppUser().getLastName(),
-                        comment.getAppUser().getEmail(),
-                        comment.getAppUser().getUserRole(),
-                        comment.getAppUser().getArticlesCount(),
-                        comment.getAppUser().getCommentsCount()
+                        comment.getAppUser().getEmail()
                 ),
-                comment.getPostedDate()
+                comment.getPostedDate(),
+                comment.isUpdated()
         );
     }
 }

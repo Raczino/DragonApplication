@@ -50,6 +50,8 @@ public class Comment {
 
     private ZonedDateTime updatedAt;
 
+    private boolean isUpdated;
+
     public Comment(
             String content,
             ZonedDateTime postedDate,

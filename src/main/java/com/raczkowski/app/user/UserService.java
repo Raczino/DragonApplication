@@ -1,5 +1,7 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.dto.UserDto;
+import com.raczkowski.app.dtoMappers.UserDtoMapper;
 import com.raczkowski.app.exceptions.EmailException;
 import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
@@ -53,5 +55,9 @@ public class UserService implements UserDetailsService {
                         .getContext()
                         .getAuthentication()
                         .getName());
+    }
+
+    public UserDto getUserById(Long id) {
+        return UserDtoMapper.userDto(userRepository.getAppUserById(id)); //TODO: dorobić logikę i zabezpiercznia
     }
 }

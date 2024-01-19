@@ -2,7 +2,7 @@ package com.raczkowski.app.article;
 
 import com.raczkowski.app.comment.CommentRepository;
 import com.raczkowski.app.dto.ArticleDto;
-import com.raczkowski.app.dto.ArticleDtoMapper;
+import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
@@ -65,7 +65,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
-    public String removeArticle(Long id) {
+    public String removeArticle(Long id) { //TODO: dorobić admin permission allows all
         Article article = articleRepository.findArticleById(id);
         if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
             throw new ArticleException("User doesn't have permission to remove this article");

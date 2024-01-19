@@ -2,7 +2,7 @@ package com.raczkowski.app.comment;
 
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
-import com.raczkowski.app.dto.CommentDtoMapper;
+import com.raczkowski.app.dtoMappers.CommentDtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
 import com.raczkowski.app.exceptions.CommentException;
 import com.raczkowski.app.likes.CommentLike;

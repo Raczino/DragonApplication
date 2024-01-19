@@ -11,17 +11,19 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class ArticleDto {
-    Long id;
+    private Long id;
 
-    String title;
+    private String title;
 
-    String content;
+    private String content;
 
-    ZonedDateTime postedDate;
+    private ZonedDateTime postedDate;
 
-    int likesCount;
+    private int likesCount;
 
-    UserDto user;
+    private authorDto user;
 
-    ZonedDateTime updatedAt;
+    private ZonedDateTime updatedAt;
+
+    private boolean isUpdated;
 }

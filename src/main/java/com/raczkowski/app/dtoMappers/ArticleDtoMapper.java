@@ -1,6 +1,8 @@
-package com.raczkowski.app.dto;
+package com.raczkowski.app.dtoMappers;
 
 import com.raczkowski.app.article.Article;
+import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dto.authorDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,16 +14,14 @@ public class ArticleDtoMapper {
                 article.getContent(),
                 article.getPostedDate(),
                 article.getLikesNumber(),
-                new UserDto(
+                new authorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().getUserRole(),
-                        article.getAppUser().getArticlesCount(),
-                        article.getAppUser().getCommentsCount()
+                        article.getAppUser().getEmail()
                 ),
-                article.getUpdatedAt()
+                article.getUpdatedAt(),
+                article.isUpdated()
         );
     }
 }
