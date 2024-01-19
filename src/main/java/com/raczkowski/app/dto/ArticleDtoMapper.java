@@ -20,6 +20,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getUserRole(),
                         article.getAppUser().getArticlesCount(),
                         article.getAppUser().getCommentsCount()
-                ));
+                ),
+                article.getUpdatedAt()
+        );
     }
 }

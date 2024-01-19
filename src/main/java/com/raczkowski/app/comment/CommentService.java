@@ -35,6 +35,10 @@ public class CommentService {
     }
 
     public String addComment(CommentRequest commentRequest) {
+        if (commentRequest.getContent().equals("")) {
+            throw new CommentException("Comment can't be empty");
+        }
+
         AppUser user = userService.getLoggedUser();
 
         if (!articleRepository.existsById(commentRequest.getId())) {
@@ -52,15 +56,14 @@ public class CommentService {
     }
 
     public void likeComment(Long id) {
-        AppUser user = userService.getLoggedUser();
         Comment comment = commentRepository.findCommentById(id);
         if (comment == null) {
             throw new CommentException("Comment doesnt exists");
         }
 
-        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment)) {
-            commentLikeRepository.save(new CommentLike(user, comment, true));
-            commentRepository.updateComment(id);
+        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
+            commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
+            commentRepository.updateCommentLikes(id);
         } else {
             throw new CommentException("Already liked");
         }
@@ -69,9 +72,30 @@ public class CommentService {
     public String removeComment(Long id) {
         Comment comment = commentRepository.findCommentById(id);
         if (comment != null && !comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new ArticleException("User doesn't have permission to remove this article");
+            throw new CommentException("User doesn't have permission to remove this comment");
         }
         commentRepository.deleteById(id);
         return "Removed";
+    }
+
+    public String updateComment(CommentRequest commentRequest) {
+        if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
+            throw new CommentException("Comment can't be empty");
+        }
+
+        Comment comment = commentRepository.findCommentById(commentRequest.getId());
+
+        if (comment == null) {
+            throw new CommentException("There is no comment with provided id:" + commentRequest.getId());
+        } else if (!comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+            throw new CommentException("User doesn't have permission to update this comment");
+        }
+
+        commentRepository.updateCommentContent(
+                commentRequest.getId(),
+                commentRequest.getContent(),
+                ZonedDateTime.now(ZoneOffset.UTC)
+        );
+        return "Updated";
     }
 }

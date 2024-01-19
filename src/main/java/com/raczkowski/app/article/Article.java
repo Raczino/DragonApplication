@@ -41,6 +41,8 @@ public class Article {
 
     private int likesNumber=0;
 
+    private ZonedDateTime updatedAt;
+
     public Article(
             String title,
             String content,

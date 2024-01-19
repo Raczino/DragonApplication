@@ -29,7 +29,12 @@ public class ArticleService {
     private final ArticleLikeRepository articleLikeRepository;
 
     public String create(ArticleRequest request) {
-        if (request.getTitle().equals("") || request.getContent().equals("")) {
+        if (
+                request.getTitle() == null
+                        || request.getContent() == null
+                        || request.getTitle().equals("")
+                        || request.getContent().equals("")
+        ) {
             throw new ArticleException("Title or content can't be empty");
         }
         articleRepository.save(new Article(
@@ -39,7 +44,7 @@ public class ArticleService {
                 userService.getLoggedUser()
         ));
         userService.getLoggedUser()
-                .incrementArticlesCount();
+                .incrementArticlesCount(); //TODO: DO ZMIANY
         return "saved";
     }
 
@@ -88,9 +93,46 @@ public class ArticleService {
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article, true));
-            articleRepository.updateArticle(id);
+            articleRepository.updateArticleLikes(id);
         } else {
             throw new ArticleException("Already liked");
+        }
+    }
+
+    public void updateArticle(ArticleRequest articleRequest) {
+        if ((articleRequest.getTitle() == null || articleRequest.getTitle().equals("")) &&
+                (articleRequest.getContent() == null || articleRequest.getContent().equals(""))) {
+            throw new ArticleException("Title or content can't be empty");
+        }
+
+        Article article = articleRepository.findArticleById(articleRequest.getId());
+
+        if (article == null) {
+            throw new ArticleException("There is no article with provided id:" + articleRequest.getId());
+        } else if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+            throw new ArticleException("User doesn't have permission to update this comment");
+        }
+
+        if (articleRequest.getTitle() == null) {
+            articleRepository.updateArticle(
+                    articleRequest.getId(),
+                    article.getTitle(),
+                    articleRequest.getContent(),
+                    ZonedDateTime.now(ZoneOffset.UTC)
+            );
+        } else if (articleRequest.getContent() == null) {
+            articleRepository.updateArticle(
+                    articleRequest.getId(),
+                    articleRequest.getTitle(),
+                    article.getContent(),
+                    ZonedDateTime.now(ZoneOffset.UTC)
+            );
+        } else {
+            articleRepository.updateArticle(
+                    articleRequest.getId(),
+                    articleRequest.getTitle(),
+                    article.getContent(),
+                    ZonedDateTime.now(ZoneOffset.UTC));
         }
     }
 }

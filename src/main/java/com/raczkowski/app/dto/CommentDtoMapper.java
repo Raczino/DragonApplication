@@ -20,7 +20,8 @@ public class CommentDtoMapper {
                         comment.getAppUser().getUserRole(),
                         comment.getAppUser().getArticlesCount(),
                         comment.getAppUser().getCommentsCount()
-                )
+                ),
+                comment.getPostedDate()
         );
     }
 }

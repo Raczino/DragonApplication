@@ -43,4 +43,9 @@ public class ArticleController {
     void likeArticle(@RequestParam Long id) {
         articleService.likeArticle(id);
     }
+
+    @PutMapping("/update")
+    void updateArticle(@RequestBody ArticleRequest articleRequest) {
+        articleService.updateArticle(articleRequest);
+    }
 }

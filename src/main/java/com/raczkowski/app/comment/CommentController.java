@@ -33,4 +33,9 @@ public class CommentController {
     ResponseEntity<String> removeComment(@RequestParam Long id) {
         return ResponseEntity.ok(commentService.removeComment(id));
     }
+
+    @PutMapping("/update")
+    ResponseEntity<String> updateComment(@RequestBody CommentRequest commentRequest){
+        return ResponseEntity.ok(commentService.updateComment(commentRequest));
+    }
 }

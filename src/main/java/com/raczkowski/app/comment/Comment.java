@@ -48,6 +48,8 @@ public class Comment {
 
     private int likesNumber = 0;
 
+    private ZonedDateTime updatedAt;
+
     public Comment(
             String content,
             ZonedDateTime postedDate,

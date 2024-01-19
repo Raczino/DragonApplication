@@ -22,4 +22,5 @@ public class CommentDto {
 
     private UserDto author;
 
+    private ZonedDateTime updatedAt;
 }
