@@ -37,14 +37,14 @@ public class ArticleService {
         ) {
             throw new ArticleException("Title or content can't be empty");
         }
+        AppUser user = userService.getLoggedUser();
         articleRepository.save(new Article(
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
-                userService.getLoggedUser()
+                user
         ));
-        userService.getLoggedUser()
-                .incrementArticlesCount(); //TODO: DO ZMIANY
+        userRepository.updateArticlesCount(user.getId());
         return "saved";
     }
 

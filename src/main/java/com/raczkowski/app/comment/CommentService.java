@@ -8,6 +8,7 @@ import com.raczkowski.app.exceptions.CommentException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
 import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class CommentService {
     private final CommentComparator commentComparator;
     private final UserService userService;
     private final CommentLikeRepository commentLikeRepository;
+    private final UserRepository userRepository;
 
     public List<CommentDto> getAllCommentsFromArticle(Long id) {
         return commentRepository.findAll().stream()
@@ -50,7 +52,7 @@ public class CommentService {
                     user,
                     articleRepository.findArticleById(commentRequest.getId()
                     )));
-            user.incrementCommentsCount();  //TODO: Fix comments and articles counter
+            userRepository.updateCommentsCount(user.getId());
         }
         return "Added";
     }

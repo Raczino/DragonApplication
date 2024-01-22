@@ -36,7 +36,7 @@ public class AppUser implements UserDetails {
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.USER; //TODO: ADD SERVICE TO CONNECT ROLE WITH USER
+    private UserRole userRole = UserRole.USER;
     private Boolean locked = false;
     private Boolean enabled = false;
 
@@ -78,16 +78,8 @@ public class AppUser implements UserDetails {
         return articlesCount;
     }
 
-    public void incrementArticlesCount() {
-        this.articlesCount = articlesCount + 1;
-    }
-
     public int getCommentsCount() {
         return commentsCount;
-    }
-
-    public void incrementCommentsCount() {
-        this.commentsCount = commentsCount + 1;
     }
 
     @Override
