@@ -1,11 +1,10 @@
 package com.raczkowski.app.comment;
 
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -20,8 +19,12 @@ public class CommentController {
     }
 
     @GetMapping()
-    ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id));
+    ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size, sortDirection));
     }
 
     @PostMapping("/like")
@@ -35,7 +38,7 @@ public class CommentController {
     }
 
     @PutMapping("/update")
-    ResponseEntity<String> updateComment(@RequestBody CommentRequest commentRequest){
+    ResponseEntity<String> updateComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(commentService.updateComment(commentRequest));
     }
 }

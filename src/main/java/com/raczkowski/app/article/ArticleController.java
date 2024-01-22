@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,13 @@ public class ArticleController {
     }
 
     @GetMapping("/get/all")
-    ResponseEntity<List<ArticleDto>> getAllArticles() {
-        return ResponseEntity.ok(articleService.getAllArticles());
+    ResponseEntity<PageResponse<ArticleDto>> getAllArticles(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "likesNumber") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
+    ) {
+        return ResponseEntity.ok(articleService.getAllArticles(page, size, sortBy, sortDirection));
     }
 
     @GetMapping("/get/from")
@@ -47,5 +53,10 @@ public class ArticleController {
     @PutMapping("/update")
     void updateArticle(@RequestBody ArticleRequest articleRequest) {
         articleService.updateArticle(articleRequest);
+    }
+
+    @GetMapping("/most")
+    ResponseEntity<ArticleDto> mostLikeArticle() {
+        return ResponseEntity.ok(articleService.getMostLikableArticle());
     }
 }

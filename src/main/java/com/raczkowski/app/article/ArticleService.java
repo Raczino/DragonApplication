@@ -1,6 +1,8 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.comment.CommentRepository;
+import com.raczkowski.app.common.MetaData;
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
@@ -10,6 +12,10 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
@@ -48,16 +54,27 @@ public class ArticleService {
         return "saved";
     }
 
-    public List<ArticleDto> getAllArticles() {
-        return articleRepository
-                .findAll()
-                .stream()
-                .sorted(articleComparator)
-                .map(ArticleDtoMapper::articleDtoMapper)
-                .collect(Collectors.toList());
+    public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Page<Article> articlePage = articleRepository.findAll(pageable);
+
+        return new PageResponse<>(
+                articlePage
+                        .stream()
+                        .map(ArticleDtoMapper::articleDtoMapper)
+                        .toList(),
+                new MetaData(
+                        articlePage.getTotalElements(),
+                        articlePage.getTotalPages(),
+                        articlePage.getNumber() + 1,
+                        articlePage.getSize()));
     }
 
-    public List<ArticleDto> getArticlesFromUser(Long userID) {
+    public ArticleDto getMostLikableArticle() {
+        return ArticleDtoMapper.articleDtoMapper(articleRepository.getFirstByOrderByLikesNumberDesc());
+    }
+
+    public List<ArticleDto> getArticlesFromUser(Long userID) { //TODO: dorobić meta dane oraz paginacje
         return articleRepository
                 .findAllByAppUser(userRepository.findById(userID))
                 .stream()

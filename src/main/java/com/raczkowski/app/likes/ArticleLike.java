@@ -29,21 +29,18 @@ public class ArticleLike {
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "app_user_id"
+            nullable = false
     )
     private AppUser appUser;
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "article_id"
+            nullable = false
     )
     private Article article;
 
     @JoinColumn(
-            nullable = false,
-            name = "isLiked"
+            nullable = false
     )
     private boolean isLiked;
 

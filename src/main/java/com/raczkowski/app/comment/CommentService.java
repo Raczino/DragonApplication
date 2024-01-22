@@ -1,6 +1,8 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.common.MetaData;
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
 import com.raczkowski.app.exceptions.ArticleException;
@@ -11,12 +13,14 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -28,12 +32,21 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
 
-    public List<CommentDto> getAllCommentsFromArticle(Long id) {
-        return commentRepository.findAll().stream()
-                .filter(comment -> comment.getArticle().getId().equals(id))
-                .sorted(commentComparator)
-                .map(CommentDtoMapper::commentDtoMapper)
-                .collect(Collectors.toList());
+    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize, String sortDirection) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), "likesNumber"));
+        Page<Comment> commentPage = commentRepository.getAllByArticleId(id, pageable);
+
+        return new PageResponse<>(
+                commentPage
+                        .stream()
+                        .map(CommentDtoMapper::commentDtoMapper)
+                        .toList(),
+                new MetaData(
+                        commentPage.getTotalElements(),
+                        commentPage.getTotalPages(),
+                        commentPage.getNumber() + 1,
+                        commentPage.getSize()
+                ));
     }
 
     public String addComment(CommentRequest commentRequest) {

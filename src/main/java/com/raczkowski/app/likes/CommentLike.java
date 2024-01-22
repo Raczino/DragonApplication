@@ -29,21 +29,18 @@ public class CommentLike {
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "app_user_id"
+            nullable = false
     )
     private AppUser appUser;
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "comment_id"
+            nullable = false
     )
     private Comment comment;
 
     @JoinColumn(
-            nullable = false,
-            name = "isLiked"
+            nullable = false
     )
     private boolean isLiked;
 

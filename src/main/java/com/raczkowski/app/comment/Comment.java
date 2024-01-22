@@ -34,15 +34,13 @@ public class Comment {
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "app_user_id"
+            nullable = false
     )
     private AppUser appUser;
 
     @OneToOne
     @JoinColumn(
-            nullable = false,
-            name = "article_id"
+            nullable = false
     )
     private Article article;
 
