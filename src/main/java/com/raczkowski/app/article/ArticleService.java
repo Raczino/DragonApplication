@@ -5,7 +5,7 @@ import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
-import com.raczkowski.app.exceptions.ArticleException;
+import com.raczkowski.app.exceptions.Exception;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -32,7 +32,6 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final CommentRepository commentRepository;
-    private final ArticleComparator articleComparator;
     private final ArticleLikeRepository articleLikeRepository;
 
     public String create(ArticleRequest request) {
@@ -42,7 +41,7 @@ public class ArticleService {
                         || request.getTitle().equals("")
                         || request.getContent().equals("")
         ) {
-            throw new ArticleException("Title or content can't be empty");
+            throw new Exception("Title or content can't be empty");
         }
         AppUser user = userService.getLoggedUser();
         articleRepository.save(new Article(
@@ -87,7 +86,7 @@ public class ArticleService {
         Article article = articleRepository.findArticleById(id);
         if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())
                 || !userService.getLoggedUser().getUserRole().equals(UserRole.ADMIN)) {
-            throw new ArticleException("User doesn't have permission to remove this article");
+            throw new Exception("User doesn't have permission to remove this article");
         }
         commentRepository.deleteCommentByArticle(article);
         articleRepository.deleteById(id);
@@ -97,7 +96,7 @@ public class ArticleService {
     public ArticleDto getArticleByID(Long id) {
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
-            throw new ArticleException("There is no article with provided id");
+            throw new Exception("There is no article with provided id");
         }
         return ArticleDtoMapper.articleDtoMapper(articleRepository.findArticleById(id));
     }
@@ -107,29 +106,29 @@ public class ArticleService {
 
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
-            throw new ArticleException("Article doesnt exists");
+            throw new Exception("Article doesnt exists");
         }
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article, true));
             articleRepository.updateArticleLikes(id);
         } else {
-            throw new ArticleException("Already liked");
+            throw new Exception("Already liked");
         }
     }
 
     public void updateArticle(ArticleRequest articleRequest) {
         if ((articleRequest.getTitle() == null || articleRequest.getTitle().equals("")) &&
                 (articleRequest.getContent() == null || articleRequest.getContent().equals(""))) {
-            throw new ArticleException("Title or content can't be empty");
+            throw new Exception("Title or content can't be empty");
         }
 
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {
-            throw new ArticleException("There is no article with provided id:" + articleRequest.getId());
+            throw new Exception("There is no article with provided id:" + articleRequest.getId());
         } else if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new ArticleException("User doesn't have permission to update this comment");
+            throw new Exception("User doesn't have permission to update this comment");
         }
 
         if (articleRequest.getTitle() == null) {

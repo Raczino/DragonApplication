@@ -15,51 +15,11 @@ import java.time.ZonedDateTime;
 @RestController
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(EmailException.class)
-    public ResponseEntity<ApiException> handleUserAlreadyExists(EmailException emailException) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiException> handleUserAlreadyExists(Exception exception) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
-                emailException.getMessage(),
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(WrongPasswordException.class)
-    public ResponseEntity<ApiException> handleWrongPasswordError(WrongPasswordException wrongPasswordException) {
-        ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST.value(),
-                wrongPasswordException.getMessage(),
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ArticleException.class)
-    public ResponseEntity<ApiException> handleArticleException(ArticleException articleException) {
-        ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST.value(),
-                articleException.getMessage(),
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(CommentException.class)
-    public ResponseEntity<ApiException> handleCommentException(CommentException commentException) {
-        ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST.value(),
-                commentException.getMessage(),
-                ZonedDateTime.now(ZoneId.of("Z")) //TODO: zrobić globalny format dat do mniejszej ilości liczb po przecinku
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<ApiException> userException(UserException userException) {
-        ApiException error = new ApiException(
-                HttpStatus.BAD_REQUEST.value(),
-                userException.getMessage(),
+                exception.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

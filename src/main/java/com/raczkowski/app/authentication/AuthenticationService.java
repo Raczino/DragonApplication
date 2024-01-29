@@ -1,9 +1,9 @@
 package com.raczkowski.app.authentication;
 
+import com.raczkowski.app.exceptions.Exception;
 import com.raczkowski.app.user.UserService;
 import com.raczkowski.app.config.JwtUtil;
 import com.raczkowski.app.dto.TokenDto;
-import com.raczkowski.app.exceptions.EmailException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +25,6 @@ public class AuthenticationService {
             );
             return new TokenDto(jwtUtil.generateToken(userDetails));
         }
-        throw new EmailException("User with this email doesn't exists");
+        throw new Exception("User with this email doesn't exists");
     }
 }
