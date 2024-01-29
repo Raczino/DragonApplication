@@ -10,6 +10,7 @@ import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
+import com.raczkowski.app.user.UserRole;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -74,7 +75,7 @@ public class ArticleService {
         return ArticleDtoMapper.articleDtoMapper(articleRepository.getFirstByOrderByLikesNumberDesc());
     }
 
-    public List<ArticleDto> getArticlesFromUser(Long userID) { //TODO: dorobić meta dane oraz paginacje
+    public List<ArticleDto> getArticlesFromUser(Long userID) {
         return articleRepository
                 .findAllByAppUser(userRepository.findById(userID))
                 .stream()
@@ -82,9 +83,10 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
-    public String removeArticle(Long id) { //TODO: dorobić admin permission allows all
+    public String removeArticle(Long id) {
         Article article = articleRepository.findArticleById(id);
-        if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+        if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())
+                || !userService.getLoggedUser().getUserRole().equals(UserRole.ADMIN)) {
             throw new ArticleException("User doesn't have permission to remove this article");
         }
         commentRepository.deleteCommentByArticle(article);

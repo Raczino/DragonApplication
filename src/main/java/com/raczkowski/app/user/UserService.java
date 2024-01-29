@@ -3,6 +3,7 @@ package com.raczkowski.app.user;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dtoMappers.UserDtoMapper;
 import com.raczkowski.app.exceptions.EmailException;
+import com.raczkowski.app.exceptions.UserException;
 import com.raczkowski.app.exceptions.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,6 +59,9 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto getUserById(Long id) {
-        return UserDtoMapper.userDto(userRepository.getAppUserById(id)); //TODO: dorobić logikę i zabezpiercznia
+        if(!this.getLoggedUser().getUserRole().equals(UserRole.ADMIN)){
+            throw new UserException("You don't have permissions to execute this request");
+        }
+        return UserDtoMapper.userDto(userRepository.getAppUserById(id));
     }
 }
