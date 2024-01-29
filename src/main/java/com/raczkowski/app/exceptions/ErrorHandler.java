@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiException> handleUserAlreadyExists(Exception exception) {
+    public ResponseEntity<ApiException> handleException(Exception exception) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
