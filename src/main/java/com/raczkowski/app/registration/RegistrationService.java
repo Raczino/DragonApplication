@@ -1,8 +1,8 @@
 package com.raczkowski.app.registration;
 
+import com.raczkowski.app.exceptions.Exception;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
-import com.raczkowski.app.exceptions.EmailException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class RegistrationService {
     public String register(RegistrationRequest request) {
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
-            throw new EmailException("Invalid Email");
+            throw new Exception("Invalid Email");
         }
         return userService.signUpUser(
                 new AppUser(
