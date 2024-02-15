@@ -1,12 +1,14 @@
-package com.raczkowski.app.dto;
+package com.raczkowski.app.dtoMappers;
 
+import com.raczkowski.app.dto.LoginResponseDto;
+import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.user.AppUser;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RegistrationResponse {
-    public static RegistrationResponseDto response(String token, AppUser appUser) {
-        return new RegistrationResponseDto(
+public class LoginResponseMapper {
+    public static LoginResponseDto response(String token, AppUser appUser) {
+        return new LoginResponseDto(
                 token,
                 new UserDto(appUser.getId(),
                         appUser.getFirstName(),

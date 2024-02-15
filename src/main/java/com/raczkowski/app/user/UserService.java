@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(appUser);
 
-        return UUID.randomUUID().toString();
+        return null;
     }
 
     public List<AppUser> loadAllUser() {
@@ -61,5 +61,9 @@ public class UserService implements UserDetailsService {
             throw new Exception("You don't have permissions to execute this request");
         }
         return UserDtoMapper.userDto(userRepository.getAppUserById(id));
+    }
+
+    public AppUser getUserByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 }
