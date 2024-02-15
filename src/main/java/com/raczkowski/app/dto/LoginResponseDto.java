@@ -2,12 +2,12 @@ package com.raczkowski.app.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-@Setter
-public class TokenDto {
+public class RegistrationResponseDto {
     private String token;
+
+    private UserDto user;
 }
