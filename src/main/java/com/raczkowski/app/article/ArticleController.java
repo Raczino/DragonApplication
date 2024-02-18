@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/articles")
 @AllArgsConstructor
-@CrossOrigin
 public class ArticleController {
 
     private final ArticleService articleService;
