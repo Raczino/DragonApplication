@@ -57,11 +57,12 @@ public class ArticleService {
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         Page<Article> articlePage = articleRepository.findAll(pageable);
+        AppUser user = userService.getLoggedUser();
 
         return new PageResponse<>(
                 articlePage
                         .stream()
-                        .map(ArticleDtoMapper::articleDtoMapper)
+                        .map(article -> ArticleDtoMapper.articleDtoMapperWithLikes(article, isArticleLiked(article, user)))
                         .toList(),
                 new MetaData(
                         articlePage.getTotalElements(),
@@ -111,9 +112,10 @@ public class ArticleService {
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article, true));
-            articleRepository.updateArticleLikes(id);
+            articleRepository.updateArticleLikes(id, 1);
         } else {
-            throw new Exception("Already liked");
+            articleLikeRepository.delete(articleLikeRepository.findByArticleAndAppUser(article, user));
+            articleRepository.updateArticleLikes(id, -1);
         }
     }
 
@@ -152,5 +154,9 @@ public class ArticleService {
                     article.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC));
         }
+    }
+
+    private boolean isArticleLiked(Article article, AppUser user) {
+        return articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article);
     }
 }

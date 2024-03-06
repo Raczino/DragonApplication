@@ -24,4 +24,23 @@ public class ArticleDtoMapper {
                 article.isUpdated()
         );
     }
+
+    public static ArticleDto articleDtoMapperWithLikes(Article article, boolean isLiked) {
+        return new ArticleDto(
+                article.getId(),
+                article.getTitle(),
+                article.getContent(),
+                article.getPostedDate(),
+                article.getLikesNumber(),
+                new authorDto(
+                        article.getAppUser().getId(),
+                        article.getAppUser().getFirstName(),
+                        article.getAppUser().getLastName(),
+                        article.getAppUser().getEmail()
+                ),
+                article.getUpdatedAt(),
+                article.isUpdated(),
+                isLiked
+        );
+    }
 }

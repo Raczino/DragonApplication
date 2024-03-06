@@ -57,9 +57,6 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto getUserById(Long id) {
-        if (!this.getLoggedUser().getUserRole().equals(UserRole.ADMIN)) {
-            throw new Exception("You don't have permissions to execute this request");
-        }
         return UserDtoMapper.userDto(userRepository.getAppUserById(id));
     }
 
