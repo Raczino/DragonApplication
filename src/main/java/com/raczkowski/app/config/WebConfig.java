@@ -19,6 +19,7 @@ public class WebConfig {
                         .allowedOrigins("http://localhost:3000/")
                         .allowedMethods(
                                 HttpMethod.GET.name(),
+                                HttpMethod.PUT.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.DELETE.name()
                         )

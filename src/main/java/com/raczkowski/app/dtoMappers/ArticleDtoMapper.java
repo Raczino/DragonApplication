@@ -25,7 +25,7 @@ public class ArticleDtoMapper {
         );
     }
 
-    public static ArticleDto articleDtoMapperWithLikes(Article article, boolean isLiked) {
+    public static ArticleDto articleDtoMapperWithAdditionalFields(Article article, boolean isLiked, int commentsNumber) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
@@ -40,7 +40,8 @@ public class ArticleDtoMapper {
                 ),
                 article.getUpdatedAt(),
                 article.isUpdated(),
-                isLiked
+                isLiked,
+                commentsNumber
         );
     }
 }

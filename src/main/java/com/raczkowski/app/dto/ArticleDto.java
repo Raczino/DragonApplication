@@ -27,6 +27,8 @@ public class ArticleDto {
 
     private boolean isLiked;
 
+    private int commentsNumber;
+
     public ArticleDto
             (
                     Long id,
@@ -58,7 +60,8 @@ public class ArticleDto {
                     authorDto user,
                     ZonedDateTime updatedAt,
                     boolean isUpdated,
-                    boolean isLiked
+                    boolean isLiked,
+                    int commentsNumber
             ) {
         this.id = id;
         this.title = title;
@@ -69,5 +72,6 @@ public class ArticleDto {
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
         this.isLiked = isLiked;
+        this.commentsNumber = commentsNumber;
     }
 }

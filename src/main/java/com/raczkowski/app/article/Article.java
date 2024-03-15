@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.user.AppUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +46,9 @@ public class Article {
     private ZonedDateTime updatedAt;
 
     private boolean isUpdated = false;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     public Article(
             String title,

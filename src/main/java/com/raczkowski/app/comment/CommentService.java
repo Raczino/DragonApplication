@@ -30,14 +30,15 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
 
-    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize, String sortDirection) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), "likesNumber"));
+    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString("Desc"), "likesNumber"));
         Page<Comment> commentPage = commentRepository.getAllByArticleId(id, pageable);
+        AppUser user = userService.getLoggedUser();
 
         return new PageResponse<>(
                 commentPage
                         .stream()
-                        .map(CommentDtoMapper::commentDtoMapper)
+                        .map(comment -> CommentDtoMapper.commentDtoMapperWithAdditionalFields(comment, isCommentLiked(comment, user)))
                         .toList(),
                 new MetaData(
                         commentPage.getTotalElements(),
@@ -47,28 +48,30 @@ public class CommentService {
                 ));
     }
 
-    public String addComment(CommentRequest commentRequest) {
+    public CommentDto addComment(CommentRequest commentRequest) {
         if (commentRequest.getContent().equals("")) {
             throw new Exception("Comment can't be empty");
         }
 
+        Comment comment;
         AppUser user = userService.getLoggedUser();
 
         if (!articleRepository.existsById(commentRequest.getId())) {
             throw new Exception("Article with this id doesnt exists");
         } else {
-            commentRepository.save(new Comment(
-                    commentRequest.getContent(),
+            comment = new Comment(commentRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC),
                     user,
                     articleRepository.findArticleById(commentRequest.getId()
-                    )));
+                    ));
+            commentRepository.save(comment);
             userRepository.updateCommentsCount(user.getId());
         }
-        return "Added";
+        return CommentDtoMapper.commentDtoMapper(comment);
     }
 
     public void likeComment(Long id) {
+        AppUser user = userService.getLoggedUser();
         Comment comment = commentRepository.findCommentById(id);
         if (comment == null) {
             throw new Exception("Comment doesnt exists");
@@ -76,9 +79,10 @@ public class CommentService {
 
         if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
             commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
-            commentRepository.updateCommentLikes(id);
+            commentRepository.updateCommentLikes(id, 1);
         } else {
-            throw new Exception("Already liked");
+            commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
+            commentRepository.updateCommentLikes(id, -1);
         }
     }
 
@@ -110,5 +114,13 @@ public class CommentService {
                 ZonedDateTime.now(ZoneOffset.UTC)
         );
         return "Updated";
+    }
+
+    public int getNumberCommentsOfArticle(Long id) {
+        return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id)).size();
+    }
+
+    private boolean isCommentLiked(Comment comment, AppUser user) {
+        return commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment);
     }
 }

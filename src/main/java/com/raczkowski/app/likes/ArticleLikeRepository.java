@@ -9,4 +9,6 @@ public interface ArticleLikeRepository extends JpaRepository<ArticleLike, Long> 
     boolean existsArticleLikesByAppUserAndArticle(AppUser user, Article article);
 
     ArticleLike findByArticleAndAppUser(Article article, AppUser user);
+
+    void deleteArticleLikesByArticle(Article article);
 }

@@ -1,6 +1,8 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentRepository;
+import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
@@ -8,9 +10,9 @@ import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.exceptions.Exception;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
+import com.raczkowski.app.likes.CommentLikeRepository;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
-import com.raczkowski.app.user.UserRole;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -31,8 +34,10 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final CommentService commentService;
     private final CommentRepository commentRepository;
     private final ArticleLikeRepository articleLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public String create(ArticleRequest request) {
         if (
@@ -62,7 +67,11 @@ public class ArticleService {
         return new PageResponse<>(
                 articlePage
                         .stream()
-                        .map(article -> ArticleDtoMapper.articleDtoMapperWithLikes(article, isArticleLiked(article, user)))
+                        .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFields(
+                                article,
+                                isArticleLiked(article, user),
+                                commentService.getNumberCommentsOfArticle(article.getId())
+                        ))
                         .toList(),
                 new MetaData(
                         articlePage.getTotalElements(),
@@ -82,14 +91,19 @@ public class ArticleService {
                 .map(ArticleDtoMapper::articleDtoMapper)
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public String removeArticle(Long id) {
         Article article = articleRepository.findArticleById(id);
-        if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())
-                || !userService.getLoggedUser().getUserRole().equals(UserRole.ADMIN)) {
+        if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
             throw new Exception("User doesn't have permission to remove this article");
         }
-        commentRepository.deleteCommentByArticle(article);
+
+        articleLikeRepository.deleteArticleLikesByArticle(article);
+
+        for (Comment comment : article.getComments()) {
+            commentLikeRepository.deleteCommentLikesByComment(comment);
+        }
+
         articleRepository.deleteById(id);
         return "Removed";
     }
@@ -151,7 +165,7 @@ public class ArticleService {
             articleRepository.updateArticle(
                     articleRequest.getId(),
                     articleRequest.getTitle(),
-                    article.getContent(),
+                    articleRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC));
         }
     }

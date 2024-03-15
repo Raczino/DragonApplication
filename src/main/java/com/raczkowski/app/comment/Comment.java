@@ -1,7 +1,8 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.article.Article;
+import com.raczkowski.app.likes.CommentLike;
+import com.raczkowski.app.user.AppUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,7 @@ public class Comment {
     )
     private AppUser appUser;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(
             nullable = false
     )
@@ -49,6 +50,9 @@ public class Comment {
     private ZonedDateTime updatedAt;
 
     private boolean isUpdated;
+
+    @OneToOne(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    private CommentLike commentLike;
 
     public Comment(
             String content,

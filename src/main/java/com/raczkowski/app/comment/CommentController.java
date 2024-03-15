@@ -14,7 +14,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/add")
-    ResponseEntity<String> addComment(@RequestBody CommentRequest commentRequest) {
+    ResponseEntity<CommentDto> addComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(commentService.addComment(commentRequest));
     }
 
@@ -22,9 +22,9 @@ public class CommentController {
     ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size, sortDirection));
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size));
     }
 
     @PostMapping("/like")

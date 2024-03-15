@@ -24,4 +24,23 @@ public class CommentDtoMapper {
                 comment.isUpdated()
         );
     }
+
+    public static CommentDto commentDtoMapperWithAdditionalFields(Comment comment, boolean isLiked) {
+        return new CommentDto(
+                comment.getId(),
+                comment.getContent(),
+                comment.getPostedDate(),
+                comment.getArticle().getId(),
+                comment.getLikesNumber(),
+                new authorDto(
+                        comment.getAppUser().getId(),
+                        comment.getAppUser().getFirstName(),
+                        comment.getAppUser().getLastName(),
+                        comment.getAppUser().getEmail()
+                ),
+                comment.getPostedDate(),
+                comment.isUpdated(),
+                isLiked
+        );
+    }
 }

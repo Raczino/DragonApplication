@@ -20,14 +20,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Comment findCommentById(Long id);
 
-    void deleteCommentByArticle(Article article);
+    List<Comment> getCommentsByArticle(Article article);
+
+    void deleteCommentsByArticle(Article article);
 
     @Transactional
     @Modifying
     @Query("UPDATE Comment c " +
-            "SET c.likesNumber = c.likesNumber + 1" +
+            "SET c.likesNumber = c.likesNumber + :amount " +
             "WHERE c.id = :id")
-    void updateCommentLikes(@Param("id") Long id);
+    void updateCommentLikes(@Param("id") Long id, @Param("amount") int amount);
 
     @Transactional
     @Modifying

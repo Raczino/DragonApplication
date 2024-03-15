@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -35,6 +36,7 @@ public class CommentLike {
 
     @OneToOne
     @JoinColumn(
+            referencedColumnName = "id",
             nullable = false
     )
     private Comment comment;
