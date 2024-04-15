@@ -4,9 +4,9 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-@EqualsAndHashCode
 @ToString
 public class RegistrationRequest {
+<<<<<<< HEAD
     @NonNull
     private final String firstName;
     @NonNull
@@ -21,4 +21,10 @@ public class RegistrationRequest {
     private final String birthDate;
 
     private final String city;
+=======
+    @NonNull String firstName;
+    @NonNull String lastName;
+    @NonNull String password;
+    @NonNull String email;
+>>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
 }

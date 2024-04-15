@@ -5,7 +5,7 @@ import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
-import com.raczkowski.app.exceptions.Exception;
+import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -49,15 +49,20 @@ public class CommentService {
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
+<<<<<<< HEAD
         if (commentRequest.getContent().isEmpty()) {
             throw new Exception("Comment can't be empty");
+=======
+        if (commentRequest.getContent().equals("")) {
+            throw new ResponseException("Comment can't be empty");
+>>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
         }
 
         Comment comment;
         AppUser user = userService.getLoggedUser();
 
         if (!articleRepository.existsById(commentRequest.getId())) {
-            throw new Exception("Article with this id doesnt exists");
+            throw new ResponseException("Article with this id doesnt exists");
         } else {
             comment = new Comment(commentRequest.getContent(),
                     ZonedDateTime.now(ZoneOffset.UTC),
@@ -74,7 +79,7 @@ public class CommentService {
         AppUser user = userService.getLoggedUser();
         Comment comment = commentRepository.findCommentById(id);
         if (comment == null) {
-            throw new Exception("Comment doesnt exists");
+            throw new ResponseException("Comment doesnt exists");
         }
 
         if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
@@ -89,23 +94,28 @@ public class CommentService {
     public String removeComment(Long id) {
         Comment comment = commentRepository.findCommentById(id);
         if (comment != null && !comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new Exception("User doesn't have permission to remove this comment");
+            throw new ResponseException("User doesn't have permission to remove this comment");
         }
         commentRepository.deleteById(id);
         return "Removed";
     }
 
     public String updateComment(CommentRequest commentRequest) {
+<<<<<<< HEAD
         if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
             throw new Exception("Comment can't be empty");
+=======
+        if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
+            throw new ResponseException("Comment can't be empty");
+>>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
         }
 
         Comment comment = commentRepository.findCommentById(commentRequest.getId());
 
         if (comment == null) {
-            throw new Exception("There is no comment with provided id:" + commentRequest.getId());
+            throw new ResponseException("There is no comment with provided id:" + commentRequest.getId());
         } else if (!comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new Exception("User doesn't have permission to update this comment");
+            throw new ResponseException("User doesn't have permission to update this comment");
         }
 
         commentRepository.updateCommentContent(

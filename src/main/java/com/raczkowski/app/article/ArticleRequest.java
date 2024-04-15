@@ -4,12 +4,15 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 public class ArticleRequest {
-    private String title;
+    private final String title;
 
-    private String content;
+    private final String content;
 
     private Long id;
+
+    public ArticleRequest(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

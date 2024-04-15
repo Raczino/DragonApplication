@@ -2,7 +2,7 @@ package com.raczkowski.app.user;
 
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dtoMappers.UserDtoMapper;
-import com.raczkowski.app.exceptions.Exception;
+import com.raczkowski.app.exceptions.ResponseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +26,11 @@ public class UserService implements UserDetailsService {
 
     public String signUpUser(AppUser appUser) {
         if (userRepository.findByEmail(appUser.getEmail()) != null) {
-            throw new Exception("User already exists");
+            throw new ResponseException("User already exists");
         }
 
         if (appUser.getPassword().length() < 8) {
-            throw new Exception("Shorter than minimum length 8");
+            throw new ResponseException("Shorter than minimum length 8");
         }
 
         String encodedPassword = bCryptPasswordEncoder

@@ -1,13 +1,12 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.comment.Comment;
-import com.raczkowski.app.comment.CommentRepository;
 import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
-import com.raczkowski.app.exceptions.Exception;
+import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.likes.CommentLikeRepository;
@@ -35,28 +34,28 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final CommentService commentService;
-    private final CommentRepository commentRepository;
     private final ArticleLikeRepository articleLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
 
-    public String create(ArticleRequest request) {
+    public ArticleDto create(ArticleRequest request) {
         if (
                 request.getTitle() == null
                         || request.getContent() == null
                         || request.getTitle().equals("")
                         || request.getContent().equals("")
         ) {
-            throw new Exception("Title or content can't be empty");
+            throw new ResponseException("Title or content can't be empty");
         }
         AppUser user = userService.getLoggedUser();
-        articleRepository.save(new Article(
+        Article createdArticle = new Article(
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
-        ));
+        );
+        articleRepository.save(createdArticle);
         userRepository.updateArticlesCount(user.getId());
-        return "saved";
+        return ArticleDtoMapper.articleDtoMapper(createdArticle);
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
@@ -95,7 +94,7 @@ public class ArticleService {
     public String removeArticle(Long id) {
         Article article = articleRepository.findArticleById(id);
         if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new Exception("User doesn't have permission to remove this article");
+            throw new ResponseException("User doesn't have permission to remove this article");
         }
 
         articleLikeRepository.deleteArticleLikesByArticle(article);
@@ -111,9 +110,9 @@ public class ArticleService {
     public ArticleDto getArticleByID(Long id) {
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
-            throw new Exception("There is no article with provided id");
+            throw new ResponseException("There is no article with provided id");
         }
-        return ArticleDtoMapper.articleDtoMapper(articleRepository.findArticleById(id));
+        return ArticleDtoMapper.articleDtoMapper(article);
     }
 
     public void likeArticle(Long id) {
@@ -121,7 +120,7 @@ public class ArticleService {
 
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
-            throw new Exception("Article doesnt exists");
+            throw new ResponseException("Article doesnt exists");
         }
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
@@ -136,15 +135,15 @@ public class ArticleService {
     public void updateArticle(ArticleRequest articleRequest) {
         if ((articleRequest.getTitle() == null || articleRequest.getTitle().equals("")) &&
                 (articleRequest.getContent() == null || articleRequest.getContent().equals(""))) {
-            throw new Exception("Title or content can't be empty");
+            throw new ResponseException("Title or content can't be empty");
         }
 
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {
-            throw new Exception("There is no article with provided id:" + articleRequest.getId());
+            throw new ResponseException("There is no article with provided id:" + articleRequest.getId());
         } else if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new Exception("User doesn't have permission to update this comment");
+            throw new ResponseException("User doesn't have permission to update this comment");
         }
 
         if (articleRequest.getTitle() == null) {
@@ -170,7 +169,7 @@ public class ArticleService {
         }
     }
 
-    private boolean isArticleLiked(Article article, AppUser user) {
+    public boolean isArticleLiked(Article article, AppUser user) {
         return articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article);
     }
 }
