@@ -4,10 +4,11 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ArticleRequest {
-    private final String title;
+    private String title;
 
-    private final String content;
+    private String content;
 
     private Long id;
 

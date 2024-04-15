@@ -1,63 +1,50 @@
-package com.raczkowski.app.article;
+package com.raczkowski.app.admin;
 
-import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
+@Entity
+@Table(name = "rejected_article")
 @Getter
 @Setter
-@EqualsAndHashCode
 @NoArgsConstructor
-@Entity
-public class Article {
+public class RejectedArticle {
+
     @SequenceGenerator(
-            name = "article_sequence",
-            sequenceName = "article_sequence",
+            name = "rejected_article_sequence",
+            sequenceName = "rejected_article_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "article_sequence"
+            generator = "rejected_article_sequence"
     )
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
     private ZonedDateTime postedDate;
 
     @OneToOne
-    @JoinColumn(
-            nullable = false
-    )
+    @JoinColumn(nullable = false)
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.APPROVED;
+    ArticleStatus status = ArticleStatus.REJECTED;
 
-    private int likesNumber = 0;
-
-    private ZonedDateTime updatedAt;
-
-    private boolean isUpdated = false;
-
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-    public Article(
+    public RejectedArticle(
             String title,
             String content,
             ZonedDateTime postedDate,

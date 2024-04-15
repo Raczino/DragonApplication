@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.admin.AdminService;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -30,6 +31,9 @@ public class ArticleServiceTest {
     private UserService userService;
 
     @Mock
+    private AdminService adminService;
+
+    @Mock
     private ArticleLikeRepository articleLikeRepository;
 
     @InjectMocks
@@ -45,7 +49,7 @@ public class ArticleServiceTest {
     public void shouldReturnSavedForCorrectArticleSave() {
         // given
         ArticleRequest request = new ArticleRequest("Title", "Content");
-        AppUser mockUser = new AppUser("firstName", "username", "password");
+        AppUser mockUser = new AppUser("firstName", "lastName", "email");
         when(userService.getLoggedUser()).thenReturn(mockUser);
 
         // when
@@ -57,8 +61,7 @@ public class ArticleServiceTest {
         assertEquals(createdArticle.getUser().getFirstName(), mockUser.getFirstName());
         assertEquals(createdArticle.getUser().getLastName(), mockUser.getLastName());
         assertEquals(createdArticle.getUser().getEmail(), mockUser.getEmail());
-        verify(articleRepository, times(1)).save(any());
-        verify(userRepository, times(1)).updateArticlesCount(any());
+        verify(adminService, times(1)).addArticle(any());
     }
 
     @Test
