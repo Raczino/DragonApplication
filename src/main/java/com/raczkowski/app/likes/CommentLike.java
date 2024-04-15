@@ -1,12 +1,11 @@
 package com.raczkowski.app.likes;
 
-import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.comment.Comment;
+import com.raczkowski.app.user.AppUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 

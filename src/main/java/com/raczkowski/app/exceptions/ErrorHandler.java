@@ -2,7 +2,6 @@ package com.raczkowski.app.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,11 +14,11 @@ import java.time.ZonedDateTime;
 @RestController
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiException> handleException(Exception exception) {
+    @ExceptionHandler(ResponseException.class)
+    public ResponseEntity<ApiException> handleException(ResponseException responseException) {
         ApiException error = new ApiException(
                 HttpStatus.BAD_REQUEST.value(),
-                exception.getMessage(),
+                responseException.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

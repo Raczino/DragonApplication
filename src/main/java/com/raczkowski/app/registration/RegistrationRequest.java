@@ -4,15 +4,10 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-@EqualsAndHashCode
 @ToString
 public class RegistrationRequest {
-    @NonNull
-    private final String firstName;
-    @NonNull
-    private final String lastName;
-    @NonNull
-    private final String password;
-    @NonNull
-    private final String email;
+    @NonNull String firstName;
+    @NonNull String lastName;
+    @NonNull String password;
+    @NonNull String email;
 }
