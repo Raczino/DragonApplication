@@ -33,7 +33,10 @@ public class AdminService { //TODO: add more validation on id which not exists
 
     public List<NonConfirmedArticleDto> getArticleToConfirm() { //TODO: Add pagination and sort
         validateIfUserIsAdminOrOperator();
-        return articleToConfirmRepository.findAll().stream().map(ArticleDtoMapper::nonConfirmedArticleMapper).toList();
+        return articleToConfirmRepository.findAll()
+                .stream()
+                .map(ArticleDtoMapper::nonConfirmedArticleMapper)
+                .toList();
     }
 
     @Transactional
@@ -41,7 +44,12 @@ public class AdminService { //TODO: add more validation on id which not exists
         validateIfUserIsAdminOrOperator();
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
-        Article article = new Article(articleToConfirm.getTitle(), articleToConfirm.getContent(), articleToConfirm.getPostedDate(), articleToConfirm.getAppUser());
+        Article article = new Article(
+                articleToConfirm.getTitle(),
+                articleToConfirm.getContent(),
+                articleToConfirm.getPostedDate(),
+                articleToConfirm.getAppUser()
+        );
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         articleRepository.save(article);
         userRepository.updateArticlesCount(article.getAppUser().getId());
@@ -55,7 +63,12 @@ public class AdminService { //TODO: add more validation on id which not exists
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
-        RejectedArticle rejectedArticle = new RejectedArticle(articleToConfirm.getTitle(), articleToConfirm.getContent(), articleToConfirm.getPostedDate(), articleToConfirm.getAppUser());
+        RejectedArticle rejectedArticle = new RejectedArticle(
+                articleToConfirm.getTitle(),
+                articleToConfirm.getContent(),
+                articleToConfirm.getPostedDate(),
+                articleToConfirm.getAppUser()
+        );
         rejectedArticleRepository.save(rejectedArticle);
 
         return ArticleDtoMapper.rejectedArticleDtoMapper(rejectedArticle);
@@ -63,7 +76,10 @@ public class AdminService { //TODO: add more validation on id which not exists
 
     public List<RejectedArticleDto> getRejectedArticles() { //TODO: Add pagination and sort
         validateIfUserIsAdminOrOperator();
-        return rejectedArticleRepository.findAll().stream().map(ArticleDtoMapper::rejectedArticleDtoMapper).toList();
+        return rejectedArticleRepository.findAll()
+                .stream()
+                .map(ArticleDtoMapper::rejectedArticleDtoMapper)
+                .toList();
     }
 
     public void validateIfUserIsAdminOrOperator() {
