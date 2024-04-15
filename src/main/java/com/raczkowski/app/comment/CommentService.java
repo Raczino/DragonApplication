@@ -49,7 +49,7 @@ public class CommentService {
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
-        if (commentRequest.getContent().equals("")) {
+        if (commentRequest.getContent().isEmpty()) {
             throw new Exception("Comment can't be empty");
         }
 
@@ -96,7 +96,7 @@ public class CommentService {
     }
 
     public String updateComment(CommentRequest commentRequest) {
-        if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
+        if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
             throw new Exception("Comment can't be empty");
         }
 

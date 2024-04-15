@@ -27,6 +27,9 @@ public class RegistrationService {
                         request.getLastName(),
                         request.getEmail(),
                         request.getPassword(),
+                        request.getDescription(),
+                        request.getBirthDate(),
+                        request.getCity(),
                         ZonedDateTime.now(ZoneOffset.UTC)
                 )
         );

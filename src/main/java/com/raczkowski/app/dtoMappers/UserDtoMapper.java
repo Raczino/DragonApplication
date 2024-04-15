@@ -12,6 +12,9 @@ public class UserDtoMapper {
                 appUser.getFirstName(),
                 appUser.getLastName(),
                 appUser.getEmail(),
+                appUser.getDescription(),
+                appUser.getBirthDate(),
+                appUser.getCity(),
                 appUser.getUserRole(),
                 appUser.getArticlesCount(),
                 appUser.getCommentsCount()

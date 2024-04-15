@@ -19,6 +19,12 @@ public class UserDto {
 
     private String email;
 
+    private String description;
+
+    private String birthDate;
+
+    private String city;
+
     private UserRole userRole;
 
     private int articlesCount;

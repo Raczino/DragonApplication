@@ -15,4 +15,10 @@ public class RegistrationRequest {
     private final String password;
     @NonNull
     private final String email;
+
+    private final String description;
+
+    private final String birthDate;
+
+    private final String city;
 }

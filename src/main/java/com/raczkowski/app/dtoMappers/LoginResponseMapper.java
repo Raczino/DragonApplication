@@ -7,16 +7,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoginResponseMapper {
-    public static LoginResponseDto response(String token, AppUser appUser) {
+    public static LoginResponseDto response(String token) {
         return new LoginResponseDto(
-                token,
-                new UserDto(appUser.getId(),
-                        appUser.getFirstName(),
-                        appUser.getLastName(),
-                        appUser.getEmail(),
-                        appUser.getUserRole(),
-                        appUser.getArticlesCount(),
-                        appUser.getCommentsCount())
+                token
         );
     }
 }
