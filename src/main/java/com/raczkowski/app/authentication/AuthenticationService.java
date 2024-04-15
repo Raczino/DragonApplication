@@ -19,14 +19,6 @@ public class AuthenticationService {
     private final JwtUtil jwtUtil;
 
     public LoginResponseDto authenticate(AuthenticationRequest request) {
-<<<<<<< HEAD
-        final UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
-        if (userDetails != null) {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            ).isAuthenticated();
-            return LoginResponseMapper.response(jwtUtil.generateToken(userDetails));
-=======
         if (request.getEmail() == null || request.getPassword() == null) {
             throw new ResponseException("Email and password can't be null");
         }
@@ -41,7 +33,6 @@ public class AuthenticationService {
             throw new ResponseException("User with this email doesn't exists");
         } else {
             throw new ResponseException("Invalid Credentials");
->>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
         }
     }
 }

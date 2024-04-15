@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     password: Hasl0123
-    url: jdbc:postgresql://localhost:5433/dragon
+    url: jdbc:postgresql://localhost:5432/dragon
     username: postgres
   jpa:
     hibernate:
@@ -19,6 +19,6 @@ spring:
   flyway:
     locations: classpath:db/migration
     baseline-on-migrate: true
-    url: jdbc:postgresql://localhost:5433/dragon
+    url: jdbc:postgresql://localhost:5432/dragon
     password: Hasl0123
     user: postgres

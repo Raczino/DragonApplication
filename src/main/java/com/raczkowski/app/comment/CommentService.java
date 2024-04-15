@@ -49,13 +49,9 @@ public class CommentService {
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
-<<<<<<< HEAD
-        if (commentRequest.getContent().isEmpty()) {
-            throw new Exception("Comment can't be empty");
-=======
+
         if (commentRequest.getContent().equals("")) {
             throw new ResponseException("Comment can't be empty");
->>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
         }
 
         Comment comment;
@@ -101,13 +97,9 @@ public class CommentService {
     }
 
     public String updateComment(CommentRequest commentRequest) {
-<<<<<<< HEAD
-        if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
-            throw new Exception("Comment can't be empty");
-=======
+
         if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
             throw new ResponseException("Comment can't be empty");
->>>>>>> 36a1067e8c940c40e49b5864d11e6b4e01129b3c
         }
 
         Comment comment = commentRepository.findCommentById(commentRequest.getId());
