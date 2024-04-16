@@ -1,4 +1,4 @@
-package com.raczkowski.app.admin;
+package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
@@ -12,28 +12,28 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/webapi/v1/")
-public class AdminController {
+public class ArticleToConfirmController {
 
-    AdminService adminService;
+    ArticleToConfirmService articleToConfirmService;
 
 
     @GetMapping("/article")
     public ResponseEntity<List<NonConfirmedArticleDto>> getArticlesToConfirm() {
-        return ResponseEntity.ok(adminService.getArticleToConfirm());
+        return ResponseEntity.ok(articleToConfirmService.getArticleToConfirm());
     }
 
     @PostMapping("/article/confirm")
     public ResponseEntity<ArticleDto> confirmArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(adminService.confirmArticle(articleId));
+        return ResponseEntity.ok(articleToConfirmService.confirmArticle(articleId));
     }
 
     @PostMapping("/article/reject")
     public ResponseEntity<RejectedArticleDto> rejectArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(adminService.rejectArticle(articleId));
+        return ResponseEntity.ok(articleToConfirmService.rejectArticle(articleId));
     }
 
     @GetMapping("/article/reject/get")
     public ResponseEntity<List<RejectedArticleDto>> rejectArticle() {
-        return ResponseEntity.ok(adminService.getRejectedArticles());
+        return ResponseEntity.ok(articleToConfirmService.getRejectedArticles());
     }
 }

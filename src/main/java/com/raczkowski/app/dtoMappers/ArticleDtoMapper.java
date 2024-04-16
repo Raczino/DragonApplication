@@ -1,7 +1,7 @@
 package com.raczkowski.app.dtoMappers;
 
-import com.raczkowski.app.admin.ArticleToConfirm;
-import com.raczkowski.app.admin.RejectedArticle;
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
+import com.raczkowski.app.admin.moderation.article.RejectedArticle;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;

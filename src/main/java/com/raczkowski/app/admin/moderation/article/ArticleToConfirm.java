@@ -1,4 +1,4 @@
-package com.raczkowski.app.admin;
+package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
@@ -10,21 +10,21 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "rejected_article")
+@Table(name = "articles_to_confirm")
 @Getter
 @Setter
 @NoArgsConstructor
-public class RejectedArticle {
+public class ArticleToConfirm { //TODO: sprawdzić czy mozna dziedziczyć po article
 
     @SequenceGenerator(
-            name = "rejected_article_sequence",
-            sequenceName = "rejected_article_sequence",
+            name = "article_to_confirm_sequence",
+            sequenceName = "article_to_confirm_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "rejected_article_sequence"
+            generator = "article_to_confirm_sequence"
     )
     private Long id;
 
@@ -41,10 +41,17 @@ public class RejectedArticle {
     @JoinColumn(nullable = false)
     private AppUser appUser;
 
-    @Enumerated(EnumType.STRING)
-    ArticleStatus status = ArticleStatus.REJECTED;
+    private int likesNumber = 0;
 
-    public RejectedArticle(
+    private ZonedDateTime updatedAt;
+
+    private boolean isUpdated = false;
+
+    @Enumerated(EnumType.STRING)
+    private ArticleStatus status = ArticleStatus.PENDING;
+
+
+    public ArticleToConfirm(
             String title,
             String content,
             ZonedDateTime postedDate,

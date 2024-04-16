@@ -1,6 +1,6 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.admin.AdminService;
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirmService;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -31,7 +31,7 @@ public class ArticleServiceTest {
     private UserService userService;
 
     @Mock
-    private AdminService adminService;
+    private ArticleToConfirmService articleToConfirmService;
 
     @Mock
     private ArticleLikeRepository articleLikeRepository;
@@ -61,7 +61,7 @@ public class ArticleServiceTest {
         assertEquals(createdArticle.getUser().getFirstName(), mockUser.getFirstName());
         assertEquals(createdArticle.getUser().getLastName(), mockUser.getLastName());
         assertEquals(createdArticle.getUser().getEmail(), mockUser.getEmail());
-        verify(adminService, times(1)).addArticle(any());
+        verify(articleToConfirmService, times(1)).addArticle(any());
     }
 
     @Test

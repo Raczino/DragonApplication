@@ -1,4 +1,4 @@
-package com.raczkowski.app.admin;
+package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
@@ -10,21 +10,21 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "articles_to_confirm")
+@Table(name = "rejected_article")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ArticleToConfirm {
+public class RejectedArticle {
 
     @SequenceGenerator(
-            name = "article_to_confirm_sequence",
-            sequenceName = "article_to_confirm_sequence",
+            name = "rejected_article_sequence",
+            sequenceName = "rejected_article_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "article_to_confirm_sequence"
+            generator = "rejected_article_sequence"
     )
     private Long id;
 
@@ -41,16 +41,10 @@ public class ArticleToConfirm {
     @JoinColumn(nullable = false)
     private AppUser appUser;
 
-    private int likesNumber = 0;
-
-    private ZonedDateTime updatedAt;
-
-    private boolean isUpdated = false;
-
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.PENDING;
+    ArticleStatus status = ArticleStatus.REJECTED;
 
-    public ArticleToConfirm(
+    public RejectedArticle(
             String title,
             String content,
             ZonedDateTime postedDate,

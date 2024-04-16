@@ -57,6 +57,10 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    ZonedDateTime acceptedAt;
+
+    String acceptedBy;
+
     public Article(
             String title,
             String content,

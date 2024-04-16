@@ -1,7 +1,7 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.admin.AdminService;
-import com.raczkowski.app.admin.ArticleToConfirm;
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirmService;
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.MetaData;
@@ -38,7 +38,7 @@ public class ArticleService {
     private final CommentService commentService;
     private final ArticleLikeRepository articleLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
-    private final AdminService adminService;
+    private final ArticleToConfirmService articleToConfirmService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -57,7 +57,7 @@ public class ArticleService {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
-        adminService.addArticle(articleToConfirm);
+        articleToConfirmService.addArticle(articleToConfirm);
 
         return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
     }
@@ -92,7 +92,7 @@ public class ArticleService {
                 .findAllByAppUser(userRepository.findById(userID))
                 .stream()
                 .map(ArticleDtoMapper::articleDtoMapper)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); //TODO: tutaj powinno zwracać artykuły w statusie pending oraz accepted
     }
 
     @Transactional
