@@ -1,7 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
-import com.raczkowski.app.admin.moderation.article.ArticleToConfirmService;
+import com.raczkowski.app.admin.moderation.article.ModerationService;
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.MetaData;
@@ -38,7 +38,7 @@ public class ArticleService {
     private final CommentService commentService;
     private final ArticleLikeRepository articleLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
-    private final ArticleToConfirmService articleToConfirmService;
+    private final ModerationService moderationService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -57,7 +57,7 @@ public class ArticleService {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
-        articleToConfirmService.addArticle(articleToConfirm);
+        moderationService.addArticle(articleToConfirm);
 
         return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
     }

@@ -57,9 +57,10 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    ZonedDateTime acceptedAt;
+    private ZonedDateTime acceptedAt;
 
-    String acceptedBy;
+    @OneToOne
+    private AppUser acceptedBy;
 
     public Article(
             String title,
@@ -71,5 +72,21 @@ public class Article {
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
+    }
+
+    public Article(
+            String title,
+            String content,
+            ZonedDateTime postedDate,
+            AppUser appUser,
+            ZonedDateTime acceptedAt,
+            AppUser acceptedBy
+    ) {
+        this.title = title;
+        this.content = content;
+        this.postedDate = postedDate;
+        this.appUser = appUser;
+        this.acceptedAt = acceptedAt;
+        this.acceptedBy = acceptedBy;
     }
 }

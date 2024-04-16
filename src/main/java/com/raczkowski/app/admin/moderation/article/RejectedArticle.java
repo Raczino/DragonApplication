@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "rejected_article")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -44,15 +43,24 @@ public class RejectedArticle {
     @Enumerated(EnumType.STRING)
     ArticleStatus status = ArticleStatus.REJECTED;
 
+    ZonedDateTime rejectedAt;
+
+    @OneToOne
+    AppUser rejectedBy;
+
     public RejectedArticle(
             String title,
             String content,
             ZonedDateTime postedDate,
-            AppUser appUser
+            AppUser appUser,
+            ZonedDateTime rejectedAt,
+            AppUser rejectedBy
     ) {
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
+        this.rejectedAt = rejectedAt;
+        this.rejectedBy = rejectedBy;
     }
 }

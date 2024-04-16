@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "articles_to_confirm")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,15 +40,8 @@ public class ArticleToConfirm { //TODO: sprawdzić czy mozna dziedziczyć po art
     @JoinColumn(nullable = false)
     private AppUser appUser;
 
-    private int likesNumber = 0;
-
-    private ZonedDateTime updatedAt;
-
-    private boolean isUpdated = false;
-
     @Enumerated(EnumType.STRING)
     private ArticleStatus status = ArticleStatus.PENDING;
-
 
     public ArticleToConfirm(
             String title,

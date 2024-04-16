@@ -7,17 +7,22 @@ import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
+import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ArticleToConfirmService { //TODO: add more validation on id which not exists
+@Transactional
+public class ModerationService { //TODO: add more validation on id which not exists
 
     ArticleToConfirmRepository articleToConfirmRepository;
     ArticleRepository articleRepository;
@@ -25,6 +30,7 @@ public class ArticleToConfirmService { //TODO: add more validation on id which n
     UserService userService;
     RejectedArticleRepository rejectedArticleRepository;
     AdminValidator adminValidator;
+
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
     }
@@ -37,16 +43,21 @@ public class ArticleToConfirmService { //TODO: add more validation on id which n
                 .toList();
     }
 
-    @Transactional
     public ArticleDto confirmArticle(Long articleId) {
         adminValidator.validateIfUserIsAdminOrOperator();
+        AppUser appUser = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
+        if (articleToConfirm == null) {
+            throw new ResponseException("Article with provided id doesn't not exists");
+        }
         Article article = new Article(
                 articleToConfirm.getTitle(),
                 articleToConfirm.getContent(),
                 articleToConfirm.getPostedDate(),
-                articleToConfirm.getAppUser()
+                articleToConfirm.getAppUser(),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                appUser
         );
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         articleRepository.save(article);
@@ -55,17 +66,22 @@ public class ArticleToConfirmService { //TODO: add more validation on id which n
         return ArticleDtoMapper.articleDtoMapper(article);
     }
 
-    @Transactional
     public RejectedArticleDto rejectArticle(Long articleId) {
         adminValidator.validateIfUserIsAdminOrOperator();
+        AppUser user = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
+        if (articleToConfirm == null) {
+            throw new ResponseException("Article with provided id doesn't not exists");
+        }
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         RejectedArticle rejectedArticle = new RejectedArticle(
                 articleToConfirm.getTitle(),
                 articleToConfirm.getContent(),
                 articleToConfirm.getPostedDate(),
-                articleToConfirm.getAppUser()
+                articleToConfirm.getAppUser(),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                user
         );
         rejectedArticleRepository.save(rejectedArticle);
 

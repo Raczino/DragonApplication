@@ -26,7 +26,14 @@ public class ArticleDtoMapper {
                 ),
                 article.getUpdatedAt(),
                 article.isUpdated(),
-                article.getStatus()
+                article.getStatus(),
+                article.getAcceptedAt(),
+                new authorDto(
+                        article.getAppUser().getId(),
+                        article.getAppUser().getFirstName(),
+                        article.getAppUser().getLastName(),
+                        article.getAppUser().getEmail()
+                )
         );
     }
 
@@ -42,7 +49,14 @@ public class ArticleDtoMapper {
                         article.getAppUser().getLastName(),
                         article.getAppUser().getEmail()
                 ),
-                article.getStatus()
+                article.getStatus(),
+                article.getRejectedAt(),
+                new authorDto(
+                        article.getAppUser().getId(),
+                        article.getAppUser().getFirstName(),
+                        article.getAppUser().getLastName(),
+                        article.getAppUser().getEmail()
+                )
         );
     }
 
@@ -52,15 +66,12 @@ public class ArticleDtoMapper {
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                article.getLikesNumber(),
                 new authorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
                         article.getAppUser().getEmail()
                 ),
-                article.getUpdatedAt(),
-                article.isUpdated(),
                 article.getStatus()
         );
     }
@@ -82,7 +93,14 @@ public class ArticleDtoMapper {
                 article.isUpdated(),
                 article.getStatus(),
                 isLiked,
-                commentsNumber
+                commentsNumber,
+                article.getAcceptedAt(),
+                new authorDto(
+                        article.getAppUser().getId(),
+                        article.getAppUser().getFirstName(),
+                        article.getAppUser().getLastName(),
+                        article.getAppUser().getEmail()
+                )
         );
     }
 }

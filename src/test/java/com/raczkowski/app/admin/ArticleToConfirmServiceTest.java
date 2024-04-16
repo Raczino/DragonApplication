@@ -3,7 +3,7 @@ package com.raczkowski.app.admin;
 import com.raczkowski.app.admin.common.AdminValidator;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.admin.moderation.article.ArticleToConfirmService;
+import com.raczkowski.app.admin.moderation.article.ModerationService;
 import com.raczkowski.app.admin.moderation.article.RejectedArticleRepository;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
@@ -39,7 +39,7 @@ public class ArticleToConfirmServiceTest {
     private AdminValidator adminValidator;
 
     @InjectMocks
-    private ArticleToConfirmService articleToConfirmService;
+    private ModerationService moderationService;
 
     @Mock
     private UserService userService;
@@ -59,7 +59,7 @@ public class ArticleToConfirmServiceTest {
         lenient().when(userService.getLoggedUser()).thenReturn(loggedUser);
 
         // When
-        ArticleDto result = articleToConfirmService.confirmArticle(articleId);
+        ArticleDto result = moderationService.confirmArticle(articleId);
 
         // Then
         verify(articleToConfirmRepository, times(1)).deleteArticleToConfirmById(articleId);

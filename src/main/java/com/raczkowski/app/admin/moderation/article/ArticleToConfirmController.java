@@ -14,26 +14,26 @@ import java.util.List;
 @RequestMapping("/webapi/v1/")
 public class ArticleToConfirmController {
 
-    ArticleToConfirmService articleToConfirmService;
+    ModerationService moderationService;
 
 
     @GetMapping("/article")
     public ResponseEntity<List<NonConfirmedArticleDto>> getArticlesToConfirm() {
-        return ResponseEntity.ok(articleToConfirmService.getArticleToConfirm());
+        return ResponseEntity.ok(moderationService.getArticleToConfirm());
     }
 
     @PostMapping("/article/confirm")
     public ResponseEntity<ArticleDto> confirmArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(articleToConfirmService.confirmArticle(articleId));
+        return ResponseEntity.ok(moderationService.confirmArticle(articleId));
     }
 
     @PostMapping("/article/reject")
     public ResponseEntity<RejectedArticleDto> rejectArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(articleToConfirmService.rejectArticle(articleId));
+        return ResponseEntity.ok(moderationService.rejectArticle(articleId));
     }
 
     @GetMapping("/article/reject/get")
     public ResponseEntity<List<RejectedArticleDto>> rejectArticle() {
-        return ResponseEntity.ok(articleToConfirmService.getRejectedArticles());
+        return ResponseEntity.ok(moderationService.getRejectedArticles());
     }
 }
