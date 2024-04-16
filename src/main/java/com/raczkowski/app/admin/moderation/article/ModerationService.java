@@ -96,4 +96,15 @@ public class ModerationService { //TODO: add more validation on id which not exi
                 .toList();
     }
 
+    public List<ArticleDto> getAcceptedArticlesByUser(Long id) {
+        adminValidator.validateIfUserIsAdminOrOperator();
+        AppUser user = userRepository.getAppUserById(id);
+        if (user == null) {
+            throw new ResponseException("User doesn't exists");
+        }
+        return articleRepository.getArticleByAcceptedBy(user)
+                .stream()
+                .map(ArticleDtoMapper::articleDtoMapper)
+                .toList();
+    }
 }

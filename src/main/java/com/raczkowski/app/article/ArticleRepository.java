@@ -18,13 +18,16 @@ import java.util.Optional;
 @Repository
 @Transactional(readOnly = true)
 public interface ArticleRepository extends JpaRepository<Article, Long> {
-    Page<Article> findAll(@NonNull Pageable pageable);
+    @NonNull Page<Article> findAll(@NonNull Pageable pageable);
 
     Article findArticleById(Long id);
 
     List<Article> findAllByAppUser(Optional<AppUser> appUser);
 
     Article getFirstByOrderByLikesNumberDesc();
+
+    List<Article> getArticleByAcceptedBy(AppUser appUser);
+
     @Transactional
     @Modifying
     @Query("UPDATE Article c " +

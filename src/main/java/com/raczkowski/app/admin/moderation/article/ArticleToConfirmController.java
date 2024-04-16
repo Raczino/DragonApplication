@@ -36,4 +36,9 @@ public class ArticleToConfirmController {
     public ResponseEntity<List<RejectedArticleDto>> rejectArticle() {
         return ResponseEntity.ok(moderationService.getRejectedArticles());
     }
+
+    @GetMapping("/article/accepted/get")
+    public ResponseEntity<List<ArticleDto>> getAcceptedArticles(@RequestParam Long id) {
+        return ResponseEntity.ok(moderationService.getAcceptedArticlesByUser(id));
+    }
 }
