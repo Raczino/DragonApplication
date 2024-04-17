@@ -1,6 +1,6 @@
 package com.raczkowski.app.dto;
 
-import com.raczkowski.app.user.UserRole;
+import com.raczkowski.app.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

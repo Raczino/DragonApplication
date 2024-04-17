@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.user.AppUser;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
@@ -18,13 +19,16 @@ import java.util.Optional;
 @Repository
 @Transactional(readOnly = true)
 public interface ArticleRepository extends JpaRepository<Article, Long> {
-    Page<Article> findAll(@NonNull Pageable pageable);
+    @NonNull Page<Article> findAll(@NonNull Pageable pageable);
 
     Article findArticleById(Long id);
 
     List<Article> findAllByAppUser(Optional<AppUser> appUser);
 
     Article getFirstByOrderByLikesNumberDesc();
+
+    Page<Article> getArticleByAcceptedBy(AppUser appUser, Pageable pageable);
+
     @Transactional
     @Modifying
     @Query("UPDATE Article c " +

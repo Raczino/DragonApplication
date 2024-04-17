@@ -1,6 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.comment.Comment;
+import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,10 +30,13 @@ public class Article {
             generator = "article_sequence"
     )
     private Long id;
+
     @Column(nullable = false)
     private String title;
+
     @Column(nullable = false)
     private String content;
+
     private ZonedDateTime postedDate;
 
     @OneToOne
@@ -40,6 +44,9 @@ public class Article {
             nullable = false
     )
     private AppUser appUser;
+
+    @Enumerated(EnumType.STRING)
+    private ArticleStatus status = ArticleStatus.APPROVED;
 
     private int likesNumber = 0;
 
@@ -49,6 +56,11 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    private ZonedDateTime acceptedAt;
+
+    @OneToOne
+    private AppUser acceptedBy;
 
     public Article(
             String title,
@@ -60,5 +72,21 @@ public class Article {
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
+    }
+
+    public Article(
+            String title,
+            String content,
+            ZonedDateTime postedDate,
+            AppUser appUser,
+            ZonedDateTime acceptedAt,
+            AppUser acceptedBy
+    ) {
+        this.title = title;
+        this.content = content;
+        this.postedDate = postedDate;
+        this.appUser = appUser;
+        this.acceptedAt = acceptedAt;
+        this.acceptedBy = acceptedBy;
     }
 }

@@ -1,5 +1,7 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
+import com.raczkowski.app.admin.moderation.article.ModerationService;
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.MetaData;
@@ -36,6 +38,7 @@ public class ArticleService {
     private final CommentService commentService;
     private final ArticleLikeRepository articleLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final ModerationService moderationService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -47,15 +50,16 @@ public class ArticleService {
             throw new ResponseException("Title or content can't be empty");
         }
         AppUser user = userService.getLoggedUser();
-        Article createdArticle = new Article(
+
+        ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
-        articleRepository.save(createdArticle);
-        userRepository.updateArticlesCount(user.getId());
-        return ArticleDtoMapper.articleDtoMapper(createdArticle);
+        moderationService.addArticle(articleToConfirm);
+
+        return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
@@ -66,7 +70,7 @@ public class ArticleService {
         return new PageResponse<>(
                 articlePage
                         .stream()
-                        .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFields(
+                        .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
                                 article,
                                 isArticleLiked(article, user),
                                 commentService.getNumberCommentsOfArticle(article.getId())
@@ -90,6 +94,7 @@ public class ArticleService {
                 .map(ArticleDtoMapper::articleDtoMapper)
                 .collect(Collectors.toList());
     }
+
     @Transactional
     public String removeArticle(Long id) {
         Article article = articleRepository.findArticleById(id);

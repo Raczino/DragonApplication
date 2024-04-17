@@ -1,5 +1,6 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,13 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     AppUser findByEmail(String email);
 
     AppUser getAppUserById(Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE AppUser c " +
+            "SET c.userRole = :userRole " +
+            "WHERE c.id = :id")
+    void updateAppUserByUserRole(Long id, UserRole userRole);
 
     @Transactional
     @Modifying

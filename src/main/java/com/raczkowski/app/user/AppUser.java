@@ -1,6 +1,6 @@
 package com.raczkowski.app.user;
 
-import lombok.EqualsAndHashCode;
+import com.raczkowski.app.enums.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +12,6 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 @Getter
 @Setter
