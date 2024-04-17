@@ -3,6 +3,8 @@ package com.raczkowski.app.admin.moderation.article;
 import com.raczkowski.app.admin.common.AdminValidator;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.common.MetaData;
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
@@ -12,17 +14,20 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
 @Transactional
-public class ModerationService { //TODO: add more validation on id which not exists
+public class ModerationService {
 
     ArticleToConfirmRepository articleToConfirmRepository;
     ArticleRepository articleRepository;
@@ -35,12 +40,23 @@ public class ModerationService { //TODO: add more validation on id which not exi
         articleToConfirmRepository.save(articleToConfirm);
     }
 
-    public List<NonConfirmedArticleDto> getArticleToConfirm() { //TODO: Add pagination and sort
+    public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
-        return articleToConfirmRepository.findAll()
-                .stream()
-                .map(ArticleDtoMapper::nonConfirmedArticleMapper)
-                .toList();
+
+        Pageable pageable = PageRequest
+                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Page<ArticleToConfirm> article = articleToConfirmRepository.findAll(pageable);
+
+        return new PageResponse<>(
+                article.stream()
+                        .map(ArticleDtoMapper::nonConfirmedArticleMapper)
+                        .toList(),
+                new MetaData(
+                        article.getTotalElements(),
+                        article.getTotalPages(),
+                        article.getNumber() + 1,
+                        article.getSize())
+        );
     }
 
     public ArticleDto confirmArticle(Long articleId) {
@@ -88,23 +104,45 @@ public class ModerationService { //TODO: add more validation on id which not exi
         return ArticleDtoMapper.rejectedArticleDtoMapper(rejectedArticle);
     }
 
-    public List<RejectedArticleDto> getRejectedArticles() { //TODO: Add pagination and sort
+    public PageResponse<RejectedArticleDto> getRejectedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
-        return rejectedArticleRepository.findAll()
-                .stream()
-                .map(ArticleDtoMapper::rejectedArticleDtoMapper)
-                .toList();
+        Pageable pageable = PageRequest
+                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Page<RejectedArticle> article = rejectedArticleRepository.findAll(pageable);
+
+        return new PageResponse<>(
+                rejectedArticleRepository.findAll()
+                        .stream()
+                        .map(ArticleDtoMapper::rejectedArticleDtoMapper)
+                        .toList(),
+                new MetaData(
+                        article.getTotalElements(),
+                        article.getTotalPages(),
+                        article.getNumber() + 1,
+                        article.getSize())
+        );
     }
 
-    public List<ArticleDto> getAcceptedArticlesByUser(Long id) {
+    public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
         AppUser user = userRepository.getAppUserById(id);
         if (user == null) {
             throw new ResponseException("User doesn't exists");
         }
-        return articleRepository.getArticleByAcceptedBy(user)
+
+        Pageable pageable = PageRequest
+                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Page<Article> article = articleRepository.getArticleByAcceptedBy(user, pageable);
+
+        return new PageResponse<>(articleRepository.getArticleByAcceptedBy(user, pageable)
                 .stream()
                 .map(ArticleDtoMapper::articleDtoMapper)
-                .toList();
+                .toList(),
+                new MetaData(
+                        article.getTotalElements(),
+                        article.getTotalPages(),
+                        article.getNumber() + 1,
+                        article.getSize())
+        );
     }
 }

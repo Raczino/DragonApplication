@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ArticleToConfirm { //TODO: sprawdzić czy mozna dziedziczyć po article
+public class ArticleToConfirm {
 
     @SequenceGenerator(
             name = "article_to_confirm_sequence",

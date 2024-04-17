@@ -1,5 +1,6 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.user.AppUser;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Article getFirstByOrderByLikesNumberDesc();
 
-    List<Article> getArticleByAcceptedBy(AppUser appUser);
+    Page<Article> getArticleByAcceptedBy(AppUser appUser, Pageable pageable);
 
     @Transactional
     @Modifying

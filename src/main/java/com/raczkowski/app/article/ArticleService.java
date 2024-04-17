@@ -92,7 +92,7 @@ public class ArticleService {
                 .findAllByAppUser(userRepository.findById(userID))
                 .stream()
                 .map(ArticleDtoMapper::articleDtoMapper)
-                .collect(Collectors.toList()); //TODO: tutaj powinno zwracać artykuły w statusie pending oraz accepted
+                .collect(Collectors.toList());
     }
 
     @Transactional
