@@ -4,6 +4,7 @@ import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ModerationService;
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.comment.CommentService;
+import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
@@ -17,9 +18,6 @@ import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -63,8 +61,14 @@ public class ArticleService {
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        Page<Article> articlePage = articleRepository.findAll(pageable);
+        Page<Article> articlePage = GenericService
+                .pagination(
+                        articleRepository,
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                );
         AppUser user = userService.getLoggedUser();
 
         return new PageResponse<>(

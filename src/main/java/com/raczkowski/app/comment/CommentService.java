@@ -1,6 +1,7 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
@@ -13,9 +14,6 @@ import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
@@ -31,8 +29,15 @@ public class CommentService {
     private final UserRepository userRepository;
 
     public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString("Desc"), "likesNumber"));
-        Page<Comment> commentPage = commentRepository.getAllByArticleId(id, pageable);
+        Page<Comment> commentPage = GenericService
+                .pagination(
+                        commentRepository,
+                        pageNumber,
+                        pageSize,
+                        "likesNumber",
+                        "desc"
+                );
+
         AppUser user = userService.getLoggedUser();
 
         return new PageResponse<>(

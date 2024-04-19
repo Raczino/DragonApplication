@@ -3,6 +3,7 @@ package com.raczkowski.app.admin.moderation.article;
 import com.raczkowski.app.admin.common.AdminValidator;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
@@ -15,14 +16,12 @@ import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -42,10 +41,14 @@ public class ModerationService {
 
     public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
-
-        Pageable pageable = PageRequest
-                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        Page<ArticleToConfirm> article = articleToConfirmRepository.findAll(pageable);
+        Page<ArticleToConfirm> article = GenericService
+                .pagination(
+                        articleToConfirmRepository,
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                );
 
         return new PageResponse<>(
                 article.stream()
@@ -106,12 +109,18 @@ public class ModerationService {
 
     public PageResponse<RejectedArticleDto> getRejectedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
-        Pageable pageable = PageRequest
-                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        Page<RejectedArticle> article = rejectedArticleRepository.findAll(pageable);
+
+        Page<RejectedArticle> article = GenericService
+                .pagination(
+                        rejectedArticleRepository,
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                );
 
         return new PageResponse<>(
-                rejectedArticleRepository.findAll()
+                article
                         .stream()
                         .map(ArticleDtoMapper::rejectedArticleDtoMapper)
                         .toList(),
@@ -125,17 +134,23 @@ public class ModerationService {
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         adminValidator.validateIfUserIsAdminOrOperator();
-        AppUser user = userRepository.getAppUserById(id);
-        if (user == null) {
+        Optional<AppUser> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new ResponseException("User doesn't exists");
         }
 
-        Pageable pageable = PageRequest
-                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        Page<Article> article = articleRepository.getArticleByAcceptedBy(user, pageable);
+        Page<Article> article = GenericService
+                .pagination(
+                        articleRepository,
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                );
 
-        return new PageResponse<>(articleRepository.getArticleByAcceptedBy(user, pageable)
+        return new PageResponse<>(article
                 .stream()
+                .filter(art -> art.getAcceptedBy().getId().equals(user.get().getId()))
                 .map(ArticleDtoMapper::articleDtoMapper)
                 .toList(),
                 new MetaData(
