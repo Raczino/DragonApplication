@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @Component
-public class AdminValidator {
+public class PermissionValidator {
     UserService userService;
 
     public void validateIfUserIsAdminOrOperator() {
@@ -17,5 +17,13 @@ public class AdminValidator {
         if (user.getUserRole() != UserRole.ADMIN && user.getUserRole() != UserRole.MODERATOR) {
             throw new ResponseException("You don't have permissions to do this action");
         }
+    }
+
+    public boolean validateIfUserIaAdmin() {
+        AppUser user = userService.getLoggedUser();
+        if (user.getUserRole() != UserRole.ADMIN) {
+            throw new ResponseException("You don't have permissions to do this action");
+        }
+        return true;
     }
 }

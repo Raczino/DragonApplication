@@ -1,9 +1,9 @@
 package com.raczkowski.app.admin;
 
-import com.raczkowski.app.admin.common.AdminValidator;
+import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.admin.moderation.article.ModerationService;
+import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
 import com.raczkowski.app.admin.moderation.article.RejectedArticleRepository;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
@@ -36,10 +36,10 @@ public class ArticleToConfirmServiceTest {
     private RejectedArticleRepository rejectedArticleRepository;
 
     @Mock
-    private AdminValidator adminValidator;
+    private PermissionValidator permissionValidator;
 
     @InjectMocks
-    private ModerationService moderationService;
+    private ModerationArticleService moderationArticleService;
 
     @Mock
     private UserService userService;
@@ -59,7 +59,7 @@ public class ArticleToConfirmServiceTest {
         lenient().when(userService.getLoggedUser()).thenReturn(loggedUser);
 
         // When
-        ArticleDto result = moderationService.confirmArticle(articleId);
+        ArticleDto result = moderationArticleService.confirmArticle(articleId);
 
         // Then
         verify(articleToConfirmRepository, times(1)).deleteArticleToConfirmById(articleId);

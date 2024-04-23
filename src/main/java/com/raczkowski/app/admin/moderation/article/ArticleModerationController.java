@@ -8,47 +8,45 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @AllArgsConstructor
-@RequestMapping("/webapi/v1/")
-public class ArticleToConfirmController {
+@RequestMapping("/webapi/v1/article")
+public class ArticleModerationController {
 
-    ModerationService moderationService;
+    ModerationArticleService moderationArticleService;
 
 
-    @GetMapping("/article")
+    @GetMapping("/toConfirm/get")
     public ResponseEntity<PageResponse<NonConfirmedArticleDto>> getArticlesToConfirm(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sortBy", defaultValue = "postedDate") String sortBy,
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
-        return ResponseEntity.ok(moderationService.getArticleToConfirm(page, size, sortBy, sortDirection));
+        return ResponseEntity.ok(moderationArticleService.getArticleToConfirm(page, size, sortBy, sortDirection));
     }
 
-    @PostMapping("/article/confirm")
+    @PostMapping("/confirm")
     public ResponseEntity<ArticleDto> confirmArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(moderationService.confirmArticle(articleId));
+        return ResponseEntity.ok(moderationArticleService.confirmArticle(articleId));
     }
 
-    @PostMapping("/article/reject")
+    @PostMapping("/reject")
     public ResponseEntity<RejectedArticleDto> rejectArticle(@RequestParam Long articleId) {
-        return ResponseEntity.ok(moderationService.rejectArticle(articleId));
+        return ResponseEntity.ok(moderationArticleService.rejectArticle(articleId));
     }
 
-    @GetMapping("/article/reject/get")
+    @GetMapping("/reject/get")
     public ResponseEntity<PageResponse<RejectedArticleDto>> rejectArticle(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sortBy", defaultValue = "rejectedAt") String sortBy,
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
-        return ResponseEntity.ok(moderationService.getRejectedArticles(page, size, sortBy, sortDirection));
+        return ResponseEntity.ok(moderationArticleService.getRejectedArticles(page, size, sortBy, sortDirection));
     }
 
-    @GetMapping("/article/accepted/get")
+    @GetMapping("/accepted/get")
     public ResponseEntity<PageResponse<ArticleDto>> getAcceptedArticles(
             @RequestParam Long id,
             @RequestParam(name = "page", defaultValue = "1") int page,
@@ -56,6 +54,21 @@ public class ArticleToConfirmController {
             @RequestParam(name = "sortBy", defaultValue = "acceptedAt") String sortBy,
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
-        return ResponseEntity.ok(moderationService.getAcceptedArticlesByUser(id, page, size, sortBy, sortDirection));
+        return ResponseEntity.ok(moderationArticleService.getAcceptedArticlesByUser(id, page, size, sortBy, sortDirection));
     }
+
+    @DeleteMapping("/delete")
+    public void deleteArticle(@RequestParam Long id) {
+        moderationArticleService.deleteArticle(id);
+    }
+
+//    @GetMapping("/deleted/get")
+//    public ResponseEntity<PageResponse<ArticleDto>> getDeletedArticlesByAdmins(
+//            @RequestParam(name = "page", defaultValue = "1") int page,
+//            @RequestParam(name = "size", defaultValue = "10") int size,
+//            @RequestParam(name = "sortBy", defaultValue = "deletedAt") String sortBy,
+//            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
+//    ) {
+//        return ResponseEntity.ok(moderationService.getDeletedArticlesByAdmins(page, size, sortBy, sortDirection));
+//    }
 }

@@ -17,7 +17,9 @@ public class UserDtoMapper {
                 appUser.getCity(),
                 appUser.getUserRole(),
                 appUser.getArticlesCount(),
-                appUser.getCommentsCount()
+                appUser.getCommentsCount(),
+                appUser.isAccountBlocked(),
+                appUser.getBlockedDate()
         );
     }
 }

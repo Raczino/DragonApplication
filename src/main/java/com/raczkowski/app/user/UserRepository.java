@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
+
 @Repository
 @Transactional(readOnly = true)
 public interface UserRepository extends JpaRepository<AppUser, Long> {
@@ -21,6 +23,20 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
             "SET c.userRole = :userRole " +
             "WHERE c.id = :id")
     void updateAppUserByUserRole(Long id, UserRole userRole);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE AppUser c " +
+            "SET c.locked = true, c.blockedDate=:blockedDate "+
+            "WHERE c.id = :id")
+    void blockUser(Long id, ZonedDateTime blockedDate);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE AppUser c " +
+            "SET c.locked = false , c.blockedDate=null "+
+            "WHERE c.id = :id")
+    void unBlockUser(Long id);
 
     @Transactional
     @Modifying

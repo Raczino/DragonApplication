@@ -1,8 +1,8 @@
 package com.raczkowski.app.admin.moderation.article;
 
-import com.raczkowski.app.admin.common.AdminValidator;
-import com.raczkowski.app.article.Article;
-import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.article.*;
+import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
@@ -10,6 +10,7 @@ import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
+import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
@@ -26,21 +27,24 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Transactional
-public class ModerationService {
+public class ModerationArticleService {
 
     ArticleToConfirmRepository articleToConfirmRepository;
     ArticleRepository articleRepository;
     UserRepository userRepository;
     UserService userService;
     RejectedArticleRepository rejectedArticleRepository;
-    AdminValidator adminValidator;
+    PermissionValidator permissionValidator;
+    DeletedArticleService deletedArticleService;
+    DeletedArticleRepository deletedArticleRepository;
+    CommentService commentService;
 
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
     }
 
     public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
         Page<ArticleToConfirm> article = GenericService
                 .pagination(
                         articleToConfirmRepository,
@@ -63,7 +67,7 @@ public class ModerationService {
     }
 
     public ArticleDto confirmArticle(Long articleId) {
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser appUser = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
@@ -86,7 +90,7 @@ public class ModerationService {
     }
 
     public RejectedArticleDto rejectArticle(Long articleId) {
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser user = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
@@ -108,7 +112,7 @@ public class ModerationService {
     }
 
     public PageResponse<RejectedArticleDto> getRejectedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
 
         Page<RejectedArticle> article = GenericService
                 .pagination(
@@ -133,14 +137,15 @@ public class ModerationService {
     }
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
         Optional<AppUser> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new ResponseException("User doesn't exists");
         }
 
         Page<Article> article = GenericService
-                .pagination(
+                .paginationOfElementsAcceptedByUser(
+                        user,
                         articleRepository,
                         pageNumber,
                         pageSize,
@@ -150,7 +155,6 @@ public class ModerationService {
 
         return new PageResponse<>(article
                 .stream()
-                .filter(art -> art.getAcceptedBy().getId().equals(user.get().getId()))
                 .map(ArticleDtoMapper::articleDtoMapper)
                 .toList(),
                 new MetaData(
@@ -160,4 +164,32 @@ public class ModerationService {
                         article.getSize())
         );
     }
+
+    public void deleteArticle(Long articleId) {
+        permissionValidator.validateIfUserIsAdminOrOperator();
+        AppUser user = userService.getLoggedUser();
+        deletedArticleService.deleteArticle(articleId, ArticleStatus.DELETED_BY_ADMIN, user);
+    }
+
+//    public PageResponse<DeletedArticle> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
+//        Page<DeletedArticle> articles = GenericService
+//                .paginationOfDeletedArticlesByStatus(
+//                        deletedArticleRepository,
+//                        ArticleStatus.DELETED_BY_ADMIN,
+//                        page,
+//                        size,
+//                        sortBy,
+//                        sortDirection
+//                );
+//        return new PageResponse<>(
+//                articles
+//                        .stream()
+//                        .map(ArticleDtoMapper::articleDtoMapper)
+//                        .toList(),
+//                new MetaData(articles.getTotalElements(),
+//                        articles.getTotalPages(),
+//                        articles.getNumber() + 1,
+//                        articles.getSize())
+//        );
+//    }
 }

@@ -1,6 +1,6 @@
 package com.raczkowski.app.admin;
 
-import com.raczkowski.app.admin.common.AdminValidator;
+import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminValidatorTest {
+public class PermissionValidatorTest {
 
     @Mock
     private UserService userService;
 
     @InjectMocks
-    private AdminValidator adminValidator;
+    private PermissionValidator permissionValidator;
 
     @Test
     public void shouldValidateIfUserIsAdmin() {
@@ -31,7 +31,7 @@ public class AdminValidatorTest {
         when(userService.getLoggedUser()).thenReturn(adminUser);
 
         // When
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
 
         // Then: No exception should be thrown
     }
@@ -44,7 +44,7 @@ public class AdminValidatorTest {
         when(userService.getLoggedUser()).thenReturn(moderatorUser);
 
         // When
-        adminValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrOperator();
 
         // Then: No exception should be thrown
     }
@@ -57,6 +57,6 @@ public class AdminValidatorTest {
         when(userService.getLoggedUser()).thenReturn(regularUser);
 
         // When & Then: Expecting a ResponseException to be thrown
-        assertThrows(ResponseException.class, () -> adminValidator.validateIfUserIsAdminOrOperator());
+        assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrOperator());
     }
 }

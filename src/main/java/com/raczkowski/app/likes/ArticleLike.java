@@ -33,7 +33,7 @@ public class ArticleLike {
     )
     private AppUser appUser;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(
             nullable = false
     )

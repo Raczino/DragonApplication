@@ -18,7 +18,8 @@ public class CommentDtoMapper {
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
                         comment.getAppUser().getLastName(),
-                        comment.getAppUser().getEmail()
+                        comment.getAppUser().getEmail(),
+                        comment.getAppUser().isAccountBlocked()
                 ),
                 comment.getPostedDate(),
                 comment.isUpdated()
@@ -36,7 +37,8 @@ public class CommentDtoMapper {
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
                         comment.getAppUser().getLastName(),
-                        comment.getAppUser().getEmail()
+                        comment.getAppUser().getEmail(),
+                        comment.getAppUser().isAccountBlocked()
                 ),
                 comment.getPostedDate(),
                 comment.isUpdated(),

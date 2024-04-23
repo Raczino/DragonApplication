@@ -17,4 +17,6 @@ public class authorDto {
     private String lastName;
 
     private String email;
+
+    private boolean isBlocked;
 }

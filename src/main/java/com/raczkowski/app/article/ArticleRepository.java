@@ -1,6 +1,6 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,13 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Article getFirstByOrderByLikesNumberDesc();
 
-    Page<Article> getArticleByAcceptedBy(AppUser appUser, Pageable pageable);
+    Page<Article> getArticleByAcceptedBy(Optional<AppUser> appUser, Pageable pageable);
+
+
+    Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
+
+    @Transactional
+    void deleteArticleById(@Param("id") Long id);
 
     @Transactional
     @Modifying

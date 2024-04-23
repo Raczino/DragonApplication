@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.ZonedDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -30,4 +32,8 @@ public class UserDto {
     private int articlesCount;
 
     private int commentsCount;
+
+    private boolean isBlocked;
+
+    private ZonedDateTime blockedDate;
 }

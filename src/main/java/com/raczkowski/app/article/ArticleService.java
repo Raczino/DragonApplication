@@ -1,18 +1,17 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
-import com.raczkowski.app.admin.moderation.article.ModerationService;
-import com.raczkowski.app.comment.Comment;
+import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
 import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
+import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
-import com.raczkowski.app.likes.CommentLikeRepository;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
@@ -35,8 +34,8 @@ public class ArticleService {
     private final UserService userService;
     private final CommentService commentService;
     private final ArticleLikeRepository articleLikeRepository;
-    private final CommentLikeRepository commentLikeRepository;
-    private final ModerationService moderationService;
+    private final ModerationArticleService moderationArticleService;
+    private final DeletedArticleService deletedArticleService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -55,7 +54,7 @@ public class ArticleService {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
-        moderationService.addArticle(articleToConfirm);
+        moderationArticleService.addArticle(articleToConfirm);
 
         return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
     }
@@ -70,6 +69,7 @@ public class ArticleService {
                         sortDirection
                 );
         AppUser user = userService.getLoggedUser();
+
 
         return new PageResponse<>(
                 articlePage
@@ -101,18 +101,7 @@ public class ArticleService {
 
     @Transactional
     public String removeArticle(Long id) {
-        Article article = articleRepository.findArticleById(id);
-        if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
-            throw new ResponseException("User doesn't have permission to remove this article");
-        }
-
-        articleLikeRepository.deleteArticleLikesByArticle(article);
-
-        for (Comment comment : article.getComments()) {
-            commentLikeRepository.deleteCommentLikesByComment(comment);
-        }
-
-        articleRepository.deleteById(id);
+        deletedArticleService.deleteArticle(id, ArticleStatus.DELETED, null);
         return "Removed";
     }
 

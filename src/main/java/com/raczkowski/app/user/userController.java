@@ -19,4 +19,9 @@ public class userController {
     ResponseEntity<UserDto> getUserById(@RequestParam Long id){
         return ResponseEntity.ok(userService.getUserById(id));
     }
+
+    @GetMapping("/get/login")
+    ResponseEntity<AppUser> getLoggedUser(){
+        return ResponseEntity.ok(userService.getLoggedUser());
+    }
 }

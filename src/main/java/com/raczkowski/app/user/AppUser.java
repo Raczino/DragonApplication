@@ -62,6 +62,8 @@ public class AppUser implements UserDetails {
 
     private ZonedDateTime registrationDate;
 
+    private ZonedDateTime blockedDate;
+
     public AppUser(String firstName,
                    String lastName,
                    String email,
@@ -114,6 +116,10 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         return !locked;
+    }
+
+    public boolean isAccountBlocked() {
+        return locked;
     }
 
     @Override

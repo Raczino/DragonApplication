@@ -6,6 +6,7 @@ import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
+import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
@@ -28,7 +29,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
 
-    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize) {
+    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize) { //TODO: do poprawy aby pobierało komentarzy z danego artykułu
         Page<Comment> commentPage = GenericService
                 .pagination(
                         commentRepository,
@@ -94,7 +95,13 @@ public class CommentService {
 
     public String removeComment(Long id) {
         Comment comment = commentRepository.findCommentById(id);
-        if (comment != null && !comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+        if (comment == null) {
+            throw new ResponseException("Comment doesn't exists");
+        }
+
+        AppUser user = userService.getLoggedUser();
+
+        if (!comment.getAppUser().getId().equals(user.getId()) || (!user.getUserRole().equals(UserRole.ADMIN) && !user.getUserRole().equals(UserRole.MODERATOR))) {
             throw new ResponseException("User doesn't have permission to remove this comment");
         }
         commentRepository.deleteById(id);

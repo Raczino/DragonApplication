@@ -22,7 +22,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 ),
                 article.getUpdatedAt(),
                 article.isUpdated(),
@@ -32,7 +33,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 )
         );
     }
@@ -47,7 +49,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 ),
                 article.getStatus(),
                 article.getRejectedAt(),
@@ -55,7 +58,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 )
         );
     }
@@ -70,7 +74,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 ),
                 article.getStatus()
         );
@@ -87,7 +92,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 ),
                 article.getUpdatedAt(),
                 article.isUpdated(),
@@ -99,7 +105,8 @@ public class ArticleDtoMapper {
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail()
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
                 )
         );
     }

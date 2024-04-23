@@ -2,9 +2,7 @@ package com.raczkowski.app.article;
 
 import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.enums.ArticleStatus;
-import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.user.AppUser;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,19 +14,18 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode
-@NoArgsConstructor
 @Entity
-public class Article {
+@NoArgsConstructor
+public class DeletedArticle {
     @SequenceGenerator(
-            name = "article_sequence",
-            sequenceName = "article_sequence",
+            name = "deleted_article_sequence",
+            sequenceName = "deleted_article_sequence",
             allocationSize = 1
     )
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "article_sequence"
+            generator = "deleted_article_sequence"
     )
     private Long id;
 
@@ -47,50 +44,52 @@ public class Article {
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.APPROVED;
+    private ArticleStatus status;
 
-    private int likesNumber = 0;
+    private int likesNumber;
 
     private ZonedDateTime updatedAt;
 
-    private boolean isUpdated = false;
+    private boolean isUpdated;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
-    private List<ArticleLike> articleLikes = new ArrayList<>();
 
     private ZonedDateTime acceptedAt;
 
     @OneToOne
     private AppUser acceptedBy;
 
-    public Article(
-            String title,
-            String content,
-            ZonedDateTime postedDate,
-            AppUser appUser
-    ) {
-        this.title = title;
-        this.content = content;
-        this.postedDate = postedDate;
-        this.appUser = appUser;
-    }
+    private ZonedDateTime deletedAt;
 
-    public Article(
+    @OneToOne
+    private AppUser deletedBy;
+
+    public DeletedArticle(
             String title,
             String content,
             ZonedDateTime postedDate,
             AppUser appUser,
+            ArticleStatus status,
+            int likesNumber,
+            ZonedDateTime updatedAt,
+            boolean isUpdated,
             ZonedDateTime acceptedAt,
-            AppUser acceptedBy
+            AppUser acceptedBy,
+            ZonedDateTime deletedAt,
+            AppUser deletedBy
     ) {
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
         this.appUser = appUser;
+        this.status = status;
+        this.likesNumber = likesNumber;
+        this.updatedAt = updatedAt;
+        this.isUpdated = isUpdated;
         this.acceptedAt = acceptedAt;
         this.acceptedBy = acceptedBy;
+        this.deletedAt = deletedAt;
+        this.deletedBy = deletedBy;
     }
 }
