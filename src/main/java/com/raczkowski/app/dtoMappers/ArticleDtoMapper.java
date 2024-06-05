@@ -3,10 +3,8 @@ package com.raczkowski.app.dtoMappers;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.RejectedArticle;
 import com.raczkowski.app.article.Article;
-import com.raczkowski.app.dto.ArticleDto;
-import com.raczkowski.app.dto.NonConfirmedArticleDto;
-import com.raczkowski.app.dto.RejectedArticleDto;
-import com.raczkowski.app.dto.authorDto;
+import com.raczkowski.app.article.DeletedArticle;
+import com.raczkowski.app.dto.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +16,7 @@ public class ArticleDtoMapper {
                 article.getContent(),
                 article.getPostedDate(),
                 article.getLikesNumber(),
-                new authorDto(
+                new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
@@ -29,12 +27,12 @@ public class ArticleDtoMapper {
                 article.isUpdated(),
                 article.getStatus(),
                 article.getAcceptedAt(),
-                new authorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
+                new AuthorDto(
+                        article.getAcceptedBy().getId(),
+                        article.getAcceptedBy().getFirstName(),
+                        article.getAcceptedBy().getLastName(),
+                        article.getAcceptedBy().getEmail(),
+                        article.getAcceptedBy().isAccountBlocked()
                 )
         );
     }
@@ -45,7 +43,7 @@ public class ArticleDtoMapper {
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                new authorDto(
+                new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
@@ -54,12 +52,12 @@ public class ArticleDtoMapper {
                 ),
                 article.getStatus(),
                 article.getRejectedAt(),
-                new authorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
+                new AuthorDto(
+                        article.getRejectedBy().getId(),
+                        article.getRejectedBy().getFirstName(),
+                        article.getRejectedBy().getLastName(),
+                        article.getRejectedBy().getEmail(),
+                        article.getRejectedBy().isAccountBlocked()
                 )
         );
     }
@@ -70,7 +68,7 @@ public class ArticleDtoMapper {
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                new authorDto(
+                new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
@@ -81,6 +79,42 @@ public class ArticleDtoMapper {
         );
     }
 
+    public static DeletedArticleDto deletedArticle(DeletedArticle article) {
+        return new DeletedArticleDto(
+                article.getId(),
+                article.getTitle(),
+                article.getContent(),
+                article.getPostedDate(),
+                article.getLikesNumber(),
+                new AuthorDto(
+                        article.getAppUser().getId(),
+                        article.getAppUser().getFirstName(),
+                        article.getAppUser().getLastName(),
+                        article.getAppUser().getEmail(),
+                        article.getAppUser().isAccountBlocked()
+                ),
+                article.getUpdatedAt(),
+                article.isUpdated(),
+                article.getStatus(),
+                article.getAcceptedAt(),
+                new AuthorDto(
+                        article.getAcceptedBy().getId(),
+                        article.getAcceptedBy().getFirstName(),
+                        article.getAcceptedBy().getLastName(),
+                        article.getAcceptedBy().getEmail(),
+                        article.getAcceptedBy().isAccountBlocked()
+                ),
+                article.getDeletedAt(),
+                new AuthorDto(
+                        article.getDeletedBy().getId(),
+                        article.getDeletedBy().getFirstName(),
+                        article.getDeletedBy().getLastName(),
+                        article.getDeletedBy().getEmail(),
+                        article.getDeletedBy().isAccountBlocked()
+                )
+        );
+    }
+
     public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked, int commentsNumber) {
         return new ArticleDto(
                 article.getId(),
@@ -88,7 +122,7 @@ public class ArticleDtoMapper {
                 article.getContent(),
                 article.getPostedDate(),
                 article.getLikesNumber(),
-                new authorDto(
+                new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
                         article.getAppUser().getLastName(),
@@ -101,12 +135,12 @@ public class ArticleDtoMapper {
                 isLiked,
                 commentsNumber,
                 article.getAcceptedAt(),
-                new authorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
+                new AuthorDto(
+                        article.getAcceptedBy().getId(),
+                        article.getAcceptedBy().getFirstName(),
+                        article.getAcceptedBy().getLastName(),
+                        article.getAcceptedBy().getEmail(),
+                        article.getAcceptedBy().isAccountBlocked()
                 )
         );
     }

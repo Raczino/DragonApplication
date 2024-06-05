@@ -7,6 +7,7 @@ import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dto.DeletedArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
@@ -171,25 +172,24 @@ public class ModerationArticleService {
         deletedArticleService.deleteArticle(articleId, ArticleStatus.DELETED_BY_ADMIN, user);
     }
 
-//    public PageResponse<DeletedArticle> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
-//        Page<DeletedArticle> articles = GenericService
-//                .paginationOfDeletedArticlesByStatus(
-//                        deletedArticleRepository,
-//                        ArticleStatus.DELETED_BY_ADMIN,
-//                        page,
-//                        size,
-//                        sortBy,
-//                        sortDirection
-//                );
-//        return new PageResponse<>(
-//                articles
-//                        .stream()
-//                        .map(ArticleDtoMapper::articleDtoMapper)
-//                        .toList(),
-//                new MetaData(articles.getTotalElements(),
-//                        articles.getTotalPages(),
-//                        articles.getNumber() + 1,
-//                        articles.getSize())
-//        );
-//    }
+    public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
+        Page<DeletedArticle> articles = GenericService
+                .paginationOfDeletedArticles(
+                        deletedArticleRepository,
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection
+                );
+        return new PageResponse<>(
+                articles
+                        .stream()
+                        .map(ArticleDtoMapper::deletedArticle)
+                        .toList(),
+                new MetaData(articles.getTotalElements(),
+                        articles.getTotalPages(),
+                        articles.getNumber() + 1,
+                        articles.getSize())
+        );
+    }
 }

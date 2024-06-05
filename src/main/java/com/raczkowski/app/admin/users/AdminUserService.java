@@ -1,9 +1,7 @@
 package com.raczkowski.app.admin.users;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
-import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
-import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;

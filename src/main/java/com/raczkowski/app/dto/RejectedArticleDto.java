@@ -19,11 +19,11 @@ public class RejectedArticleDto {
 
     private ZonedDateTime postedDate;
 
-    private authorDto user;
+    private AuthorDto user;
 
     private ArticleStatus status;
 
     private ZonedDateTime rejectedAt;
 
-    private authorDto rejectedBy;
+    private AuthorDto rejectedBy;
 }

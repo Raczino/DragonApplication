@@ -1,6 +1,7 @@
 package com.raczkowski.app.dto;
 
 import com.raczkowski.app.enums.ArticleStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class ArticleDto {
     private Long id;
 
@@ -20,7 +22,7 @@ public class ArticleDto {
 
     private int likesCount;
 
-    private authorDto user;
+    private AuthorDto author;
 
     private ZonedDateTime updatedAt;
 
@@ -30,11 +32,11 @@ public class ArticleDto {
 
     private int commentsNumber;
 
-    ArticleStatus status;
+    private ArticleStatus status;
 
-    ZonedDateTime acceptedAt;
+    private ZonedDateTime acceptedAt;
 
-    authorDto acceptedBy;
+    private AuthorDto acceptedBy;
 
     public ArticleDto
             (
@@ -43,19 +45,19 @@ public class ArticleDto {
                     String content,
                     ZonedDateTime postedDate,
                     int likesCount,
-                    authorDto user,
+                    AuthorDto author,
                     ZonedDateTime updatedAt,
                     boolean isUpdated,
                     ArticleStatus status,
                     ZonedDateTime acceptedAt,
-                    authorDto acceptedBy
+                    AuthorDto acceptedBy
             ) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
         this.likesCount = likesCount;
-        this.user = user;
+        this.author = author;
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
         this.status = status;
@@ -70,21 +72,21 @@ public class ArticleDto {
                     String content,
                     ZonedDateTime postedDate,
                     int likesCount,
-                    authorDto user,
+                    AuthorDto author,
                     ZonedDateTime updatedAt,
                     boolean isUpdated,
                     ArticleStatus status,
                     boolean isLiked,
                     int commentsNumber,
                     ZonedDateTime acceptedAt,
-                    authorDto acceptedBy
+                    AuthorDto acceptedBy
             ) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
         this.likesCount = likesCount;
-        this.user = user;
+        this.author = author;
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
         this.status = status;
@@ -99,14 +101,14 @@ public class ArticleDto {
             String title,
             String content,
             ZonedDateTime postedDate,
-            authorDto user,
+            AuthorDto author,
             ArticleStatus status
     ) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
-        this.user = user;
+        this.author = author;
         this.status = status;
     }
 }

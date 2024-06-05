@@ -58,9 +58,9 @@ public class ArticleServiceTest {
         // then
         assertEquals(createdArticle.getTitle(), request.getTitle());
         assertEquals(createdArticle.getContent(), request.getContent());
-        assertEquals(createdArticle.getUser().getFirstName(), mockUser.getFirstName());
-        assertEquals(createdArticle.getUser().getLastName(), mockUser.getLastName());
-        assertEquals(createdArticle.getUser().getEmail(), mockUser.getEmail());
+        assertEquals(createdArticle.getAuthor().getFirstName(), mockUser.getFirstName());
+        assertEquals(createdArticle.getAuthor().getLastName(), mockUser.getLastName());
+        assertEquals(createdArticle.getAuthor().getEmail(), mockUser.getEmail());
         verify(moderationArticleService, times(1)).addArticle(any());
     }
 
@@ -145,11 +145,11 @@ public class ArticleServiceTest {
         assertEquals("Title1", result.get(0).getTitle());
         assertEquals("Content1", result.get(0).getContent());
         assertEquals(postedDate, result.get(0).getPostedDate());
-        assertEquals(user.getId(), result.get(0).getUser().getId());
+        assertEquals(user.getId(), result.get(0).getAuthor().getId());
         assertEquals("Title2", result.get(1).getTitle());
         assertEquals("Content2", result.get(1).getContent());
         assertEquals(postedDate, result.get(1).getPostedDate());
-        assertEquals(user.getId(), result.get(1).getUser().getId());
+        assertEquals(user.getId(), result.get(1).getAuthor().getId());
         verify(userRepository, times(1)).findById(userId);
         verify(articleRepository, times(1)).findAllByAppUser(Optional.of(user));
     }
@@ -237,7 +237,7 @@ public class ArticleServiceTest {
         // then
         assertNotNull(result);
         assertEquals(articleId, result.getId());
-        assertEquals(userId, result.getUser().getId());
+        assertEquals(userId, result.getAuthor().getId());
         verify(articleRepository, times(1)).findArticleById(articleId);
     }
 
