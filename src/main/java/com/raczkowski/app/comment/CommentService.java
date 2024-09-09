@@ -137,4 +137,8 @@ public class CommentService {
     private boolean isCommentLiked(Comment comment, AppUser user) {
         return commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment);
     }
+
+    public void pinComment(Long id) {
+        commentRepository.pinComment(id);
+    }
 }

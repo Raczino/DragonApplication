@@ -73,4 +73,9 @@ public class ArticleModerationController {
     ) {
         return ResponseEntity.ok(moderationArticleService.getAllDeletedArticlesByAdmins(page, size, sortBy, sortDirection));
     }
+
+    @PostMapping("/pin")
+    public void getDeletedArticlesByAdmins(@RequestParam Long id) {
+        moderationArticleService.pinArticle(id);
+    }
 }

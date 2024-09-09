@@ -24,6 +24,12 @@ public class GenericService {
         return repository.findAll(pageable);
     }
 
+    public static Page<Article> paginationOfArticle(ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Pageable pageable = PageRequest
+                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        return articleRepository.findAllWithPinnedFirst(pageable);
+    }
+
     public static Page<DeletedArticle> paginationOfDeletedArticles(DeletedArticleRepository deletedArticleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest
                 .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));

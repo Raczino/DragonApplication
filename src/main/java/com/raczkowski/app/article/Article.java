@@ -66,6 +66,9 @@ public class Article {
     @OneToOne
     private AppUser acceptedBy;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isPinned;
+
     public Article(
             String title,
             String content,

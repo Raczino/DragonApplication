@@ -141,7 +141,8 @@ public class ArticleDtoMapper {
                         article.getAcceptedBy().getLastName(),
                         article.getAcceptedBy().getEmail(),
                         article.getAcceptedBy().isAccountBlocked()
-                )
+                ),
+                article.isPinned()
         );
     }
 }

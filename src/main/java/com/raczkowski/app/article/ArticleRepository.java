@@ -21,6 +21,9 @@ import java.util.Optional;
 public interface ArticleRepository extends JpaRepository<Article, Long> {
     @NonNull Page<Article> findAll(@NonNull Pageable pageable);
 
+    @Query("SELECT a FROM Article a ORDER BY a.isPinned DESC")
+    Page<Article> findAllWithPinnedFirst(Pageable pageable);
+
     Article findArticleById(Long id);
 
     List<Article> findAllByAppUser(Optional<AppUser> appUser);
@@ -48,4 +51,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             "SET c.title = :title, c.content = :content, c.updatedAt = :zonedDateTime, c.isUpdated = true WHERE c.id = :id")
     void updateArticle(@Param("id") Long id, @Param("title") String tile, @Param("content") String content, ZonedDateTime zonedDateTime);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Article c " +
+            "SET c.isPinned = true WHERE c.id = :id")
+    void pinArticle(@Param("id") Long id);
 }

@@ -14,7 +14,8 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Page<Comment> getAllByArticleId(Long articleId, Pageable pageable);
+    @Query("SELECT a FROM Comment a ORDER BY a.isPinned DESC")
+    Page<Comment> findAllWithPinnedFirst(Pageable pageable);
 
     Comment findCommentById(Long id);
 
@@ -32,4 +33,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("UPDATE Comment c " +
             "SET c.content = :content, c.updatedAt = :zonedDateTime, c.isUpdated = true WHERE c.id = :id")
     void updateCommentContent(@Param("id") Long id, @Param("content") String content, ZonedDateTime zonedDateTime);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Comment c " +
+            "SET c.isPinned = true WHERE c.id = :id")
+    void pinComment(@Param("id") Long id);
 }

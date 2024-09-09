@@ -61,7 +61,7 @@ public class ArticleService {
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Page<Article> articlePage = GenericService
-                .pagination(
+                .paginationOfArticle(
                         articleRepository,
                         pageNumber,
                         pageSize,

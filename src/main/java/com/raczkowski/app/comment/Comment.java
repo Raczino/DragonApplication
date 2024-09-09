@@ -54,6 +54,9 @@ public class Comment {
     @OneToOne(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private CommentLike commentLike;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isPinned;
+
     public Comment(
             String content,
             ZonedDateTime postedDate,

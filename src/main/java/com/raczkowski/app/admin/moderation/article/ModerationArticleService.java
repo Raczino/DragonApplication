@@ -173,6 +173,7 @@ public class ModerationArticleService {
     }
 
     public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
+        permissionValidator.validateIfUserIsAdminOrOperator();
         Page<DeletedArticle> articles = GenericService
                 .paginationOfDeletedArticles(
                         deletedArticleRepository,
@@ -191,5 +192,15 @@ public class ModerationArticleService {
                         articles.getNumber() + 1,
                         articles.getSize())
         );
+    }
+
+    public void pinArticle(Long id) {
+        permissionValidator.validateIfUserIsAdminOrOperator();
+
+        if (articleRepository.findArticleById(id) == null) {
+            throw new ResponseException("There is no article with provided id");
+        }
+
+        articleRepository.pinArticle(id);
     }
 }

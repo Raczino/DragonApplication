@@ -24,7 +24,7 @@ public class CommentController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size));
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size)); //TODO: zmienic metode zwracajaca aby zwracaa komentarze dla artykulu
     }
 
     @PostMapping("/like")
@@ -40,5 +40,10 @@ public class CommentController {
     @PutMapping("/update")
     ResponseEntity<String> updateComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(commentService.updateComment(commentRequest));
+    }
+
+    @PostMapping("/pin")
+    void pinComment(@RequestParam Long id) {
+        commentService.pinComment(id);
     }
 }

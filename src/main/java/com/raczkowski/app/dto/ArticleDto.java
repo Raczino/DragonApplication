@@ -38,6 +38,8 @@ public class ArticleDto {
 
     private AuthorDto acceptedBy;
 
+    private boolean isPinned;
+
     public ArticleDto
             (
                     Long id,
@@ -79,7 +81,8 @@ public class ArticleDto {
                     boolean isLiked,
                     int commentsNumber,
                     ZonedDateTime acceptedAt,
-                    AuthorDto acceptedBy
+                    AuthorDto acceptedBy,
+                    boolean isPinned
             ) {
         this.id = id;
         this.title = title;
@@ -94,6 +97,7 @@ public class ArticleDto {
         this.commentsNumber = commentsNumber;
         this.acceptedAt = acceptedAt;
         this.acceptedBy = acceptedBy;
+        this.isPinned = isPinned;
     }
 
     public ArticleDto(
