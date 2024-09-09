@@ -4,7 +4,6 @@ import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.article.DeletedArticle;
 import com.raczkowski.app.article.DeletedArticleRepository;
-import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,16 +24,16 @@ public class GenericService {
         return repository.findAll(pageable);
     }
 
-    public static Page<DeletedArticle> paginationOfDeletedArticlesByAdmin(AppUser adminUser, DeletedArticleRepository deletedArticleRepository, ArticleStatus status, int pageNumber, int pageSize, String sortBy, String sortDirection) {
+    public static Page<Article> paginationOfArticle(ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest
                 .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        return deletedArticleRepository.getDeletedArticleByDeletedByAndStatus(adminUser, status, pageable);
+        return articleRepository.findAllWithPinnedFirst(pageable);
     }
 
-    public static Page<DeletedArticle> paginationOfDeletedArticlesByStatus(DeletedArticleRepository deletedArticleRepository, ArticleStatus status, int pageNumber, int pageSize, String sortBy, String sortDirection) {
+    public static Page<DeletedArticle> paginationOfDeletedArticles(DeletedArticleRepository deletedArticleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest
                 .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        return deletedArticleRepository.getDeletedArticleByStatus(status, pageable);
+        return deletedArticleRepository.findAll(pageable);
     }
 
     public static Page<Article> paginationOfElementsAcceptedByUser(Optional<AppUser> user, ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {

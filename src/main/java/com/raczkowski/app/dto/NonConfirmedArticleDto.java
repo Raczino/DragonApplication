@@ -8,8 +8,15 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
-public class NonConfirmedArticleDto extends ArticleDto{
-    public NonConfirmedArticleDto(Long id, String title, String content, ZonedDateTime postedDate, authorDto user, ArticleStatus status) {
+public class NonConfirmedArticleDto extends ArticleDto {
+    public NonConfirmedArticleDto(
+            Long id,
+            String title,
+            String content,
+            ZonedDateTime postedDate,
+            AuthorDto user,
+            ArticleStatus status
+    ) {
         super(id, title, content, postedDate, user, status);
     }
 }

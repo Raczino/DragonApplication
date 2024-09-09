@@ -1,5 +1,6 @@
 package com.raczkowski.app.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,7 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class CommentDto {
     private Long id;
 
@@ -14,11 +16,11 @@ public class CommentDto {
 
     private ZonedDateTime postedDate;
 
-    private Long ArticleId;
+    private Long articleId;
 
     private int likesNumber;
 
-    private authorDto author;
+    private AuthorDto author;
 
     private ZonedDateTime updatedAt;
 
@@ -33,40 +35,17 @@ public class CommentDto {
                     ZonedDateTime postedDate,
                     Long articleId,
                     int likesNumber,
-                    authorDto author,
+                    AuthorDto author,
                     ZonedDateTime updatedAt,
                     boolean isUpdated
             ) {
         this.id = id;
         this.content = content;
         this.postedDate = postedDate;
-        ArticleId = articleId;
+        this.articleId = articleId;
         this.likesNumber = likesNumber;
         this.author = author;
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
-    }
-
-    public CommentDto
-            (
-                    Long id,
-                    String content,
-                    ZonedDateTime postedDate,
-                    Long articleId,
-                    int likesNumber,
-                    authorDto author,
-                    ZonedDateTime updatedAt,
-                    boolean isUpdated,
-                    boolean isLiked
-            ) {
-        this.id = id;
-        this.content = content;
-        this.postedDate = postedDate;
-        ArticleId = articleId;
-        this.likesNumber = likesNumber;
-        this.author = author;
-        this.updatedAt = updatedAt;
-        this.isUpdated = isUpdated;
-        this.isLiked = isLiked;
     }
 }

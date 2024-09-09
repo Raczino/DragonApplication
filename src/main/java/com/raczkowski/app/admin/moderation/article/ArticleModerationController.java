@@ -1,7 +1,9 @@
 package com.raczkowski.app.admin.moderation.article;
 
+import com.raczkowski.app.article.DeletedArticle;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dto.DeletedArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
 import lombok.AllArgsConstructor;
@@ -62,13 +64,18 @@ public class ArticleModerationController {
         moderationArticleService.deleteArticle(id);
     }
 
-//    @GetMapping("/deleted/get")
-//    public ResponseEntity<PageResponse<ArticleDto>> getDeletedArticlesByAdmins(
-//            @RequestParam(name = "page", defaultValue = "1") int page,
-//            @RequestParam(name = "size", defaultValue = "10") int size,
-//            @RequestParam(name = "sortBy", defaultValue = "deletedAt") String sortBy,
-//            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
-//    ) {
-//        return ResponseEntity.ok(moderationService.getDeletedArticlesByAdmins(page, size, sortBy, sortDirection));
-//    }
+    @GetMapping("/deleted/get")
+    public ResponseEntity<PageResponse<DeletedArticleDto>> getDeletedArticlesByAdmins(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "deletedAt") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
+    ) {
+        return ResponseEntity.ok(moderationArticleService.getAllDeletedArticlesByAdmins(page, size, sortBy, sortDirection));
+    }
+
+    @PostMapping("/pin")
+    public void getDeletedArticlesByAdmins(@RequestParam Long id) {
+        moderationArticleService.pinArticle(id);
+    }
 }
