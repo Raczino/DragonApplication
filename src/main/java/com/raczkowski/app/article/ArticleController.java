@@ -5,6 +5,7 @@ import com.raczkowski.app.dto.ArticleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import twitter4j.TwitterException;
 
 import java.util.List;
 

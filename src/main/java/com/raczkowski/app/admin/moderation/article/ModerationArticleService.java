@@ -13,6 +13,7 @@ import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -83,8 +86,10 @@ public class ModerationArticleService {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 appUser
         );
-        articleToConfirmRepository.deleteArticleToConfirmById(articleId);
+        List<Hashtag> hashtags = new ArrayList<>(articleToConfirm.getHashtags());
+        article.setHashtags(hashtags);
         articleRepository.save(article);
+        articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         userRepository.updateArticlesCount(article.getAppUser().getId());
 
         return ArticleDtoMapper.articleDtoMapper(article);

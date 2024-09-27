@@ -1,6 +1,7 @@
 package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.user.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,6 +45,14 @@ public class ArticleToConfirm {
 
     @Enumerated(EnumType.STRING)
     private ArticleStatus status = ArticleStatus.PENDING;
+
+    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE} )
+    @JoinTable(
+            name = "article_to_confirm_hashtag",
+            joinColumns = @JoinColumn(name = "article_to_confirm_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    private List<Hashtag> hashtags = new ArrayList<>();
 
     public ArticleToConfirm(
             String title,

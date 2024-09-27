@@ -10,6 +10,8 @@ import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.hashtags.Hashtag;
+import com.raczkowski.app.hashtags.HashtagService;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -18,6 +20,8 @@ import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import twitter4j.Status;
+import twitter4j.TwitterException;
 
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
@@ -36,6 +40,7 @@ public class ArticleService {
     private final ArticleLikeRepository articleLikeRepository;
     private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
+    private final HashtagService hashtagService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -48,15 +53,26 @@ public class ArticleService {
         }
         AppUser user = userService.getLoggedUser();
 
+
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
+
+        if (request.getHashtags()!=null) {
+            List<Hashtag> hashtags = hashtagService.parseHashtags(request.getHashtags());
+            articleToConfirm.setHashtags(hashtags);
+        }
+
         moderationArticleService.addArticle(articleToConfirm);
 
         return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
+    }
+
+    public List<Article> getAllArticles(){
+        return articleRepository.findAll();
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
