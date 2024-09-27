@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -27,9 +26,10 @@ import java.util.List;
 public class RedditClient {
 
     private final RedditPostRepository redditPostRepository;
+    private final RedditClientConfig redditClientConfig;
 
     public String getAccessToken() throws IOException {
-        String auth = CLIENT_ID + ":" + CLIENT_SECRET;
+        String auth = redditClientConfig.getClient().getId() + ":" + redditClientConfig.getClient().getSecret();
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
         String url = "https://www.reddit.com/api/v1/access_token";
         String postData = "grant_type=client_credentials";
@@ -41,36 +41,18 @@ public class RedditClient {
         return jsonResponse.get("access_token").getAsString();
     }
 
-    public void searchPostsOnSubreddit(String keyword) throws IOException {
+    public List<RedditPost> searchPostsOnSubreddit(String keyword) throws IOException {
         String queryq = String.join("|", keyword);
         String encodedQuery = URLEncoder.encode(queryq, StandardCharsets.UTF_8);
 
         String accessToken = getAccessToken();
-        String urlString = "https://oauth.reddit.com/r/" + SUBREDDIT + "/search.json?q=" + encodedQuery + "&restrict_sr=true&limit=10";
+        String urlString = "https://oauth.reddit.com/r/" + redditClientConfig.getUser().getSubreddit() + "/search.json?q=" + encodedQuery + "&restrict_sr=true&limit=10";
         HttpURLConnection conn = sendHttpRequest(urlString, "GET", "Bearer " + accessToken, null);
         String response = readResponse(conn);
         System.out.println(urlString);
-        // Przetwarzanie odpowiedzi
-        processResponse(response);
-    }
-
-    public void savePost(RedditPost newPost) {
-        List<RedditPost> existingPosts = redditPostRepository.findAll();
-
-        boolean postExists = existingPosts.stream()
-                .anyMatch(existingPost -> existingPost.equals(newPost));
-
-        if (postExists) {
-            System.out.println("Post already exists in the database.");
-        } else {
-            redditPostRepository.save(newPost);
-            System.out.println("Post saved successfully.");
-        }
-    }
-
-    private void processResponse(String response) {
         JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
         JsonArray posts = jsonResponse.getAsJsonObject("data").getAsJsonArray("children");
+        List<RedditPost> redditPostsForArticle = new ArrayList<>();
 
         for (int i = 0; i < posts.size(); i++) {
             JsonObject post = posts.get(i).getAsJsonObject().getAsJsonObject("data");
@@ -85,11 +67,20 @@ public class RedditClient {
             long createdUtc = post.get("created_utc").getAsLong();
             ZonedDateTime createdDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(createdUtc), ZoneId.systemDefault());
             redditPost.setCreatedDate(createdDate);
-            System.out.println("pobrałem " + posts.size() + " postow");
-            System.out.println("post: " + redditPost.getId() + " tite: " + redditPost.getTitle());
-//            fetchedPosts.add(redditPost);
-            //savePost(redditPost);
+            redditPost.setSearchedBy(keyword);
+            System.out.println(post.has("selftext")
+                    && !post.get("selftext").getAsString().isEmpty()
+                    ? post.get("selftext").getAsString() : "No description available");
+            if (!checkIfPostAlreadyExists(redditPost)) {
+                redditPostRepository.save(redditPost);
+                redditPostsForArticle.add(redditPost);
+            }
         }
+        return redditPostsForArticle;
+    }
+
+    public boolean checkIfPostAlreadyExists(RedditPost newPost) {
+        return redditPostRepository.existsByUrl(newPost.getUrl());
     }
 
     private HttpURLConnection sendHttpRequest(String urlString, String method, String authHeader, String postData) throws IOException {
@@ -97,7 +88,7 @@ public class RedditClient {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
         conn.setRequestProperty("Authorization", authHeader);
-        conn.setRequestProperty("User-Agent", USER_AGENT);
+        conn.setRequestProperty("User-Agent", redditClientConfig.getUser().getAgent());
         if (method.equals("POST")) {
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);

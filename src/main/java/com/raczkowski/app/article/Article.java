@@ -54,10 +54,18 @@ public class Article {
 
     private boolean isUpdated = false;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    @OneToMany(
+            mappedBy = "article",
+            cascade = CascadeType.REMOVE,
+            fetch = FetchType.LAZY
+    )
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    @OneToMany(
+            mappedBy = "article",
+            cascade = CascadeType.REMOVE,
+            fetch = FetchType.LAZY
+    )
     private List<ArticleLike> articleLikes = new ArrayList<>();
 
     private ZonedDateTime acceptedAt;
@@ -68,7 +76,7 @@ public class Article {
     @Column(columnDefinition = "boolean default false")
     private boolean isPinned;
 
-    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "article_hashtag",
             joinColumns = @JoinColumn(name = "article_id"),

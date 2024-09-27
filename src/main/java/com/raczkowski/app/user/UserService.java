@@ -55,8 +55,12 @@ public class UserService implements UserDetailsService {
                         .getName());
     }
 
-    public UserDto getUserById(Long id) {
+    public UserDto getUserByIdToDTO(Long id) {
         return UserDtoMapper.userDto(userRepository.getAppUserById(id));
+    }
+
+    public AppUser getUserById(Long id){
+        return userRepository.getAppUserById(id);
     }
 
     public AppUser getUserByEmail(String email){

@@ -27,23 +27,6 @@ public class RedditPost {
     private String description;
     private String author;
     private ZonedDateTime createdDate;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RedditPost that = (RedditPost) o;
-        return score == that.score &&
-                Objects.equals(title, that.title) &&
-                Objects.equals(url, that.url) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(author, that.author) &&
-                Objects.equals(createdDate, that.createdDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(title, score, url, description, author, createdDate);
-    }
+    private String searchedBy;
 }
 

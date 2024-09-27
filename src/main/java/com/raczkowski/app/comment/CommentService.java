@@ -77,6 +77,10 @@ public class CommentService {
         return CommentDtoMapper.commentDtoMapper(comment);
     }
 
+    public void createComment(Comment comment){
+        commentRepository.save(comment);
+    }
+
     public void likeComment(Long id) {
         AppUser user = userService.getLoggedUser();
         Comment comment = commentRepository.findCommentById(id);

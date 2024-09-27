@@ -17,7 +17,7 @@ public class userController {
 
     @GetMapping("/get")
     ResponseEntity<UserDto> getUserById(@RequestParam Long id){
-        return ResponseEntity.ok(userService.getUserById(id));
+        return ResponseEntity.ok(userService.getUserByIdToDTO(id));
     }
 
     @GetMapping("/get/login")
