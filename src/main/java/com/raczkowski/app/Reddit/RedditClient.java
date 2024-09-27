@@ -25,10 +25,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class RedditClient {
-    private static final String CLIENT_ID = "u-NWTqUDIiZFi6MBJKY-7g";
-    private static final String CLIENT_SECRET = "Ou7-NAUgGLb4S3qUu4uRBoegjVCLqQ";
-    private static final String USER_AGENT = "dragon /u/raczino";
-    private static final String SUBREDDIT = "raczino";
+
     private final RedditPostRepository redditPostRepository;
 
     public String getAccessToken() throws IOException {
