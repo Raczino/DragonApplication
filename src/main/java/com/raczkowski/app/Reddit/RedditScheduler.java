@@ -10,7 +10,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class RedditScheduler {
     private final RedditPostService redditPostService;
-    @Scheduled(fixedRate = 60000) //60min
+    @Scheduled(fixedRate = 600000) //60min
     public void fetchPosts() {
         try {
             redditPostService.getCommentsForArticle();

@@ -64,6 +64,14 @@ public class AppUser implements UserDetails {
 
     private ZonedDateTime blockedDate;
 
+    private String facebookUrl;
+
+    private String instagramUrl;
+
+    private String linkedInUrl;
+
+    private String twitterUrl;
+
     public AppUser(String firstName,
                    String lastName,
                    String email,
