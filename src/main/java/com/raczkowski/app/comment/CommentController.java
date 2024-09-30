@@ -2,9 +2,13 @@ package com.raczkowski.app.comment;
 
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
+import com.raczkowski.app.hashtags.Hashtag;
+import com.raczkowski.app.hashtags.HashtagService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final HashtagService hashtagService;
 
     @PostMapping("/add")
     ResponseEntity<CommentDto> addComment(@RequestBody CommentRequest commentRequest) {

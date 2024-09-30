@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AllArgsConstructor
 @Service
@@ -14,17 +16,17 @@ public class HashtagService {
     private final HashtagRepository hashtagRepository;
 
     public List<Hashtag> parseHashtags(String hashtagString) {
-        String[] hashtagNames = hashtagString
-                .replaceFirst("^#", "")
-                .split("#");
+        Pattern pattern = Pattern.compile("#\\w+");
+        Matcher matcher = pattern.matcher(hashtagString);
 
         List<Hashtag> hashtags = new ArrayList<>();
-        for (String name : hashtagNames) {
-            if (!name.trim().isEmpty()) {
-                Hashtag hashtag = findOrCreateHashtag(name);
-                hashtags.add(hashtag);
-            }
+
+        while (matcher.find()) {
+            String name = matcher.group();
+            Hashtag hashtag = findOrCreateHashtag(name);
+            hashtags.add(hashtag);
         }
+
         return hashtags;
     }
 

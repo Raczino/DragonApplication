@@ -42,48 +42,49 @@ public class RedditClient {
     }
 
     public List<RedditPost> searchPostsOnSubreddit(String keyword) throws IOException {
-        String queryq = String.join("|", keyword);
-        String encodedQuery = URLEncoder.encode(queryq, StandardCharsets.UTF_8);
-
+        String query = String.join("|", keyword);
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+        System.out.println(keyword);
         String accessToken = getAccessToken();
         String urlString = "https://oauth.reddit.com/r/" + redditClientConfig.getUser().getSubreddit() + "/search.json?q=" + encodedQuery + "&restrict_sr=true&limit=10";
         HttpURLConnection conn = sendHttpRequest(urlString, "GET", "Bearer " + accessToken, null);
         String response = readResponse(conn);
-        System.out.println(urlString);
         JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
         JsonArray posts = jsonResponse.getAsJsonObject("data").getAsJsonArray("children");
         List<RedditPost> redditPostsForArticle = new ArrayList<>();
 
         for (int i = 0; i < posts.size(); i++) {
             JsonObject post = posts.get(i).getAsJsonObject().getAsJsonObject("data");
-            RedditPost redditPost = new RedditPost();
-            redditPost.setTitle(post.get("title").getAsString());
-            redditPost.setScore(post.get("score").getAsInt());
-            redditPost.setUrl(post.get("url").getAsString());
-            redditPost.setDescription(post.has("selftext")
-                    && !post.get("selftext").getAsString().isEmpty()
-                    ? post.get("selftext").getAsString() : "No description available");
-            redditPost.setAuthor(post.get("author").getAsString());
-            long createdUtc = post.get("created_utc").getAsLong();
-            ZonedDateTime createdDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(createdUtc), ZoneId.systemDefault());
-            redditPost.setCreatedDate(createdDate);
-            redditPost.setSearchedBy(keyword);
-            System.out.println(post.has("selftext")
-                    && !post.get("selftext").getAsString().isEmpty()
-                    ? post.get("selftext").getAsString() : "No description available");
-            if (!checkIfPostAlreadyExists(redditPost)) {
-                redditPostRepository.save(redditPost);
-                redditPostsForArticle.add(redditPost);
+            String description = post.has("selftext") && !post.get("selftext").getAsString().isEmpty()
+                    ? post.get("selftext").getAsString() : null;
+
+            if (description != null) {
+                RedditPost redditPost = new RedditPost();
+                redditPost.setTitle(post.get("title").getAsString());
+                redditPost.setScore(post.get("score").getAsInt());
+                redditPost.setUrl(post.get("url").getAsString());
+                redditPost.setDescription(description);
+                redditPost.setAuthor(post.get("author").getAsString());
+                long createdUtc = post.get("created_utc").getAsLong();
+                ZonedDateTime createdDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(createdUtc), ZoneId.systemDefault());
+                redditPost.setCreatedDate(createdDate);
+                redditPost.setSearchedBy(keyword);
+
+                if (!checkIfPostAlreadyExists(redditPost)) {
+                    redditPostRepository.save(redditPost);
+                    redditPostsForArticle.add(redditPost);
+                }
             }
         }
         return redditPostsForArticle;
     }
 
+
     public boolean checkIfPostAlreadyExists(RedditPost newPost) {
         return redditPostRepository.existsByUrl(newPost.getUrl());
     }
 
-    private HttpURLConnection sendHttpRequest(String urlString, String method, String authHeader, String postData) throws IOException {
+    public HttpURLConnection sendHttpRequest(String urlString, String method, String authHeader, String postData) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
@@ -101,7 +102,7 @@ public class RedditClient {
         return conn;
     }
 
-    private String readResponse(HttpURLConnection conn) throws IOException {
+    public String readResponse(HttpURLConnection conn) throws IOException {
         int responseCode = conn.getResponseCode();
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 responseCode == HttpURLConnection.HTTP_OK ? conn.getInputStream() : conn.getErrorStream()));
