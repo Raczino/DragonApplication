@@ -1,5 +1,7 @@
-package com.raczkowski.app.surveys;
+package com.raczkowski.app.surveys.answers;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.raczkowski.app.surveys.questions.Question;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +21,8 @@ public class Answers {
     private String value;
 
     @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
+    @JoinColumn(name = "question_id")
+    @JsonBackReference
     private Question question;
 
     public Answers(String value, Question question) {

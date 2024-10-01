@@ -10,12 +10,12 @@ import java.io.IOException;
 @AllArgsConstructor
 public class RedditScheduler {
     private final RedditPostService redditPostService;
-    @Scheduled(fixedRate = 600000) //60min
-    public void fetchPosts() {
-        try {
-            redditPostService.getCommentsForArticle();
-        } catch (IOException e) {
-            System.err.println("Api connection error: " + e.getMessage());
-        }
-    }
+//    @Scheduled(fixedRate = 600000) //60min
+//    public void fetchPosts() {
+//        try {
+//            redditPostService.getCommentsForArticle();
+//        } catch (IOException e) {
+//            System.err.println("Api connection error: " + e.getMessage());
+//        }
+//    }
 }

@@ -1,5 +1,6 @@
-package com.raczkowski.app.surveys;
+package com.raczkowski.app.surveys.survey;
 
+import com.raczkowski.app.surveys.questions.Question;
 import com.raczkowski.app.user.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,7 @@ public class Survey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "survey", nullable = false)
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;
 
     private ZonedDateTime createdAt;
