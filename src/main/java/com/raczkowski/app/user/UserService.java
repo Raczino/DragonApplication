@@ -66,4 +66,34 @@ public class UserService implements UserDetailsService {
     public AppUser getUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
+
+    public List<AppUser> getFollowers(Long userId) {
+        return userRepository.findFollowersByUserId(userId);
+    }
+
+    public List<AppUser> getFollowing(Long userId) {
+        return userRepository.findFollowingByUserId(userId);
+    }
+
+    public void followUser(Long userIdToFollow) {
+        AppUser currentUser = getLoggedUser();
+        AppUser userToFollow = userRepository.findById(userIdToFollow)
+                .orElseThrow(() -> new ResponseException("User not found"));
+
+        if (currentUser.equals(userToFollow)) {
+            throw new ResponseException("You cannot follow yourself.");
+        }
+
+        currentUser.followUser(userToFollow);
+        userRepository.save(currentUser);
+    }
+
+    public void unfollowUser(Long userIdToUnfollow) {
+        AppUser currentUser = getLoggedUser();
+        AppUser userToUnfollow = userRepository.findById(userIdToUnfollow)
+                .orElseThrow(() -> new ResponseException("User not found"));
+
+        currentUser.unfollowUser(userToUnfollow);
+        userRepository.save(currentUser);
+    }
 }

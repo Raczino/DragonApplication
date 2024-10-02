@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
@@ -51,4 +52,12 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
             "SET u.commentsCount = u.commentsCount + 1" +
             "WHERE u.id = :id")
     void updateCommentsCount(@Param("id") Long id);
+
+    @Query("SELECT uf FROM AppUser u JOIN u.followers uf WHERE u.id = :userId")
+    List<AppUser> findFollowersByUserId(@Param("userId") Long userId);
+
+
+    @Query("SELECT uf FROM AppUser u JOIN u.followedUsers uf WHERE u.id = :userId")
+    List<AppUser> findFollowingByUserId(@Param("userId") Long userId);
+
 }
