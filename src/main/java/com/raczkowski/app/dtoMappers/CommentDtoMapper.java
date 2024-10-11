@@ -7,32 +7,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommentDtoMapper {
-    public static CommentDto commentDtoMapper(Comment comment) {
+    public static CommentDto commentDtoMapper(Comment comment, int likesCount) {
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
                 comment.getPostedDate(),
                 comment.getArticle().getId(),
-                comment.getLikesNumber(),
-                new AuthorDto(
-                        comment.getAppUser().getId(),
-                        comment.getAppUser().getFirstName(),
-                        comment.getAppUser().getLastName(),
-                        comment.getAppUser().getEmail(),
-                        comment.getAppUser().isAccountBlocked()
-                ),
-                comment.getPostedDate(),
-                comment.isUpdated()
-        );
-    }
-
-    public static CommentDto commentDtoMapperWithAdditionalFields(Comment comment, boolean isLiked) {
-        return new CommentDto(
-                comment.getId(),
-                comment.getContent(),
-                comment.getPostedDate(),
-                comment.getArticle().getId(),
-                comment.getLikesNumber(),
+                likesCount,
                 new AuthorDto(
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
@@ -42,7 +23,28 @@ public class CommentDtoMapper {
                 ),
                 comment.getPostedDate(),
                 comment.isUpdated(),
-                isLiked
+                comment.isPinned()
+        );
+    }
+
+    public static CommentDto commentDtoMapperWithAdditionalFields(Comment comment, boolean isLiked, int likesCount) {
+        return new CommentDto(
+                comment.getId(),
+                comment.getContent(),
+                comment.getPostedDate(),
+                comment.getArticle().getId(),
+                likesCount,
+                new AuthorDto(
+                        comment.getAppUser().getId(),
+                        comment.getAppUser().getFirstName(),
+                        comment.getAppUser().getLastName(),
+                        comment.getAppUser().getEmail(),
+                        comment.getAppUser().isAccountBlocked()
+                ),
+                comment.getPostedDate(),
+                comment.isUpdated(),
+                isLiked,
+                comment.isPinned()
         );
     }
 }

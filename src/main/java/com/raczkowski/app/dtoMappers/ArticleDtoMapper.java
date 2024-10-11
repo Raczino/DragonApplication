@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ArticleDtoMapper {
-    public static ArticleDto articleDtoMapper(Article article) {
+    public static ArticleDto articleDtoMapper(Article article, int likesCount) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                article.getLikesNumber(),
+                likesCount,
                 new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
@@ -115,13 +115,13 @@ public class ArticleDtoMapper {
         );
     }
 
-    public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked, int commentsNumber) {
+    public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked, int commentsNumber, int likesCount) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                article.getLikesNumber(),
+                likesCount,
                 new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),

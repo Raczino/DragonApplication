@@ -1,9 +1,7 @@
 package com.raczkowski.app.comment;
 
+import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
-import com.raczkowski.app.common.GenericService;
-import com.raczkowski.app.common.MetaData;
-import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
 import com.raczkowski.app.enums.UserRole;
@@ -14,11 +12,11 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -28,30 +26,18 @@ public class CommentService {
     private final UserService userService;
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
+    private final CommentStatisticsService commentStatisticsService;
 
-    public PageResponse<CommentDto> getAllCommentsFromArticle(Long id, int pageNumber, int pageSize) { //TODO: do poprawy aby pobierało komentarzy z danego artykułu
-        Page<Comment> commentPage = GenericService
-                .pagination(
-                        commentRepository,
-                        pageNumber,
-                        pageSize,
-                        "likesNumber",
-                        "desc"
-                );
-
-        AppUser user = userService.getLoggedUser();
-
-        return new PageResponse<>(
-                commentPage
-                        .stream()
-                        .map(comment -> CommentDtoMapper.commentDtoMapperWithAdditionalFields(comment, isCommentLiked(comment, user)))
-                        .toList(),
-                new MetaData(
-                        commentPage.getTotalElements(),
-                        commentPage.getTotalPages(),
-                        commentPage.getNumber() + 1,
-                        commentPage.getSize()
-                ));
+    public List<CommentDto> getAllCommentsFromArticle(Long id) {
+        return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id))
+                .stream()
+                .map(
+                        comment ->
+                                CommentDtoMapper.commentDtoMapperWithAdditionalFields(
+                                        comment,
+                                        isCommentLiked(comment, userService.getLoggedUser()),
+                                        commentStatisticsService.getLikesCountForComment(comment))
+                ).toList();
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
@@ -72,30 +58,30 @@ public class CommentService {
                     articleRepository.findArticleById(commentRequest.getId()
                     ));
             commentRepository.save(comment);
-            userRepository.updateCommentsCount(user.getId());
+        //    userRepository.updateCommentsCount(user.getId());
         }
-        return CommentDtoMapper.commentDtoMapper(comment);
+        return CommentDtoMapper.commentDtoMapper(comment, commentStatisticsService.getLikesCountForComment(comment));
     }
 
-    public void createComment(Comment comment){
+    public void createComment(Comment comment) {
         commentRepository.save(comment);
     }
 
-    public void likeComment(Long id) {
-        AppUser user = userService.getLoggedUser();
-        Comment comment = commentRepository.findCommentById(id);
-        if (comment == null) {
-            throw new ResponseException("Comment doesnt exists");
-        }
-
-        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
-            commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
-            commentRepository.updateCommentLikes(id, 1);
-        } else {
-            commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
-            commentRepository.updateCommentLikes(id, -1);
-        }
-    }
+//    public void likeComment(Long id) {
+//        AppUser user = userService.getLoggedUser();
+//        Comment comment = commentRepository.findCommentById(id);
+//        if (comment == null) {
+//            throw new ResponseException("Comment doesnt exists");
+//        }
+//
+//        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
+//            commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
+//            commentRepository.updateCommentLikes(id, 1);
+//        } else {
+//            commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
+//            commentRepository.updateCommentLikes(id, -1);
+//        }
+//    }
 
     public String removeComment(Long id) {
         Comment comment = commentRepository.findCommentById(id);
@@ -144,5 +130,26 @@ public class CommentService {
 
     public void pinComment(Long id) {
         commentRepository.pinComment(id);
+    }
+
+    public List<CommentDto> getAllCommentsForUser(Long id) {
+        AppUser user = userService.getUserById(id);
+
+        return commentRepository.getCommentsByAppUser(user).stream()
+                .map(
+                        comment -> CommentDtoMapper.commentDtoMapperWithAdditionalFields(
+                                comment,
+                                isCommentLiked(comment, user),
+                                commentStatisticsService.getLikesCountForComment(comment)))
+                .toList();
+
+    }
+
+    public int getCommentsCountForUser(AppUser appUser) {
+        return commentRepository.findAllByAppUser(appUser).size();
+    }
+
+    public int getCommentCountForArticle(Article article) {
+        return commentRepository.getCommentsByArticle(article).size();
     }
 }

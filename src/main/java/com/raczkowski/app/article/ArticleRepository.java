@@ -26,11 +26,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Article findArticleById(Long id);
 
-    List<Article> findAllByAppUser(Optional<AppUser> appUser);
+    List<Article> findAllByAppUser(AppUser appUser);
 
-    Article getFirstByOrderByLikesNumberDesc();
-
-    Page<Article> getArticleByAcceptedBy(Optional<AppUser> appUser, Pageable pageable);
+    Page<Article> getArticleByAcceptedBy(AppUser appUser, Pageable pageable);
 
 
     Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
@@ -38,12 +36,12 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Transactional
     void deleteArticleById(@Param("id") Long id);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Article c " +
-            "SET c.likesNumber = c.likesNumber + :amount " +
-            "WHERE c.id = :id")
-    void updateArticleLikes(@Param("id") Long id, @Param("amount") int amount);
+//    @Transactional
+//    @Modifying
+//    @Query("UPDATE Article c " +
+//            "SET c.likesNumber = c.likesNumber + :amount " +
+//            "WHERE c.id = :id")
+//    void updateArticleLikes(@Param("id") Long id, @Param("amount") int amount);
 
     @Transactional
     @Modifying

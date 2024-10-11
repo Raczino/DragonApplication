@@ -46,18 +46,14 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.removeArticle(id));
     }
 
-    @PostMapping("/like")
-    void likeArticle(@RequestParam Long id) {
-        articleService.likeArticle(id);
-    }
+//    @PostMapping("/like")
+//    void likeArticle(@RequestParam Long id) {
+//        articleService.likeArticle(id);
+//    }
+    //TODO:zrobic nowa metode do like artykulow
 
     @PutMapping("/update")
     void updateArticle(@RequestBody ArticleRequest articleRequest) {
         articleService.updateArticle(articleRequest);
-    }
-
-    @GetMapping("/most")
-    ResponseEntity<ArticleDto> mostLikeArticle() {
-        return ResponseEntity.ok(articleService.getMostLikableArticle());
     }
 }

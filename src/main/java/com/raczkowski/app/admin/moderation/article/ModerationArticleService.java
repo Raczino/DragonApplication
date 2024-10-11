@@ -33,15 +33,15 @@ import java.util.Optional;
 @Transactional
 public class ModerationArticleService {
 
-    ArticleToConfirmRepository articleToConfirmRepository;
-    ArticleRepository articleRepository;
-    UserRepository userRepository;
-    UserService userService;
-    RejectedArticleRepository rejectedArticleRepository;
-    PermissionValidator permissionValidator;
-    DeletedArticleService deletedArticleService;
-    DeletedArticleRepository deletedArticleRepository;
-    CommentService commentService;
+    private final ArticleToConfirmRepository articleToConfirmRepository;
+    private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final RejectedArticleRepository rejectedArticleRepository;
+    private final PermissionValidator permissionValidator;
+    private final DeletedArticleService deletedArticleService;
+    private final DeletedArticleRepository deletedArticleRepository;
+    private final ArticleStatisticsService articleStatisticsService;
 
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
@@ -90,9 +90,9 @@ public class ModerationArticleService {
         article.setHashtags(hashtags);
         articleRepository.save(article);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
-        userRepository.updateArticlesCount(article.getAppUser().getId());
+        //userRepository.updateArticlesCount(article.getAppUser().getId());
 
-        return ArticleDtoMapper.articleDtoMapper(article);
+        return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
     }
 
     public RejectedArticleDto rejectArticle(Long articleId) {
@@ -144,12 +144,12 @@ public class ModerationArticleService {
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
-        Optional<AppUser> user = userRepository.findById(id);
-        if (user.isEmpty()) {
+        AppUser user = userRepository.getAppUserById(id);
+        if (user == null) {
             throw new ResponseException("User doesn't exists");
         }
 
-        Page<Article> article = GenericService
+        Page<Article> articles = GenericService
                 .paginationOfElementsAcceptedByUser(
                         user,
                         articleRepository,
@@ -159,15 +159,15 @@ public class ModerationArticleService {
                         sortDirection
                 );
 
-        return new PageResponse<>(article
+        return new PageResponse<>(articles
                 .stream()
-                .map(ArticleDtoMapper::articleDtoMapper)
+                .map(article -> ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article)))
                 .toList(),
                 new MetaData(
-                        article.getTotalElements(),
-                        article.getTotalPages(),
-                        article.getNumber() + 1,
-                        article.getSize())
+                        articles.getTotalElements(),
+                        articles.getTotalPages(),
+                        articles.getNumber() + 1,
+                        articles.getSize())
         );
     }
 

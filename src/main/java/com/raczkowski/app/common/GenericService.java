@@ -1,9 +1,11 @@
 package com.raczkowski.app.common;
 
+import com.github.jreddit.retrieval.Comments;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.article.DeletedArticle;
 import com.raczkowski.app.article.DeletedArticleRepository;
+import com.raczkowski.app.comment.CommentRepository;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,7 @@ public class GenericService {
         return deletedArticleRepository.findAll(pageable);
     }
 
-    public static Page<Article> paginationOfElementsAcceptedByUser(Optional<AppUser> user, ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
+    public static Page<Article> paginationOfElementsAcceptedByUser(AppUser user, ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest
                 .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         return articleRepository.getArticleByAcceptedBy(user, pageable);

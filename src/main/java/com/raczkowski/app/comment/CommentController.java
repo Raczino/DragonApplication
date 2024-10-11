@@ -16,26 +16,26 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-    private final HashtagService hashtagService;
 
     @PostMapping("/add")
     ResponseEntity<CommentDto> addComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(commentService.addComment(commentRequest));
     }
 
-    @GetMapping()
-    ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
-    ) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size)); //TODO: zmienic metode zwracajaca aby zwracaa komentarze dla artykulu
+    @GetMapping("/article")
+    ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id));
     }
 
-    @PostMapping("/like")
-    void likeComment(@RequestParam Long id) {
-        commentService.likeComment(id);
+    @GetMapping("/user")
+    ResponseEntity<List<CommentDto>> getAllCommentsForUser(Long id) {
+        return ResponseEntity.ok(commentService.getAllCommentsForUser(id));
     }
+
+//    @PostMapping("/like")
+//    void likeComment(@RequestParam Long id) {
+//        commentService.likeComment(id);
+//    }
 
     @DeleteMapping("/delete")
     ResponseEntity<String> removeComment(@RequestParam Long id) {
