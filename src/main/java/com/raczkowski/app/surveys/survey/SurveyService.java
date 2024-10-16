@@ -59,10 +59,14 @@ public class SurveyService {
     }
 
     public Survey getSurveyById(Long id) {
-        Survey survey =  surveyRepository.findSurveyById(id);
-        if (survey== null){
+        Survey survey = surveyRepository.findSurveyById(id);
+        if (survey == null) {
             throw new ResponseException("Survey with provided id doesn't exists");
         }
         return survey;
+    }
+
+    public List<Survey> getAllSurveys() {
+        return surveyRepository.findAll();
     }
 }

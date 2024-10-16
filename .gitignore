@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 /src/main/resources/application.properties
 logs/application-error.log
+
 ### STS ###
 .apt_generated
 .classpath

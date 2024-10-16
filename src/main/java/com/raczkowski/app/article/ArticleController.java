@@ -55,9 +55,4 @@ public class ArticleController {
     void updateArticle(@RequestBody ArticleRequest articleRequest) {
         articleService.updateArticle(articleRequest);
     }
-
-    @GetMapping("/most")
-    ResponseEntity<ArticleDto> mostLikeArticle() {
-        return ResponseEntity.ok(articleService.getMostLikableArticle());
-    }
 }

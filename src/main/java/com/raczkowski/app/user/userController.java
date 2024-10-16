@@ -15,10 +15,18 @@ import java.util.stream.Collectors;
 public class userController {
 
     private final UserService userService;
+    private final UserStatisticsService userStatisticsService;
 
     @GetMapping("/get")
     ResponseEntity<UserDto> getUserById(@RequestParam Long id){
-        return ResponseEntity.ok(userService.getUserByIdToDTO(id));
+        AppUser user = userService.getUserById(id);
+        return ResponseEntity.ok(UserDtoMapper.userDto(
+                user,
+                userStatisticsService.getArticlesCount(user),
+                userStatisticsService.getCommentsCount(user),
+                userStatisticsService.getFollowersCount(user),
+                userStatisticsService.getFollowingCount(user)
+                ));
     }
 
     @GetMapping("/get/login")
@@ -39,15 +47,25 @@ public class userController {
     @GetMapping("/{userId}/followers")
     public ResponseEntity<List<UserDto>> getFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowers(userId).stream()
-                .map(UserDtoMapper::userDto)
+                .map(user -> UserDtoMapper.userDto(
+                        user,
+                        userStatisticsService.getArticlesCount(user),
+                        userStatisticsService.getCommentsCount(user),
+                        userStatisticsService.getFollowersCount(user),
+                        userStatisticsService.getFollowingCount(user)
+                ))
                 .collect(Collectors.toList()));
     }
 
     @GetMapping("/{userId}/following")
     public ResponseEntity<List<UserDto>> getFollowing(@PathVariable Long userId) {
-        List<AppUser> following = userService.getFollowing(userId);
-        return ResponseEntity.ok(following.stream()
-                .map(UserDtoMapper::userDto)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.getFollowing(userId).stream()
+                .map(user -> UserDtoMapper.userDto(
+                        user,
+                        userStatisticsService.getArticlesCount(user),
+                        userStatisticsService.getCommentsCount(user),
+                        userStatisticsService.getFollowersCount(user),
+                        userStatisticsService.getFollowingCount(user)
+                )).collect(Collectors.toList()));
     }
 }

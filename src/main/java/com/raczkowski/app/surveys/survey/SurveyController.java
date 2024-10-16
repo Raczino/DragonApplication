@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/surveys")
@@ -20,5 +22,10 @@ public class SurveyController {
     @GetMapping("/get")
     ResponseEntity<SurveyDto> getSurvey(@RequestParam Long id){
         return ResponseEntity.ok(SurveyDtoMapper.toDTO(surveyService.getSurveyById(id)));
+    }
+
+    @GetMapping("/getAll")
+    ResponseEntity<List<SurveyDto>> getAllSurveys(){
+        return ResponseEntity.ok(surveyService.getAllSurveys().stream().map(SurveyDtoMapper::toDTO).toList());
     }
 }

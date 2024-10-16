@@ -42,8 +42,6 @@ public class Comment {
     )
     private Article article;
 
-    private int likesNumber = 0;
-
     private ZonedDateTime updatedAt;
 
     private boolean isUpdated;

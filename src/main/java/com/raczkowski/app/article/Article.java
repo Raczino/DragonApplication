@@ -48,8 +48,6 @@ public class Article {
     @Enumerated(EnumType.STRING)
     private ArticleStatus status = ArticleStatus.APPROVED;
 
-    private int likesNumber = 0;
-
     private ZonedDateTime updatedAt;
 
     private boolean isUpdated = false;

@@ -14,9 +14,9 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class DeletedArticleService {
 
-    DeletedArticleRepository deletedArticleRepository;
-    ArticleRepository articleRepository;
-
+    private final DeletedArticleRepository deletedArticleRepository;
+    private final ArticleRepository articleRepository;
+    private final ArticleStatisticsService articleStatisticsService;
     @Transactional
     public void deleteArticle(Long articleId, ArticleStatus status, AppUser user) {
         Article article = articleRepository.findArticleById(articleId);
@@ -28,7 +28,7 @@ public class DeletedArticleService {
                     article.getPostedDate(),
                     article.getAppUser(),
                     status,
-                    article.getLikesNumber(),
+                    articleStatisticsService.getLikesCountForArticle(article),
                     article.getUpdatedAt(),
                     article.isUpdated(),
                     article.getAcceptedAt(),

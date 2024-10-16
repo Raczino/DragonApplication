@@ -59,12 +59,6 @@ public class AppUser implements UserDetails {
 
     private Boolean enabled = false;
 
-    @Getter
-    private int articlesCount = 0;
-
-    @Getter
-    private int commentsCount = 0;
-
     private ZonedDateTime registrationDate;
 
     private ZonedDateTime blockedDate;

@@ -28,6 +28,8 @@ public class CommentDto {
 
     private boolean isLiked;
 
+    private boolean isPinned;
+
     public CommentDto
             (
                     Long id,
@@ -37,7 +39,8 @@ public class CommentDto {
                     int likesNumber,
                     AuthorDto author,
                     ZonedDateTime updatedAt,
-                    boolean isUpdated
+                    boolean isUpdated,
+                    boolean isPinned
             ) {
         this.id = id;
         this.content = content;
@@ -47,5 +50,6 @@ public class CommentDto {
         this.author = author;
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
+        this.isPinned = isPinned;
     }
 }
