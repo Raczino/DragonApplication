@@ -76,7 +76,6 @@ public class ArticleServiceTest {
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
         verify(articleRepository, never()).save(any());
-        verify(userRepository, never()).updateArticlesCount(any());
     }
 
     @Test
@@ -91,7 +90,6 @@ public class ArticleServiceTest {
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
         verify(articleRepository, never()).save(any());
-        verify(userRepository, never()).updateArticlesCount(any());
     }
 
     @Test
@@ -106,7 +104,6 @@ public class ArticleServiceTest {
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
         verify(articleRepository, never()).save(any());
-        verify(userRepository, never()).updateArticlesCount(any());
     }
 
     @Test
@@ -121,7 +118,6 @@ public class ArticleServiceTest {
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
         verify(articleRepository, never()).save(any());
-        verify(userRepository, never()).updateArticlesCount(any());
     }
 
     @Test
@@ -183,7 +179,6 @@ public class ArticleServiceTest {
 
         // then
         verify(articleLikeRepository, times(1)).save(any());
-        verify(articleRepository, times(1)).updateArticleLikes(articleId, 1);
     }
 
     @Test
@@ -201,7 +196,6 @@ public class ArticleServiceTest {
 
         // then
         verify(articleLikeRepository, times(1)).delete(any());
-        verify(articleRepository, times(1)).updateArticleLikes(articleId, -1);
     }
 
     @Test
@@ -217,7 +211,6 @@ public class ArticleServiceTest {
         assertEquals("Article doesnt exists", exception.getMessage());
         assertThrows(Exception.class, () -> articleService.likeArticle(articleId));
         verify(articleLikeRepository, never()).save(any());
-        verify(articleRepository, never()).updateArticleLikes(any(), anyInt());
     }
 
     @Test

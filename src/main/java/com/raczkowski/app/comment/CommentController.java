@@ -32,10 +32,10 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getAllCommentsForUser(id));
     }
 
-//    @PostMapping("/like")
-//    void likeComment(@RequestParam Long id) {
-//        commentService.likeComment(id);
-//    }
+    @PostMapping("/like")
+    void likeComment(@RequestParam Long id) {
+        commentService.likeComment(id);
+    }
 
     @DeleteMapping("/delete")
     ResponseEntity<String> removeComment(@RequestParam Long id) {

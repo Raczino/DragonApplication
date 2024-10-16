@@ -58,7 +58,6 @@ public class CommentService {
                     articleRepository.findArticleById(commentRequest.getId()
                     ));
             commentRepository.save(comment);
-        //    userRepository.updateCommentsCount(user.getId());
         }
         return CommentDtoMapper.commentDtoMapper(comment, commentStatisticsService.getLikesCountForComment(comment));
     }
@@ -67,21 +66,19 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-//    public void likeComment(Long id) {
-//        AppUser user = userService.getLoggedUser();
-//        Comment comment = commentRepository.findCommentById(id);
-//        if (comment == null) {
-//            throw new ResponseException("Comment doesnt exists");
-//        }
-//
-//        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
-//            commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
-//            commentRepository.updateCommentLikes(id, 1);
-//        } else {
-//            commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
-//            commentRepository.updateCommentLikes(id, -1);
-//        }
-//    }
+    public void likeComment(Long id) {
+        AppUser user = userService.getLoggedUser();
+        Comment comment = commentRepository.findCommentById(id);
+        if (comment == null) {
+            throw new ResponseException("Comment doesnt exists");
+        }
+
+        if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
+            commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
+        } else {
+            commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
+        }
+    }
 
     public String removeComment(Long id) {
         Comment comment = commentRepository.findCommentById(id);

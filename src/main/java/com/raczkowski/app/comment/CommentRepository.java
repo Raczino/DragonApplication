@@ -26,13 +26,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByAppUser(AppUser appUser);
 
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE Comment c " +
-//            "SET c.likesNumber = c.likesNumber + :amount " +
-//            "WHERE c.id = :id")
-//    void updateCommentLikes(@Param("id") Long id, @Param("amount") int amount);
-
     @Transactional
     @Modifying
     @Query("UPDATE Comment c " +

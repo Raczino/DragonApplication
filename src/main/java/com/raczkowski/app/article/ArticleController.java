@@ -46,11 +46,10 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.removeArticle(id));
     }
 
-//    @PostMapping("/like")
-//    void likeArticle(@RequestParam Long id) {
-//        articleService.likeArticle(id);
-//    }
-    //TODO:zrobic nowa metode do like artykulow
+    @PostMapping("/like")
+    void likeArticle(@RequestParam Long id) {
+        articleService.likeArticle(id);
+    }
 
     @PutMapping("/update")
     void updateArticle(@RequestBody ArticleRequest articleRequest) {

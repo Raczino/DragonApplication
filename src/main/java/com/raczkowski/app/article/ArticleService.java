@@ -134,22 +134,20 @@ public class ArticleService {
         return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
     }
 
-//    public void likeArticle(Long id) {
-//        AppUser user = userService.getLoggedUser();
-//
-//        Article article = articleRepository.findArticleById(id);
-//        if (article == null) {
-//            throw new ResponseException("Article doesnt exists");
-//        }
-//
-//        if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
-//            articleLikeRepository.save(new ArticleLike(user, article, true));
-//            articleRepository.updateArticleLikes(id, 1);
-//        } else {
-//            articleLikeRepository.delete(articleLikeRepository.findByArticleAndAppUser(article, user));
-//            articleRepository.updateArticleLikes(id, -1);
-//        }
-//    }
+    public void likeArticle(Long id) {
+        AppUser user = userService.getLoggedUser();
+
+        Article article = articleRepository.findArticleById(id);
+        if (article == null) {
+            throw new ResponseException("Article doesnt exists");
+        }
+
+        if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
+            articleLikeRepository.save(new ArticleLike(user, article, true));
+        } else {
+            articleLikeRepository.delete(articleLikeRepository.findByArticleAndAppUser(article, user));
+        }
+    }
 
     public void updateArticle(ArticleRequest articleRequest) {
         if ((articleRequest.getTitle() == null || articleRequest.getTitle().equals("")) &&
