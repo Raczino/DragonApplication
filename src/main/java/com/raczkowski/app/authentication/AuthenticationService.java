@@ -28,7 +28,7 @@ public class AuthenticationService {
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
                 ).isAuthenticated();
-                return LoginResponseMapper.response(jwtUtil.generateToken(userDetails));
+                return LoginResponseMapper.response(jwtUtil.generateToken(userDetails),userService.getUserByEmail(userDetails.getUsername()));
             }
             throw new ResponseException("User with this email doesn't exists");
         } else {

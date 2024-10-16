@@ -1,6 +1,7 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.article.Article;
+import com.raczkowski.app.user.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,12 +22,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> getCommentsByArticle(Article article);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Comment c " +
-            "SET c.likesNumber = c.likesNumber + :amount " +
-            "WHERE c.id = :id")
-    void updateCommentLikes(@Param("id") Long id, @Param("amount") int amount);
+    List<Comment> getCommentsByAppUser(AppUser user);
+
+    List<Comment> findAllByAppUser(AppUser appUser);
 
     @Transactional
     @Modifying

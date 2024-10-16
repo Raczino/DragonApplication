@@ -6,10 +6,12 @@ import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
-import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dto.*;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.hashtags.Hashtag;
+import com.raczkowski.app.hashtags.HashtagService;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
@@ -36,6 +38,8 @@ public class ArticleService {
     private final ArticleLikeRepository articleLikeRepository;
     private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
+    private final HashtagService hashtagService;
+    private final ArticleStatisticsService articleStatisticsService;
 
     public ArticleDto create(ArticleRequest request) {
         if (
@@ -48,15 +52,26 @@ public class ArticleService {
         }
         AppUser user = userService.getLoggedUser();
 
+
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 user
         );
+
+        if (request.getHashtags() != null) {
+            List<Hashtag> hashtags = hashtagService.parseHashtags(request.getHashtags());
+            articleToConfirm.setHashtags(hashtags);
+        }
+
         moderationArticleService.addArticle(articleToConfirm);
 
         return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
+    }
+
+    public List<Article> getAllArticles() {
+        return articleRepository.findAll();
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
@@ -77,7 +92,8 @@ public class ArticleService {
                         .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
                                 article,
                                 isArticleLiked(article, user),
-                                commentService.getNumberCommentsOfArticle(article.getId())
+                                commentService.getNumberCommentsOfArticle(article.getId()),
+                                articleStatisticsService.getLikesCountForArticle(article)
                         ))
                         .toList(),
                 new MetaData(
@@ -87,15 +103,20 @@ public class ArticleService {
                         articlePage.getSize()));
     }
 
-    public ArticleDto getMostLikableArticle() {
-        return ArticleDtoMapper.articleDtoMapper(articleRepository.getFirstByOrderByLikesNumberDesc());
-    }
-
     public List<ArticleDto> getArticlesFromUser(Long userID) {
+        AppUser user = userRepository.getAppUserById(userID);
+        if (user == null) {
+            throw new ResponseException("There is no user");
+        }
+
         return articleRepository
-                .findAllByAppUser(userRepository.findById(userID))
+                .findAllByAppUser(user)
                 .stream()
-                .map(ArticleDtoMapper::articleDtoMapper)
+                .map(
+                        article -> ArticleDtoMapper.articleDtoMapper(
+                                article,
+                                articleStatisticsService.getLikesCountForArticle(article)
+                        ))
                 .collect(Collectors.toList());
     }
 
@@ -110,7 +131,7 @@ public class ArticleService {
         if (article == null) {
             throw new ResponseException("There is no article with provided id");
         }
-        return ArticleDtoMapper.articleDtoMapper(article);
+        return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
     }
 
     public void likeArticle(Long id) {
@@ -123,10 +144,8 @@ public class ArticleService {
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article, true));
-            articleRepository.updateArticleLikes(id, 1);
         } else {
             articleLikeRepository.delete(articleLikeRepository.findByArticleAndAppUser(article, user));
-            articleRepository.updateArticleLikes(id, -1);
         }
     }
 
@@ -169,5 +188,9 @@ public class ArticleService {
 
     public boolean isArticleLiked(Article article, AppUser user) {
         return articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article);
+    }
+
+    public int getArticlesCountForUser(AppUser appUser) {
+        return articleRepository.findAllByAppUser(appUser).size();
     }
 }

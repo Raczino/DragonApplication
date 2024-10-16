@@ -36,4 +36,8 @@ public class UserDto {
     private boolean isBlocked;
 
     private ZonedDateTime blockedDate;
+
+    private int followersCount;
+
+    private int followsCount;
 }

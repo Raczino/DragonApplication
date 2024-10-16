@@ -2,9 +2,13 @@ package com.raczkowski.app.comment;
 
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
+import com.raczkowski.app.hashtags.Hashtag;
+import com.raczkowski.app.hashtags.HashtagService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -18,13 +22,14 @@ public class CommentController {
         return ResponseEntity.ok(commentService.addComment(commentRequest));
     }
 
-    @GetMapping()
-    ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
-    ) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id, page, size)); //TODO: zmienic metode zwracajaca aby zwracaa komentarze dla artykulu
+    @GetMapping("/article")
+    ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
+        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id));
+    }
+
+    @GetMapping("/user")
+    ResponseEntity<List<CommentDto>> getAllCommentsForUser(Long id) {
+        return ResponseEntity.ok(commentService.getAllCommentsForUser(id));
     }
 
     @PostMapping("/like")

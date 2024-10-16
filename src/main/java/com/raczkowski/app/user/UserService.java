@@ -1,9 +1,12 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.article.ArticleService;
+import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dtoMappers.UserDtoMapper;
 import com.raczkowski.app.exceptions.ResponseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,11 +60,49 @@ public class UserService implements UserDetailsService {
                         .getName());
     }
 
-    public UserDto getUserById(Long id) {
-        return UserDtoMapper.userDto(userRepository.getAppUserById(id));
+    public int userFollowersCount(AppUser user) {
+        return userRepository.findFollowersByUserId(getUserById(user.getId()).getId()).size();
     }
 
-    public AppUser getUserByEmail(String email){
+    public int userFollowingCount(AppUser user) {
+        return userRepository.findFollowingByUserId(getUserById(user.getId()).getId()).size();
+    }
+
+    public AppUser getUserById(Long id) {
+        return userRepository.getAppUserById(id);
+    }
+
+    public AppUser getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<AppUser> getFollowers(Long userId) {
+        return userRepository.findFollowersByUserId(userId);
+    }
+
+    public List<AppUser> getFollowing(Long userId) {
+        return userRepository.findFollowingByUserId(userId);
+    }
+
+    public void followUser(Long userIdToFollow) {
+        AppUser currentUser = getLoggedUser();
+        AppUser userToFollow = userRepository.findById(userIdToFollow)
+                .orElseThrow(() -> new ResponseException("User not found"));
+
+        if (currentUser.equals(userToFollow)) {
+            throw new ResponseException("You cannot follow yourself.");
+        }
+
+        currentUser.followUser(userToFollow);
+        userRepository.save(currentUser);
+    }
+
+    public void unfollowUser(Long userIdToUnfollow) {
+        AppUser currentUser = getLoggedUser();
+        AppUser userToUnfollow = userRepository.findById(userIdToUnfollow)
+                .orElseThrow(() -> new ResponseException("User not found"));
+
+        currentUser.unfollowUser(userToUnfollow);
+        userRepository.save(currentUser);
     }
 }

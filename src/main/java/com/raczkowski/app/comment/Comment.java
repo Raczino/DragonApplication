@@ -34,9 +34,6 @@ public class Comment {
     private ZonedDateTime postedDate;
 
     @OneToOne
-    @JoinColumn(
-            nullable = false
-    )
     private AppUser appUser;
 
     @ManyToOne
@@ -44,8 +41,6 @@ public class Comment {
             nullable = false
     )
     private Article article;
-
-    private int likesNumber = 0;
 
     private ZonedDateTime updatedAt;
 
@@ -57,6 +52,10 @@ public class Comment {
     @Column(columnDefinition = "boolean default false")
     private boolean isPinned;
 
+    private String redditUrl;
+
+    private String redditUsername;
+
     public Comment(
             String content,
             ZonedDateTime postedDate,
@@ -67,5 +66,14 @@ public class Comment {
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.article = article;
+    }
+
+    public Comment(String content, ZonedDateTime postedDate, Article article, String redditUrl, String redditUsername, AppUser appUser) {
+        this.content = content;
+        this.postedDate = postedDate;
+        this.article = article;
+        this.redditUrl = redditUrl;
+        this.redditUsername = redditUsername;
+        this.appUser = appUser;
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserDtoMapper {
-    public static UserDto userDto(AppUser appUser) {
+    public static UserDto userDto(AppUser appUser, int articlesCount, int commentsCount, int followersCount, int followingCount) {
         return new UserDto(
                 appUser.getId(),
                 appUser.getFirstName(),
@@ -16,10 +16,12 @@ public class UserDtoMapper {
                 appUser.getBirthDate(),
                 appUser.getCity(),
                 appUser.getUserRole(),
-                appUser.getArticlesCount(),
-                appUser.getCommentsCount(),
+                articlesCount,
+                commentsCount,
                 appUser.isAccountBlocked(),
-                appUser.getBlockedDate()
+                appUser.getBlockedDate(),
+                followersCount,
+                followingCount
         );
     }
 }

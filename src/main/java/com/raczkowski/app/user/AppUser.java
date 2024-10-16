@@ -1,5 +1,8 @@
 package com.raczkowski.app.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.raczkowski.app.enums.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +15,8 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -54,15 +59,31 @@ public class AppUser implements UserDetails {
 
     private Boolean enabled = false;
 
-    @Getter
-    private int articlesCount = 0;
-
-    @Getter
-    private int commentsCount = 0;
-
     private ZonedDateTime registrationDate;
 
     private ZonedDateTime blockedDate;
+
+    private String facebookUrl;
+
+    private String instagramUrl;
+
+    private String linkedInUrl;
+
+    private String twitterUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    @JsonManagedReference
+    private Set<AppUser> followedUsers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "followedUsers")
+    @JsonBackReference
+    private Set<AppUser> followers = new HashSet<>();
+
 
     public AppUser(String firstName,
                    String lastName,
@@ -130,5 +151,15 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void followUser(AppUser user) {
+        followedUsers.add(user);
+        user.getFollowers().add(this);
+    }
+
+    public void unfollowUser(AppUser user) {
+        followedUsers.remove(user);
+        user.getFollowers().remove(this);
     }
 }
