@@ -23,6 +23,10 @@ public class Survey {
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;
 
+    private String title;
+
+    private String description;
+
     private ZonedDateTime createdAt;
 
     private ZonedDateTime endTime;

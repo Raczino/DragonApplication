@@ -23,6 +23,8 @@ public class SurveyService {
     public Survey createNewSurvey(SurveyRequest surveyRequest) {
         SurveyRequestValidator.validateSurveyRequest(surveyRequest);
         Survey survey = new Survey();
+        survey.setTitle(survey.getTitle());
+        survey.setDescription(survey.getDescription());
         survey.setCreatedAt(ZonedDateTime.now());
         survey.setEndTime(surveyRequest.getEndTime());
         survey.setOwner(userService.getLoggedUser());

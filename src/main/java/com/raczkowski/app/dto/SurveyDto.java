@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SurveyDto {
     private Long id;
+    private String title;
+    private String description;
     private ZonedDateTime createdAt;
     private ZonedDateTime endTime;
     private AuthorDto author;

@@ -16,4 +16,11 @@ public class SurveyRequest {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     private ZonedDateTime endTime;
     private List<QuestionRequest> questions;
+    private String title;
+    private String description; //TODO: dodac walidace do title i description
+
+    public SurveyRequest(ZonedDateTime endTime, List<QuestionRequest> questions) {
+        this.endTime = endTime;
+        this.questions = questions;
+    }
 }

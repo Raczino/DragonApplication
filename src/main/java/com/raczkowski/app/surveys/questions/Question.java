@@ -43,6 +43,9 @@ public class Question {
 
     private int maxSelected;
 
+    public Question(Long id) {
+        this.id = id;
+    }
     public Question(String value, SurveyQuestionType type, boolean required, List<Answers> answers, Survey survey, int minSelected, int maxSelected) {
         this.value = value;
         this.type = type;

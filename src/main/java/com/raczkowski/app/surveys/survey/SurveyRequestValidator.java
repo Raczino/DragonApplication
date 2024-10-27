@@ -5,6 +5,7 @@ import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.surveys.answers.AnswersRequest;
 import com.raczkowski.app.surveys.questions.QuestionRequest;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class SurveyRequestValidator {
     private static final int MAX_ANSWERS = 5;
 
     public static void validateSurveyRequest(SurveyRequest surveyRequest) {
-        if (surveyRequest.getEndTime() == null || surveyRequest.getEndTime().isBefore(ZonedDateTime.now())) {
+        if (surveyRequest.getEndTime() == null || surveyRequest.getEndTime().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
             throw new ResponseException("End time must be in the future.");
         }
 
