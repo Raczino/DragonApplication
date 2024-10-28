@@ -94,7 +94,7 @@ public class ModerationArticleService {
         article.setHashtags(hashtags);
         articleRepository.save(article);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
-        sendPublishArticleNotification(NotificationType.ARTICLE_PUBLISH,
+        sendNotification(NotificationType.ARTICLE_PUBLISH,
                 String.valueOf(article.getAppUser().getId()),
                 article.getAcceptedBy(),
                 "Your article has been accepted!",
@@ -121,7 +121,7 @@ public class ModerationArticleService {
                 user
         );
         rejectedArticleRepository.save(rejectedArticle);
-        sendPublishArticleNotification(NotificationType.ARTICLE_REJECT,
+        sendNotification(NotificationType.ARTICLE_REJECT,
                 String.valueOf(rejectedArticle.getAppUser().getId()),
                 rejectedArticle.getRejectedBy(),
                 "Your article has been rejected!",
@@ -224,7 +224,7 @@ public class ModerationArticleService {
     }
 
     @Transactional
-    public void sendPublishArticleNotification(NotificationType type, String userId, AppUser createdBy, String title, String message, String targetUrl) {
+    public void sendNotification(NotificationType type, String userId, AppUser createdBy, String title, String message, String targetUrl) {
         Notification notification = new Notification(
                 userId,
                 type,
