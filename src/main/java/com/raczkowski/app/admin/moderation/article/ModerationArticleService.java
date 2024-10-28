@@ -2,7 +2,6 @@ package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.article.*;
-import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
@@ -12,8 +11,12 @@ import com.raczkowski.app.dto.NonConfirmedArticleDto;
 import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
+import com.raczkowski.app.notification.Notification;
+import com.raczkowski.app.notification.NotificationRepository;
+import com.raczkowski.app.notification.NotificationService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
@@ -26,7 +29,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +44,8 @@ public class ModerationArticleService {
     private final DeletedArticleService deletedArticleService;
     private final DeletedArticleRepository deletedArticleRepository;
     private final ArticleStatisticsService articleStatisticsService;
+    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
@@ -90,8 +94,12 @@ public class ModerationArticleService {
         article.setHashtags(hashtags);
         articleRepository.save(article);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
-        //userRepository.updateArticlesCount(article.getAppUser().getId());
-
+        sendPublishArticleNotification(NotificationType.ARTICLE_PUBLISH,
+                String.valueOf(article.getAppUser().getId()),
+                article.getAcceptedBy(),
+                "Your article has been accepted!",
+                "Accepted By",
+                "article/" + article.getId());
         return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
     }
 
@@ -113,6 +121,12 @@ public class ModerationArticleService {
                 user
         );
         rejectedArticleRepository.save(rejectedArticle);
+        sendPublishArticleNotification(NotificationType.ARTICLE_REJECT,
+                String.valueOf(rejectedArticle.getAppUser().getId()),
+                rejectedArticle.getRejectedBy(),
+                "Your article has been rejected!",
+                "Rejected By",
+                null);
 
         return ArticleDtoMapper.rejectedArticleDtoMapper(rejectedArticle);
     }
@@ -207,5 +221,20 @@ public class ModerationArticleService {
         }
 
         articleRepository.pinArticle(id);
+    }
+
+    @Transactional
+    public void sendPublishArticleNotification(NotificationType type, String userId, AppUser createdBy, String title, String message, String targetUrl) {
+        Notification notification = new Notification(
+                userId,
+                type,
+                title,
+                message,
+                ZonedDateTime.now(ZoneOffset.UTC),
+                createdBy.getFirstName(),
+                targetUrl
+        );
+        notificationRepository.save(notification);
+        notificationService.sendNotification(userId, notification);
     }
 }

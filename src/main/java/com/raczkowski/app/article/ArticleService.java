@@ -14,6 +14,8 @@ import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.hashtags.HashtagService;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
+import com.raczkowski.app.notification.Notification;
+import com.raczkowski.app.notification.NotificationService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;

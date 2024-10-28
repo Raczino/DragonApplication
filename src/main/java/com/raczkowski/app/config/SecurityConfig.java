@@ -45,6 +45,8 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST)
                 .permitAll()
+                .antMatchers("/ws/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
