@@ -5,5 +5,6 @@ public enum ArticleStatus {
     APPROVED,
     REJECTED,
     DELETED,
-    DELETED_BY_ADMIN
+    DELETED_BY_ADMIN,
+    SCHEDULED
 }

@@ -1,6 +1,5 @@
 package com.raczkowski.app.admin.moderation.article;
 
-import com.raczkowski.app.article.DeletedArticle;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DeletedArticleDto;
@@ -9,6 +8,8 @@ import com.raczkowski.app.dto.RejectedArticleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -77,5 +78,10 @@ public class ArticleModerationController {
     @PostMapping("/pin")
     public void getDeletedArticlesByAdmins(@RequestParam Long id) {
         moderationArticleService.pinArticle(id);
+    }
+
+    @GetMapping("get/from/user")
+    public ResponseEntity<List<NonConfirmedArticleDto>> getPendingArticlesForUser(@RequestParam Long id){
+        return ResponseEntity.ok(moderationArticleService.getPendingArticlesForUser(id));
     }
 }

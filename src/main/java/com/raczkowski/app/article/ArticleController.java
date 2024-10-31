@@ -25,7 +25,7 @@ public class ArticleController {
     ResponseEntity<PageResponse<ArticleDto>> getAllArticles(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortBy", defaultValue = "likesNumber") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "likesNumber") String sortBy, //TODO: need to change sort by Likes
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
         return ResponseEntity.ok(articleService.getAllArticles(page, size, sortBy, sortDirection));

@@ -6,7 +6,7 @@ import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
-import com.raczkowski.app.dto.*;
+import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
@@ -14,18 +14,18 @@ import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.hashtags.HashtagService;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
-import com.raczkowski.app.notification.Notification;
-import com.raczkowski.app.notification.NotificationService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,6 +59,8 @@ public class ArticleService {
                 request.getTitle(),
                 request.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC),
+                request.getScheduledForDate(),
+                ArticleStatus.PENDING,
                 user
         );
 
@@ -76,6 +78,9 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
+    /**
+     * @return Return page object with published articles
+     */
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Page<Article> articlePage = GenericService
                 .paginationOfArticle(
@@ -91,6 +96,7 @@ public class ArticleService {
         return new PageResponse<>(
                 articlePage
                         .stream()
+                        .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
                         .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
                                 article,
                                 isArticleLiked(article, user),
@@ -194,5 +200,19 @@ public class ArticleService {
 
     public int getArticlesCountForUser(AppUser appUser) {
         return articleRepository.findAllByAppUser(appUser).size();
+    }
+
+    @Scheduled(fixedRate = 900000)
+    @Transactional
+    public void publishArticle(){
+        List<Article> articlesToPublish = articleRepository.getAllByStatus(ArticleStatus.SCHEDULED);
+        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+
+        for(Article article : articlesToPublish){
+            if (article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
+                    article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
+                articleRepository.updateArticleStatus(article.getId());
+            }
+        }
     }
 }

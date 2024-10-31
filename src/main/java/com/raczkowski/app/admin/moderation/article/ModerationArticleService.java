@@ -88,10 +88,16 @@ public class ModerationArticleService {
                 articleToConfirm.getPostedDate(),
                 articleToConfirm.getAppUser(),
                 ZonedDateTime.now(ZoneOffset.UTC),
+                articleToConfirm.getScheduledForDate(),
                 appUser
         );
         List<Hashtag> hashtags = new ArrayList<>(articleToConfirm.getHashtags());
         article.setHashtags(hashtags);
+        if (articleToConfirm.scheduledForDate != null) {
+            article.setStatus(ArticleStatus.SCHEDULED);
+        } else {
+            article.setStatus(ArticleStatus.APPROVED);
+        }
         articleRepository.save(article);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         sendNotification(NotificationType.ARTICLE_PUBLISH,
@@ -236,5 +242,13 @@ public class ModerationArticleService {
         );
         notificationRepository.save(notification);
         notificationService.sendNotification(userId, notification);
+    }
+
+    public List<NonConfirmedArticleDto> getPendingArticlesForUser(Long id) {
+        return articleToConfirmRepository.findAll()
+                .stream()
+                .filter(articleToConfirm -> articleToConfirm.getAppUser().getId().equals(id))
+                .map(ArticleDtoMapper::nonConfirmedArticleMapper)
+                .toList();
     }
 }

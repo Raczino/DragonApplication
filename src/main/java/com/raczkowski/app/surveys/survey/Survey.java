@@ -44,3 +44,5 @@ public class Survey {
         this.owner = owner;
     }
 }
+
+//TODO: add scheduled date for survey

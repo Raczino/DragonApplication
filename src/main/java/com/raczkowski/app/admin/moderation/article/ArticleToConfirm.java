@@ -44,7 +44,9 @@ public class ArticleToConfirm {
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.PENDING;
+    private ArticleStatus status;
+
+    ZonedDateTime scheduledForDate;
 
     @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE} )
     @JoinTable(
@@ -58,11 +60,15 @@ public class ArticleToConfirm {
             String title,
             String content,
             ZonedDateTime postedDate,
+            ZonedDateTime scheduledForDate,
+            ArticleStatus articleStatus,
             AppUser appUser
     ) {
         this.title = title;
         this.content = content;
         this.postedDate = postedDate;
+        this.scheduledForDate = scheduledForDate;
+        this.status = articleStatus;
         this.appUser = appUser;
     }
 }

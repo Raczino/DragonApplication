@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @Transactional(readOnly = true)
@@ -30,11 +29,15 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Page<Article> getArticleByAcceptedBy(AppUser appUser, Pageable pageable);
 
-
-    Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
+    List<Article> getAllByStatus(ArticleStatus status);
 
     @Transactional
     void deleteArticleById(@Param("id") Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Article c SET c.status = 'APPROVED' WHERE c.id = :id")
+    void updateArticleStatus(@Param("id") Long id);
 
     @Transactional
     @Modifying

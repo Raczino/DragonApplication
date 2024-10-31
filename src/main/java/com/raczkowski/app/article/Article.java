@@ -39,6 +39,8 @@ public class Article {
 
     private ZonedDateTime postedDate;
 
+    private ZonedDateTime scheduledForDate;
+
     @OneToOne
     @JoinColumn(
             nullable = false
@@ -46,7 +48,7 @@ public class Article {
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.APPROVED;
+    private ArticleStatus status;
 
     private ZonedDateTime updatedAt;
 
@@ -100,6 +102,7 @@ public class Article {
             ZonedDateTime postedDate,
             AppUser appUser,
             ZonedDateTime acceptedAt,
+            ZonedDateTime scheduledForDate,
             AppUser acceptedBy
     ) {
         this.title = title;
@@ -107,6 +110,7 @@ public class Article {
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.acceptedAt = acceptedAt;
+        this.scheduledForDate = scheduledForDate;
         this.acceptedBy = acceptedBy;
     }
 }
