@@ -53,7 +53,6 @@ public class ArticleToConfirmServiceTest {
         articleToConfirm.setAppUser(new AppUser());
         when(articleToConfirmRepository.getArticleToConfirmById(articleId)).thenReturn(articleToConfirm);
 
-        // Ustaw odpowiednie zachowanie dla userService.getLoggedUser()
         AppUser loggedUser = new AppUser();
         loggedUser.setUserRole(UserRole.ADMIN);
         lenient().when(userService.getLoggedUser()).thenReturn(loggedUser);

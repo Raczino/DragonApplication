@@ -1,5 +1,6 @@
 package com.raczkowski.app.surveys.survey;
 
+import com.raczkowski.app.surveys.survey.Survey;
 import com.raczkowski.app.user.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

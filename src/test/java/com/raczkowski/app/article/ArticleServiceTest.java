@@ -1,11 +1,14 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
-import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,34 +17,27 @@ import org.mockito.MockitoAnnotations;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ArticleServiceTest {
-
     @Mock
     private ArticleRepository articleRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private UserService userService;
-
     @Mock
     private ModerationArticleService moderationArticleService;
-
     @Mock
     private ArticleLikeRepository articleLikeRepository;
-
     @InjectMocks
     private ArticleService articleService;
-
     private final AppUser user = new AppUser("username", "password", "test@test.pl");
 
-    public ArticleServiceTest() {
+    @BeforeEach
+    public void init() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -53,79 +49,40 @@ public class ArticleServiceTest {
         when(userService.getLoggedUser()).thenReturn(mockUser);
 
         // when
-        ArticleDto createdArticle = articleService.create(request);
+        ArticleToConfirm createdArticle = articleService.create(request);
 
         // then
         assertEquals(createdArticle.getTitle(), request.getTitle());
         assertEquals(createdArticle.getContent(), request.getContent());
-        assertEquals(createdArticle.getAuthor().getFirstName(), mockUser.getFirstName());
-        assertEquals(createdArticle.getAuthor().getLastName(), mockUser.getLastName());
-        assertEquals(createdArticle.getAuthor().getEmail(), mockUser.getEmail());
+        assertEquals(createdArticle.getAppUser().getFirstName(), mockUser.getFirstName());
+        assertEquals(createdArticle.getAppUser().getLastName(), mockUser.getLastName());
+        assertEquals(createdArticle.getAppUser().getEmail(), mockUser.getEmail());
+        assertEquals(createdArticle.getStatus(), ArticleStatus.PENDING);
         verify(moderationArticleService, times(1)).addArticle(any());
     }
 
     @Test
-    public void shouldReturnExceptionForNullValueOfTitle() {
-        // given
-        ArticleRequest emptyRequest = new ArticleRequest(null, "content");
-        when(userService.getLoggedUser()).thenReturn(new AppUser());
+    public void ShouldReturnAllArticles() {
+        //given:
+        List<Article> articlesList = new ArrayList<>();
+        articlesList.add(new Article());
+        articlesList.add(new Article());
+        when(articleRepository.findAll()).thenReturn(articlesList);
 
-        // when
-        Exception exception = assertThrows(Exception.class, () -> articleService.create(emptyRequest));
+        //when:
+        List<Article> allArticles = articleService.getAllArticles();
 
-        // then
-        assertEquals("Title or content can't be empty", exception.getMessage());
-        verify(articleRepository, never()).save(any());
-    }
-
-    @Test
-    public void shouldReturnExceptionForNullValueOfContent() {
-        // given
-        ArticleRequest emptyRequest = new ArticleRequest("title", null);
-        when(userService.getLoggedUser()).thenReturn(new AppUser());
-
-        // when
-        Exception exception = assertThrows(Exception.class, () -> articleService.create(emptyRequest));
-
-        // then
-        assertEquals("Title or content can't be empty", exception.getMessage());
-        verify(articleRepository, never()).save(any());
-    }
-
-    @Test
-    public void shouldReturnExceptionForEmptyTitle() {
-        // given
-        ArticleRequest emptyRequest = new ArticleRequest("", "title");
-        when(userService.getLoggedUser()).thenReturn(new AppUser());
-
-        // when
-        Exception exception = assertThrows(Exception.class, () -> articleService.create(emptyRequest));
-
-        // then
-        assertEquals("Title or content can't be empty", exception.getMessage());
-        verify(articleRepository, never()).save(any());
-    }
-
-    @Test
-    public void shouldReturnExceptionForEmptyContent() {
-        // given
-        ArticleRequest emptyRequest = new ArticleRequest("title", "");
-        when(userService.getLoggedUser()).thenReturn(new AppUser());
-
-        // when
-        Exception exception = assertThrows(Exception.class, () -> articleService.create(emptyRequest));
-
-        // then
-        assertEquals("Title or content can't be empty", exception.getMessage());
-        verify(articleRepository, never()).save(any());
+        //then:
+        assertEquals(2, allArticles.size());
     }
 
     @Test
     public void ShouldGetArticlesFromUser() {
         // given
         Long userId = 1L;
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        AppUser user = new AppUser();
+        user.setId(userId);
+        when(userRepository.getAppUserById(userId)).thenReturn(user);
 
         ZonedDateTime postedDate = ZonedDateTime.now();
         List<Article> articles = new ArrayList<>();
@@ -134,19 +91,19 @@ public class ArticleServiceTest {
         when(articleRepository.findAllByAppUser(user)).thenReturn(articles);
 
         // when
-        List<ArticleDto> result = articleService.getArticlesFromUser(userId);
+        List<Article> result = articleService.getArticlesFromUser(userId);
 
         // then
         assertEquals(2, result.size());
         assertEquals("Title1", result.get(0).getTitle());
         assertEquals("Content1", result.get(0).getContent());
         assertEquals(postedDate, result.get(0).getPostedDate());
-        assertEquals(user.getId(), result.get(0).getAuthor().getId());
+        assertEquals(user.getId(), result.get(0).getAppUser().getId());
         assertEquals("Title2", result.get(1).getTitle());
         assertEquals("Content2", result.get(1).getContent());
         assertEquals(postedDate, result.get(1).getPostedDate());
-        assertEquals(user.getId(), result.get(1).getAuthor().getId());
-        verify(userRepository, times(1)).findById(userId);
+        assertEquals(user.getId(), result.get(1).getAppUser().getId());
+        verify(userRepository, times(1)).getAppUserById(userId);
         verify(articleRepository, times(1)).findAllByAppUser(user);
     }
 
@@ -154,10 +111,10 @@ public class ArticleServiceTest {
     public void ShouldReturnEmptyListForUserWithoutPostedArticle() {
         // given
         Long userId = 123L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepository.getAppUserById(userId)).thenReturn(new AppUser());
 
         // when
-        List<ArticleDto> result = articleService.getArticlesFromUser(userId);
+        List<Article> result = articleService.getArticlesFromUser(userId);
 
         // then
         assertNotNull(result);
@@ -225,12 +182,12 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(articleId)).thenReturn(article);
 
         // when
-        ArticleDto result = articleService.getArticleByID(articleId);
+        Article result = articleService.getArticleByID(articleId);
 
         // then
         assertNotNull(result);
         assertEquals(articleId, result.getId());
-        assertEquals(userId, result.getAuthor().getId());
+        assertEquals(userId, result.getAppUser().getId());
         verify(articleRepository, times(1)).findArticleById(articleId);
     }
 
@@ -272,6 +229,99 @@ public class ArticleServiceTest {
         // then
         assertTrue(result);
         verify(articleLikeRepository, times(1)).existsArticleLikesByAppUserAndArticle(user, article);
+    }
+
+    @Test
+    void shouldUpdateTitleAndContentWhenBothProvided() {
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setId(1L);
+        articleRequest.setTitle("New Title");
+        articleRequest.setContent("New Content");
+
+        AppUser user = new AppUser();
+        user.setId(1L);
+
+        Article article = new Article();
+        article.setAppUser(user);
+        article.getAppUser().setId(1L);
+
+        when(articleRepository.findArticleById(1L)).thenReturn(article);
+        when(userService.getLoggedUser()).thenReturn(user);
+
+        articleService.updateArticle(articleRequest);
+
+        verify(articleRepository).updateArticle(
+                eq(1L),
+                eq("New Title"),
+                eq("New Content"),
+                any(ZonedDateTime.class)
+        );
+    }
+
+    @Test
+    void shouldUpdateTitleWhenTitleProvided() {
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setId(1L);
+        articleRequest.setTitle("New Title");
+
+        AppUser user = new AppUser();
+        user.setId(1L);
+
+        Article article = new Article();
+        article.setAppUser(user);
+        article.getAppUser().setId(1L);
+        article.setContent("Old Content");
+
+
+        when(articleRepository.findArticleById(1L)).thenReturn(article);
+        when(userService.getLoggedUser()).thenReturn(user);
+
+        articleService.updateArticle(articleRequest);
+
+        verify(articleRepository).updateArticle(
+                eq(1L),
+                eq("New Title"),
+                eq("Old Content"),
+                any(ZonedDateTime.class)
+        );
+    }
+
+    @Test
+    void shouldUpdateContentWhenContentProvided() {
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setId(1L);
+        articleRequest.setContent("New Content");
+
+        AppUser user = new AppUser();
+        user.setId(1L);
+
+        Article article = new Article();
+        article.setAppUser(user);
+        article.getAppUser().setId(1L);
+        article.setTitle("Old Title");
+
+        when(articleRepository.findArticleById(1L)).thenReturn(article);
+        when(userService.getLoggedUser()).thenReturn(user);
+
+        articleService.updateArticle(articleRequest);
+
+        verify(articleRepository).updateArticle(
+                eq(1L),
+                eq("Old Title"),
+                eq("New Content"),
+                any(ZonedDateTime.class)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateArticleAndArticleNotFound() {
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setId(1L);
+
+        when(articleRepository.findArticleById(1L)).thenReturn(null);
+
+        assertThrows(ResponseException.class, () -> articleService.updateArticle(articleRequest));
+        verify(articleRepository, never()).updateArticle(anyLong(), anyString(), anyString(), any());
     }
 }
 

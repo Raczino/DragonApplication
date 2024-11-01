@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > SurveyDtoMapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.raczkowski.app.dtoMappers</a>
+</div>
+
+<h1>Coverage Summary for Class: SurveyDtoMapper (com.raczkowski.app.dtoMappers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurveyDtoMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.raczkowski.app.dtoMappers;
+&nbsp;
+&nbsp;import com.raczkowski.app.dto.AnswersDto;
+&nbsp;import com.raczkowski.app.dto.AuthorDto;
+&nbsp;import com.raczkowski.app.dto.QuestionDto;
+&nbsp;import com.raczkowski.app.dto.SurveyDto;
+&nbsp;import com.raczkowski.app.surveys.questions.Question;
+&nbsp;import com.raczkowski.app.surveys.survey.Survey;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+<b class="nc">&nbsp;public class SurveyDtoMapper {</b>
+&nbsp;    public static SurveyDto toDTO(Survey survey) {
+<b class="nc">&nbsp;        if (survey == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;QuestionDto&gt; questionDTOs = survey.getQuestions().stream()</b>
+<b class="nc">&nbsp;                .map(SurveyDtoMapper::toQuestionDTO)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        AuthorDto authorDto = new AuthorDto(survey.getOwner().getId(), survey.getOwner().getFirstName(), survey.getOwner().getLastName(), survey.getOwner().getEmail(), survey.getOwner().isAccountBlocked());</b>
+<b class="nc">&nbsp;        SurveyDto surveyDto = new SurveyDto();</b>
+<b class="nc">&nbsp;        surveyDto.setId(survey.getId());</b>
+<b class="nc">&nbsp;        surveyDto.setTitle(survey.getTitle());</b>
+<b class="nc">&nbsp;        surveyDto.setDescription(survey.getDescription());</b>
+<b class="nc">&nbsp;        surveyDto.setCreatedAt(survey.getCreatedAt());</b>
+<b class="nc">&nbsp;        surveyDto.setEndTime(survey.getEndTime());</b>
+<b class="nc">&nbsp;        surveyDto.setAuthor(authorDto);</b>
+<b class="nc">&nbsp;        surveyDto.setQuestions(questionDTOs);</b>
+&nbsp;
+<b class="nc">&nbsp;        return surveyDto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static QuestionDto toQuestionDTO(Question question) {
+<b class="nc">&nbsp;        if (question == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new QuestionDto(</b>
+<b class="nc">&nbsp;                question.getId(),</b>
+<b class="nc">&nbsp;                question.getValue(),</b>
+<b class="nc">&nbsp;                question.getType(),</b>
+<b class="nc">&nbsp;                question.isRequired(),</b>
+<b class="nc">&nbsp;                question.getMinSelected(),</b>
+<b class="nc">&nbsp;                question.getMaxSelected(),</b>
+<b class="nc">&nbsp;                question.getAnswers().stream()</b>
+<b class="nc">&nbsp;                        .map(answer -&gt; new AnswersDto(answer.getId(), answer.getValue()))</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toList())</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-11-01 21:44</div>
+</div>
+</body>
+</html>

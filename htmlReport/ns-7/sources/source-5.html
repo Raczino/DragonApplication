@@ -1,0 +1,145 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > ArticleRequestValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.raczkowski.app.article</a>
+</div>
+
+<h1>Coverage Summary for Class: ArticleRequestValidator (com.raczkowski.app.article)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArticleRequestValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.raczkowski.app.article;
+&nbsp;
+&nbsp;import com.raczkowski.app.exceptions.ResponseException;
+&nbsp;
+<b class="nc">&nbsp;public class ArticleRequestValidator {</b>
+&nbsp;    private static final int TITLE_MAX_LENGTH = 250;
+&nbsp;    private static final int CONTENT_MAX_LENGTH = 2000;
+&nbsp;    private static final int HASHTAGS_MAX_LENGTH = 100;
+&nbsp;
+&nbsp;    public static void validateCreationRequest(ArticleRequest request) {
+&nbsp;        //Validation of content and title, those can&#39;t be null or empty
+<b class="nc">&nbsp;        if (request.getTitle() == null</b>
+<b class="nc">&nbsp;                || request.getContent() == null</b>
+<b class="nc">&nbsp;                || request.getTitle().equals(&quot;&quot;)</b>
+<b class="nc">&nbsp;                || request.getContent().equals(&quot;&quot;)) {</b>
+<b class="nc">&nbsp;            throw new ResponseException(&quot;Title or content can&#39;t be empty&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Validation maximum length of title and content
+<b class="nc">&nbsp;        if (request.getTitle().length() &gt; TITLE_MAX_LENGTH) {</b>
+<b class="nc">&nbsp;            throw new ResponseException(&quot;Title is longer than maximum length &quot; + TITLE_MAX_LENGTH);</b>
+<b class="nc">&nbsp;        } else if (request.getContent().length() &gt; CONTENT_MAX_LENGTH) {</b>
+<b class="nc">&nbsp;            throw new ResponseException(&quot;Content is longer than maximum length &quot; + CONTENT_MAX_LENGTH);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Validation maximum length of hashtags
+<b class="nc">&nbsp;        if(request.getHashtags() != null){</b>
+<b class="nc">&nbsp;            if(request.getHashtags().length()&gt;HASHTAGS_MAX_LENGTH){</b>
+<b class="nc">&nbsp;                throw new ResponseException(&quot;Hashtags is longer than maximum length &quot; + HASHTAGS_MAX_LENGTH);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void validateUpdateRequest(ArticleRequest request) {
+&nbsp;        //Validation of update, during update title or content both of them cant be empty or null
+<b class="nc">&nbsp;        if ((request.getTitle() == null || request.getTitle().equals(&quot;&quot;)) &amp;&amp;</b>
+<b class="nc">&nbsp;                (request.getContent() == null || request.getContent().equals(&quot;&quot;))) {</b>
+<b class="nc">&nbsp;            throw new ResponseException(&quot;Title or content can&#39;t be empty&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-11-01 21:44</div>
+</div>
+</body>
+</html>

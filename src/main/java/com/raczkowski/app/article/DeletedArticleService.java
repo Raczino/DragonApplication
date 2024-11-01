@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 @Service
 @AllArgsConstructor
 public class DeletedArticleService {
-
     private final DeletedArticleRepository deletedArticleRepository;
     private final ArticleRepository articleRepository;
     private final ArticleStatisticsService articleStatisticsService;

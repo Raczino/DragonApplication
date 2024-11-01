@@ -16,20 +16,25 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
 public class GenericService {
+    public static <T> Page<T> paginate(
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            String sortDirection,
+            Function<Pageable, Page<T>> queryFunction) {
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        return queryFunction.apply(pageable);
+    }
     public static <T> Page<T> pagination(JpaRepository<T, Long> repository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest
                 .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         return repository.findAll(pageable);
-    }
-
-    public static Page<Article> paginationOfArticle(ArticleRepository articleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        Pageable pageable = PageRequest
-                .of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        return articleRepository.findAllWithPinnedFirst(pageable);
     }
 
     public static Page<DeletedArticle> paginationOfDeletedArticles(DeletedArticleRepository deletedArticleRepository, int pageNumber, int pageSize, String sortBy, String sortDirection) {

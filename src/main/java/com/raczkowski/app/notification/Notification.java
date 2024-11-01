@@ -31,7 +31,13 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String userId, NotificationType type, String title, String message, ZonedDateTime createdAt, String createdBy, String targetUrl) {
+    public Notification(String userId,
+                        NotificationType type,
+                        String title,
+                        String message,
+                        ZonedDateTime createdAt,
+                        String createdBy,
+                        String targetUrl) {
         this.userId = userId;
         this.type = type;
         this.title = title;

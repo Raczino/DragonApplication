@@ -2,12 +2,7 @@ package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
-import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
-import com.raczkowski.app.common.MetaData;
-import com.raczkowski.app.common.PageResponse;
-import com.raczkowski.app.dto.ArticleDto;
-import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
@@ -27,33 +22,21 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ArticleService {
-
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final CommentService commentService;
     private final ArticleLikeRepository articleLikeRepository;
     private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
     private final HashtagService hashtagService;
-    private final ArticleStatisticsService articleStatisticsService;
 
-    public ArticleDto create(ArticleRequest request) {
-        if (
-                request.getTitle() == null
-                        || request.getContent() == null
-                        || request.getTitle().equals("")
-                        || request.getContent().equals("")
-        ) {
-            throw new ResponseException("Title or content can't be empty");
-        }
+    public ArticleToConfirm create(ArticleRequest request) {
+        ArticleRequestValidator.validateCreationRequest(request);
         AppUser user = userService.getLoggedUser();
-
 
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
@@ -70,82 +53,42 @@ public class ArticleService {
         }
 
         moderationArticleService.addArticle(articleToConfirm);
-
-        return ArticleDtoMapper.nonConfirmedArticleMapper(articleToConfirm);
+        return articleToConfirm;
     }
 
     public List<Article> getAllArticles() {
         return articleRepository.findAll();
     }
 
-    /**
-     * @return Return page object with published articles
-     */
-    public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        Page<Article> articlePage = GenericService
-                .paginationOfArticle(
-                        articleRepository,
-                        pageNumber,
-                        pageSize,
-                        sortBy,
-                        sortDirection
-                );
-        AppUser user = userService.getLoggedUser();
-
-
-        return new PageResponse<>(
-                articlePage
-                        .stream()
-                        .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
-                        .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
-                                article,
-                                isArticleLiked(article, user),
-                                commentService.getNumberCommentsOfArticle(article.getId()),
-                                articleStatisticsService.getLikesCountForArticle(article)
-                        ))
-                        .toList(),
-                new MetaData(
-                        articlePage.getTotalElements(),
-                        articlePage.getTotalPages(),
-                        articlePage.getNumber() + 1,
-                        articlePage.getSize()));
+    public Page<Article> getAllPaginatedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        return GenericService.paginate(pageNumber, pageSize, sortBy, sortDirection, articleRepository::findAllWithPinnedFirst);
     }
 
-    public List<ArticleDto> getArticlesFromUser(Long userID) {
+    public List<Article> getArticlesFromUser(Long userID) {
         AppUser user = userRepository.getAppUserById(userID);
         if (user == null) {
             throw new ResponseException("There is no user");
         }
-
-        return articleRepository
-                .findAllByAppUser(user)
-                .stream()
-                .map(
-                        article -> ArticleDtoMapper.articleDtoMapper(
-                                article,
-                                articleStatisticsService.getLikesCountForArticle(article)
-                        ))
-                .collect(Collectors.toList());
+        return articleRepository.findAllByAppUser(user);
     }
 
     @Transactional
-    public String removeArticle(Long id) {
+    public void removeArticle(Long id) {
         deletedArticleService.deleteArticle(id, ArticleStatus.DELETED, null);
-        return "Removed";
     }
 
-    public ArticleDto getArticleByID(Long id) {
+    public Article getArticleByID(Long id) {
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
             throw new ResponseException("There is no article with provided id");
         }
-        return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
+        return article;
     }
 
     public void likeArticle(Long id) {
         AppUser user = userService.getLoggedUser();
-
         Article article = articleRepository.findArticleById(id);
+
         if (article == null) {
             throw new ResponseException("Article doesnt exists");
         }
@@ -158,11 +101,7 @@ public class ArticleService {
     }
 
     public void updateArticle(ArticleRequest articleRequest) {
-        if ((articleRequest.getTitle() == null || articleRequest.getTitle().equals("")) &&
-                (articleRequest.getContent() == null || articleRequest.getContent().equals(""))) {
-            throw new ResponseException("Title or content can't be empty");
-        }
-
+        ArticleRequestValidator.validateUpdateRequest(articleRequest);
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {
@@ -204,11 +143,11 @@ public class ArticleService {
 
     @Scheduled(fixedRate = 900000)
     @Transactional
-    public void publishArticle(){
+    public void publishArticle() {
         List<Article> articlesToPublish = articleRepository.getAllByStatus(ArticleStatus.SCHEDULED);
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
 
-        for(Article article : articlesToPublish){
+        for (Article article : articlesToPublish) {
             if (article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
                     article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
                 articleRepository.updateArticleStatus(article.getId());

@@ -7,7 +7,6 @@ import com.raczkowski.app.dto.SurveyDto;
 import com.raczkowski.app.surveys.questions.Question;
 import com.raczkowski.app.surveys.survey.Survey;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

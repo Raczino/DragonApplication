@@ -1,12 +1,14 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.hashtags.Hashtag;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleRequest {
