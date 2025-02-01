@@ -1,15 +1,9 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.comment.CommentService;
-import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
-import com.raczkowski.app.enums.ArticleStatus;
-import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +16,6 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final ArticleStatisticsService articleStatisticsService;
-    private final CommentService commentService;
-    private final UserService userService;
 
     @PostMapping("/add")
     ResponseEntity<ArticleDto> create(@RequestBody ArticleRequest request) {
@@ -37,30 +29,8 @@ public class ArticleController {
             @RequestParam(name = "sortBy", defaultValue = "likesNumber") String sortBy, //TODO: need to change sort by Likes
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
-        Page<Article> articlePage = articleService.getAllPaginatedArticles(page, size, sortBy, sortDirection);
-        AppUser user = userService.getLoggedUser();
 
-        List<ArticleDto> articleDto = articlePage.getContent().stream()
-                .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
-                .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
-                        article,
-                        articleService.isArticleLiked(article, user),
-                        commentService.getNumberCommentsOfArticle(article.getId()),
-                        articleStatisticsService.getLikesCountForArticle(article)
-                ))
-                .toList();
-
-        PageResponse<ArticleDto> response = new PageResponse<>(
-                articleDto,
-                new MetaData(
-                        articlePage.getTotalElements(),
-                        articlePage.getTotalPages(),
-                        articlePage.getNumber() + 1,
-                        articlePage.getSize()
-                )
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(articleService.getAllPaginatedArticles(page, size, sortBy, sortDirection));
     }
 
     @GetMapping("/get/from")

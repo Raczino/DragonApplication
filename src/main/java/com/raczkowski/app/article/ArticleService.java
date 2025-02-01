@@ -2,7 +2,12 @@ package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
+import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
+import com.raczkowski.app.common.MetaData;
+import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
@@ -33,6 +38,8 @@ public class ArticleService {
     private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
     private final HashtagService hashtagService;
+    private final CommentService commentService;
+    private final ArticleStatisticsService articleStatisticsService;
 
     public ArticleToConfirm create(ArticleRequest request) {
         ArticleRequestValidator.validateCreationRequest(request);
@@ -60,8 +67,30 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
-    public Page<Article> getAllPaginatedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        return GenericService.paginate(pageNumber, pageSize, sortBy, sortDirection, articleRepository::findAllWithPinnedFirst);
+    public PageResponse<ArticleDto> getAllPaginatedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Page<Article> articlePage = GenericService.paginate(pageNumber, pageSize, sortBy, sortDirection, articleRepository::findAllWithPinnedFirst);
+
+        AppUser user = userService.getLoggedUser();
+
+        List<ArticleDto> articleDto = articlePage.getContent().stream()
+                .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
+                .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
+                        article,
+                        isArticleLiked(article, user),
+                        commentService.getNumberCommentsOfArticle(article.getId()),
+                        articleStatisticsService.getLikesCountForArticle(article)
+                ))
+                .toList();
+
+        return new PageResponse<>(
+                articleDto,
+                new MetaData(
+                        articlePage.getTotalElements(),
+                        articlePage.getTotalPages(),
+                        articlePage.getNumber() + 1,
+                        articlePage.getSize()
+                )
+        );
     }
 
     public List<Article> getArticlesFromUser(Long userID) {
