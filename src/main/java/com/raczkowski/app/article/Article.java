@@ -14,10 +14,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-@ToString
 public class Article {
     @SequenceGenerator(
             name = "article_sequence",
@@ -83,6 +81,10 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
     private List<Hashtag> hashtags = new ArrayList<>();
+
+    private int likesCount;
+
+    private int commentsCount;
 
     public Article(
             String title,

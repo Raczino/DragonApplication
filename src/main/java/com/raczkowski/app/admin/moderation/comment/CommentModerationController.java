@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/webapi/v1/comment")
 @AllArgsConstructor
 public class CommentModerationController {
-    ModerationCommentService moderationCommentService;
+    private final ModerationCommentService moderationCommentService;
 
     @DeleteMapping("/delete")
     public void deleteComment(@RequestParam Long id) {

@@ -14,30 +14,17 @@ import java.time.ZonedDateTime;
 @Setter
 public class UserDto {
     private Long id;
-
     private String firstName;
-
     private String lastName;
-
     private String email;
-
     private String description;
-
     private String birthDate;
-
     private String city;
-
     private UserRole userRole;
-
     private int articlesCount;
-
     private int commentsCount;
-
     private boolean isBlocked;
-
     private ZonedDateTime blockedDate;
-
     private int followersCount;
-
     private int followsCount;
 }

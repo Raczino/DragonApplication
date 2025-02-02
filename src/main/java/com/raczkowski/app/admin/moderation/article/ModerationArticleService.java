@@ -43,7 +43,6 @@ public class ModerationArticleService {
     private final PermissionValidator permissionValidator;
     private final DeletedArticleService deletedArticleService;
     private final DeletedArticleRepository deletedArticleRepository;
-    private final ArticleStatisticsService articleStatisticsService;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
 
@@ -106,7 +105,7 @@ public class ModerationArticleService {
                 "Your article has been accepted!",
                 "Accepted By",
                 "article/" + article.getId());
-        return ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article));
+        return ArticleDtoMapper.articleDtoMapper(article);
     }
 
     public RejectedArticleDto rejectArticle(Long articleId) {
@@ -181,7 +180,7 @@ public class ModerationArticleService {
 
         return new PageResponse<>(articles
                 .stream()
-                .map(article -> ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article)))
+                .map(ArticleDtoMapper::articleDtoMapper)
                 .toList(),
                 new MetaData(
                         articles.getTotalElements(),

@@ -15,7 +15,6 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final ArticleStatisticsService articleStatisticsService;
 
     @PostMapping("/add")
     ResponseEntity<ArticleDto> create(@RequestBody ArticleRequest request) {
@@ -26,7 +25,7 @@ public class ArticleController {
     ResponseEntity<PageResponse<ArticleDto>> getAllArticles(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortBy", defaultValue = "likesNumber") String sortBy, //TODO: need to change sort by Likes
+            @RequestParam(name = "sortBy", defaultValue = "likesCount") String sortBy,
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
 
@@ -37,15 +36,14 @@ public class ArticleController {
     ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam Long id) {
         return ResponseEntity.ok(
                 articleService.getArticlesFromUser(id).stream()
-                        .map(article -> ArticleDtoMapper.articleDtoMapper(article,
-                                articleStatisticsService.getLikesCountForArticle(article)))
+                        .map(ArticleDtoMapper::articleDtoMapper)
                         .toList());
     }
 
     @GetMapping("/get")
     ResponseEntity<ArticleDto> getArticleByID(@RequestParam Long id) {
         Article article = articleService.getArticleByID(id);
-        return ResponseEntity.ok(ArticleDtoMapper.articleDtoMapper(article, articleStatisticsService.getLikesCountForArticle(article)));
+        return ResponseEntity.ok(ArticleDtoMapper.articleDtoMapper(article));
     }
 
     @DeleteMapping("/delete")

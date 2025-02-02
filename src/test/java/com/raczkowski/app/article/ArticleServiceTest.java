@@ -29,6 +29,8 @@ public class ArticleServiceTest {
     @Mock
     private UserService userService;
     @Mock
+    private ArticleRequestValidator articleRequestValidator;
+    @Mock
     private ModerationArticleService moderationArticleService;
     @Mock
     private ArticleLikeRepository articleLikeRepository;
@@ -248,6 +250,7 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
 
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
         articleService.updateArticle(articleRequest);
 
         verify(articleRepository).updateArticle(
@@ -276,6 +279,8 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
 
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
+
         articleService.updateArticle(articleRequest);
 
         verify(articleRepository).updateArticle(
@@ -302,6 +307,8 @@ public class ArticleServiceTest {
 
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
+
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
 
         articleService.updateArticle(articleRequest);
 

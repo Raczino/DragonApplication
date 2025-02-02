@@ -18,6 +18,7 @@ public class DeletedArticleDto extends ArticleDto {
             String content,
             ZonedDateTime postedDate,
             int likesCount,
+            int commentsCount,
             AuthorDto user,
             ZonedDateTime updatedAt,
             boolean isUpdated,
@@ -27,7 +28,7 @@ public class DeletedArticleDto extends ArticleDto {
             ZonedDateTime deletedAt,
             AuthorDto deletedBy
     ) {
-        super(id, title, content, postedDate, likesCount, user, updatedAt, isUpdated, status, acceptedAt, acceptedBy);
+        super(id, title, content, postedDate, likesCount, commentsCount, user, updatedAt, isUpdated, status, acceptedAt, acceptedBy);
         this.deletedAt = deletedAt;
         this.deletedBy = deletedBy;
     }

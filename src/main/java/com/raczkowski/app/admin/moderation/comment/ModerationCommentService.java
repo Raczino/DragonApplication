@@ -9,9 +9,8 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class ModerationCommentService {
-    CommentService commentService;
-    PermissionValidator permissionValidator;
-    UserService userService;
+    private final CommentService commentService;
+    private final PermissionValidator permissionValidator;
 
     public void deleteComment(Long commentId) {
         permissionValidator.validateIfUserIsAdminOrOperator();

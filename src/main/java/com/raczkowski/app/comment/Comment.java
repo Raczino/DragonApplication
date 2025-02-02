@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @NoArgsConstructor
 @Entity
 public class Comment {
@@ -55,6 +54,8 @@ public class Comment {
     private String redditUrl;
 
     private String redditUsername;
+
+    private int likesCount;
 
     public Comment(
             String content,

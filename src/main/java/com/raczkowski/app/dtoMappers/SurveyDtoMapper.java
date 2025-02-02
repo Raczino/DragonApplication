@@ -19,7 +19,12 @@ public class SurveyDtoMapper {
         List<QuestionDto> questionDTOs = survey.getQuestions().stream()
                 .map(SurveyDtoMapper::toQuestionDTO)
                 .collect(Collectors.toList());
-        AuthorDto authorDto = new AuthorDto(survey.getOwner().getId(), survey.getOwner().getFirstName(), survey.getOwner().getLastName(), survey.getOwner().getEmail(), survey.getOwner().isAccountBlocked());
+        AuthorDto authorDto = new AuthorDto(
+                survey.getOwner().getId(),
+                survey.getOwner().getFirstName(),
+                survey.getOwner().getLastName(),
+                survey.getOwner().getEmail(),
+                survey.getOwner().isAccountBlocked());
         SurveyDto surveyDto = new SurveyDto();
         surveyDto.setId(survey.getId());
         surveyDto.setTitle(survey.getTitle());

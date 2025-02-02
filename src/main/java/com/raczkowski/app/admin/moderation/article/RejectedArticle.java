@@ -41,12 +41,12 @@ public class RejectedArticle {
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
-    ArticleStatus status = ArticleStatus.REJECTED;
+    private ArticleStatus status = ArticleStatus.REJECTED;
 
-    ZonedDateTime rejectedAt;
+    private ZonedDateTime rejectedAt;
 
     @OneToOne
-    AppUser rejectedBy;
+    private AppUser rejectedBy;
 
     public RejectedArticle(
             String title,

@@ -13,31 +13,18 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class ArticleDto {
     private Long id;
-
     private String title;
-
     private String content;
-
     private ZonedDateTime postedDate;
-
     private int likesCount;
-
+    private int commentsCount;
     private AuthorDto author;
-
     private ZonedDateTime updatedAt;
-
     private boolean isUpdated;
-
     private boolean isLiked;
-
-    private int commentsNumber;
-
     private ArticleStatus status;
-
     private ZonedDateTime acceptedAt;
-
     private AuthorDto acceptedBy;
-
     private boolean isPinned;
 
     public ArticleDto
@@ -47,6 +34,7 @@ public class ArticleDto {
                     String content,
                     ZonedDateTime postedDate,
                     int likesCount,
+                    int commentsCount,
                     AuthorDto author,
                     ZonedDateTime updatedAt,
                     boolean isUpdated,
@@ -59,6 +47,7 @@ public class ArticleDto {
         this.content = content;
         this.postedDate = postedDate;
         this.likesCount = likesCount;
+        this.commentsCount = commentsCount;
         this.author = author;
         this.updatedAt = updatedAt;
         this.isUpdated = isUpdated;
@@ -79,7 +68,7 @@ public class ArticleDto {
                     boolean isUpdated,
                     ArticleStatus status,
                     boolean isLiked,
-                    int commentsNumber,
+                    int commentsCount,
                     ZonedDateTime acceptedAt,
                     AuthorDto acceptedBy,
                     boolean isPinned
@@ -94,7 +83,7 @@ public class ArticleDto {
         this.isUpdated = isUpdated;
         this.status = status;
         this.isLiked = isLiked;
-        this.commentsNumber = commentsNumber;
+        this.commentsCount = commentsCount;
         this.acceptedAt = acceptedAt;
         this.acceptedBy = acceptedBy;
         this.isPinned = isPinned;

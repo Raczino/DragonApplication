@@ -1,6 +1,5 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
@@ -9,7 +8,6 @@ import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
 import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,8 +23,7 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final UserService userService;
     private final CommentLikeRepository commentLikeRepository;
-    private final UserRepository userRepository;
-    private final CommentStatisticsService commentStatisticsService;
+    private final CommentRequestValidator commentRequestValidator;
 
     public List<CommentDto> getAllCommentsFromArticle(Long id) {
         return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id))
@@ -35,31 +32,29 @@ public class CommentService {
                         comment ->
                                 CommentDtoMapper.commentDtoMapperWithAdditionalFields(
                                         comment,
-                                        isCommentLiked(comment, userService.getLoggedUser()),
-                                        commentStatisticsService.getLikesCountForComment(comment))
+                                        isCommentLiked(comment, userService.getLoggedUser()))
                 ).toList();
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
+        commentRequestValidator.validateCreationRequest(commentRequest);
 
-        if (commentRequest.getContent().equals("")) {
-            throw new ResponseException("Comment can't be empty");
-        }
-
-        Comment comment;
         AppUser user = userService.getLoggedUser();
 
         if (!articleRepository.existsById(commentRequest.getId())) {
             throw new ResponseException("Article with this id doesnt exists");
-        } else {
-            comment = new Comment(commentRequest.getContent(),
-                    ZonedDateTime.now(ZoneOffset.UTC),
-                    user,
-                    articleRepository.findArticleById(commentRequest.getId()
-                    ));
-            commentRepository.save(comment);
         }
-        return CommentDtoMapper.commentDtoMapper(comment, commentStatisticsService.getLikesCountForComment(comment));
+
+        Comment comment = new Comment(commentRequest.getContent(),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                user,
+                articleRepository.findArticleById(commentRequest.getId()
+                ));
+
+        commentRepository.save(comment);
+        articleRepository.updateArticleLikesCount(commentRequest.getId(), 1);
+
+        return CommentDtoMapper.commentDtoMapper(comment);
     }
 
     public void createComment(Comment comment) {
@@ -75,8 +70,14 @@ public class CommentService {
 
         if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
             commentLikeRepository.save(new CommentLike(userService.getLoggedUser(), comment, true));
+            if (commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
+                commentRepository.updateCommentLikesCount(comment.getId(), 1);
+            }
         } else {
             commentLikeRepository.delete(commentLikeRepository.findByCommentAndAppUser(comment, user));
+            if (!commentLikeRepository.existsCommentLikeByAppUserAndComment(userService.getLoggedUser(), comment)) {
+                commentRepository.updateCommentLikesCount(comment.getId(), -1);
+            }
         }
     }
 
@@ -91,7 +92,12 @@ public class CommentService {
         if (!comment.getAppUser().getId().equals(user.getId()) || (!user.getUserRole().equals(UserRole.ADMIN) && !user.getUserRole().equals(UserRole.MODERATOR))) {
             throw new ResponseException("User doesn't have permission to remove this comment");
         }
+
         commentRepository.deleteById(id);
+
+        if (commentRepository.findCommentById(id) == null) {
+            articleRepository.updateArticleLikesCount(comment.getArticle().getId(), -1);
+        }
         return "Removed";
     }
 
@@ -117,10 +123,6 @@ public class CommentService {
         return "Updated";
     }
 
-    public int getNumberCommentsOfArticle(Long id) {
-        return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id)).size();
-    }
-
     private boolean isCommentLiked(Comment comment, AppUser user) {
         return commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment);
     }
@@ -136,17 +138,11 @@ public class CommentService {
                 .map(
                         comment -> CommentDtoMapper.commentDtoMapperWithAdditionalFields(
                                 comment,
-                                isCommentLiked(comment, user),
-                                commentStatisticsService.getLikesCountForComment(comment)))
+                                isCommentLiked(comment, user)))
                 .toList();
-
     }
 
     public int getCommentsCountForUser(AppUser appUser) {
         return commentRepository.findAllByAppUser(appUser).size();
-    }
-
-    public int getCommentCountForArticle(Article article) {
-        return commentRepository.getCommentsByArticle(article).size();
     }
 }

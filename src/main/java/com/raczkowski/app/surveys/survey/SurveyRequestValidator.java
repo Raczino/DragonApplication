@@ -10,11 +10,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public class SurveyRequestValidator {
-    private static final int MAX_QUESTIONS = 5;
+    private static final int MAX_QUESTIONS = 5; //TODO: Przerobić na admin setting oraz dodać validacje na długość znaków w pytaniach odpowiedzi itp
     private static final int MAX_ANSWERS = 5;
 
     public static void validateSurveyRequest(SurveyRequest surveyRequest) {
-        if (surveyRequest.getEndTime() == null || surveyRequest.getEndTime().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
+        if (surveyRequest.getEndTime() == null
+                || surveyRequest.getEndTime().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
             throw new ResponseException("End time must be in the future.");
         }
 
@@ -44,7 +45,8 @@ public class SurveyRequestValidator {
                 throw new ResponseException("MinSelected cannot be lower than 1.");
             }
             if (questionRequest.getMaxSelected() < questionRequest.getMinSelected()) {
-                throw new ResponseException("MaxSelected "+ questionRequest.getMaxSelected() +" cannot be less than minSelected: "+ questionRequest.getMinSelected());
+                throw new ResponseException("MaxSelected " + questionRequest.getMaxSelected()
+                        + " cannot be less than minSelected: " + questionRequest.getMinSelected());
             }
         }
 

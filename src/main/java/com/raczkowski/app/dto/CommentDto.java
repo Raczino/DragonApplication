@@ -11,23 +11,14 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class CommentDto {
     private Long id;
-
     private String content;
-
     private ZonedDateTime postedDate;
-
     private Long articleId;
-
     private int likesNumber;
-
     private AuthorDto author;
-
     private ZonedDateTime updatedAt;
-
     private boolean isUpdated;
-
     private boolean isLiked;
-
     private boolean isPinned;
 
     public CommentDto

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class PermissionValidator {
-    UserService userService;
+    private final UserService userService;
 
     public void validateIfUserIsAdminOrOperator() {
         AppUser user = userService.getLoggedUser();

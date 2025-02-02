@@ -9,6 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 public class PermissionRequest {
     private Long id;
-
-    UserRole userRole;
+    private UserRole userRole;
 }

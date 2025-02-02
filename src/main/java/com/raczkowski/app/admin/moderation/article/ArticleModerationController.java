@@ -16,8 +16,7 @@ import java.util.List;
 @RequestMapping("/webapi/v1/article")
 public class ArticleModerationController {
 
-    ModerationArticleService moderationArticleService;
-
+    private final ModerationArticleService moderationArticleService;
 
     @GetMapping("/toConfirm/get")
     public ResponseEntity<PageResponse<NonConfirmedArticleDto>> getArticlesToConfirm(
@@ -81,7 +80,7 @@ public class ArticleModerationController {
     }
 
     @GetMapping("get/from/user")
-    public ResponseEntity<List<NonConfirmedArticleDto>> getPendingArticlesForUser(@RequestParam Long id){
+    public ResponseEntity<List<NonConfirmedArticleDto>> getPendingArticlesForUser(@RequestParam Long id) {
         return ResponseEntity.ok(moderationArticleService.getPendingArticlesForUser(id));
     }
 }

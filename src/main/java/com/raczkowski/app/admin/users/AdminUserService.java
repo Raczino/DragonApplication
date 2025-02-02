@@ -16,10 +16,8 @@ import java.time.ZonedDateTime;
 @Service
 @AllArgsConstructor
 public class AdminUserService {
-    UserRepository userRepository;
-    PermissionValidator permissionValidator;
-    ArticleRepository articleRepository;
-    UserService userService;
+    private final UserRepository userRepository;
+    private final PermissionValidator permissionValidator;
 
     public void changeUserPermission(PermissionRequest permissionRequest) {
         boolean isUserAdmin = permissionValidator.validateIfUserIaAdmin();
@@ -29,10 +27,10 @@ public class AdminUserService {
             if (userRole.equals(UserRole.ADMIN) || userRole.equals(UserRole.MODERATOR)) {
                 throw new ResponseException("You don't have permission");
             } else {
-                userRepository.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.userRole);
+                userRepository.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.getUserRole());
             }
         } else {
-            userRepository.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.userRole);
+            userRepository.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.getUserRole());
         }
     }
 

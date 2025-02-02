@@ -46,7 +46,7 @@ public class userController {
 
     @GetMapping("/{userId}/followers")
     public ResponseEntity<List<UserDto>> getFollowers(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getFollowers(userId).stream()
+        return ResponseEntity.ok(userService.getFollowersCount(userId).stream()
                 .map(user -> UserDtoMapper.userDto(
                         user,
                         userStatisticsService.getArticlesCount(user),
@@ -59,7 +59,7 @@ public class userController {
 
     @GetMapping("/{userId}/following")
     public ResponseEntity<List<UserDto>> getFollowing(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getFollowing(userId).stream()
+        return ResponseEntity.ok(userService.getFollowingUsersByUserCount(userId).stream()
                 .map(user -> UserDtoMapper.userDto(
                         user,
                         userStatisticsService.getArticlesCount(user),

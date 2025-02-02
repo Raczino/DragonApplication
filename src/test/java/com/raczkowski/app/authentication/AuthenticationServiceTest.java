@@ -2,7 +2,10 @@ package com.raczkowski.app.authentication;
 
 import com.raczkowski.app.config.JwtUtil;
 import com.raczkowski.app.dto.LoginResponseDto;
+import com.raczkowski.app.enums.UserRole;
+import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
+import com.sun.security.auth.UserPrincipal;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,13 +42,19 @@ class AuthenticationServiceTest {
     public void shouldReturnLoginResponseDtoWhenUserExists() {
         // given
         AuthenticationRequest request = new AuthenticationRequest("test@example.com", "password");
-        UserDetails userDetails = User.withUsername("test@example.com").password("password")
-                .authorities(new SimpleGrantedAuthority("USER"))
-                .build();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        when(userService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+
+        AppUser user = new AppUser();
+        user.setId(1L);
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        user.setUserRole(UserRole.USER);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+        when(userService.loadUserByUsername("test@example.com")).thenReturn(user);
+        when(userService.getUserByEmail("test@example.com")).thenReturn(user);  // Mockowanie getUserByEmail
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(jwtUtil.generateToken(userDetails)).thenReturn("jwt_token");
+        when(jwtUtil.generateToken(user)).thenReturn("jwt_token");
 
         // when
         LoginResponseDto response = authenticationService.authenticate(request);
@@ -53,6 +62,7 @@ class AuthenticationServiceTest {
         // then
         assertNotNull(response);
         assertEquals("jwt_token", response.getToken());
+        assertEquals(1L, response.getUser().getId());  // Sprawdzamy, czy ID użytkownika się zgadza
     }
 
     @Test

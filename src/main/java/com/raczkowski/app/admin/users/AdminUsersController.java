@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/webapi/v1/users")
 @AllArgsConstructor
 public class AdminUsersController {
-    AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
     @PostMapping("/change/permission")
     public void changeUserPermission(@RequestBody PermissionRequest permissionRequest) {

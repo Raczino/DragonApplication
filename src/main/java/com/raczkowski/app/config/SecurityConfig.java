@@ -24,9 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtAthFilter jwtAuthFilter;
-
     private final UserService userService;
-
     private final PasswordEncoder passwordEncoder;
 
     private static final String[] AUTH_WHITELIST = {

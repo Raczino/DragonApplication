@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ArticleToConfirm {
-
     @SequenceGenerator(
             name = "article_to_confirm_sequence",
             sequenceName = "article_to_confirm_sequence",

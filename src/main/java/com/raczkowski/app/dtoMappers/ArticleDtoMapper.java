@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ArticleDtoMapper {
-    public static ArticleDto articleDtoMapper(Article article, int likesCount) {
+    public static ArticleDto articleDtoMapper(Article article) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                likesCount,
+                article.getLikesCount(),
+                article.getCommentsCount(),
                 new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
@@ -86,6 +87,7 @@ public class ArticleDtoMapper {
                 article.getContent(),
                 article.getPostedDate(),
                 article.getLikesNumber(),
+                article.getCommentsCount(),
                 new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
@@ -115,13 +117,13 @@ public class ArticleDtoMapper {
         );
     }
 
-    public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked, int commentsNumber, int likesCount) {
+    public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked) {
         return new ArticleDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
                 article.getPostedDate(),
-                likesCount,
+                article.getLikesCount(),
                 new AuthorDto(
                         article.getAppUser().getId(),
                         article.getAppUser().getFirstName(),
@@ -133,7 +135,7 @@ public class ArticleDtoMapper {
                 article.isUpdated(),
                 article.getStatus(),
                 isLiked,
-                commentsNumber,
+                article.getCommentsCount(),
                 article.getAcceptedAt(),
                 new AuthorDto(
                         article.getAcceptedBy().getId(),

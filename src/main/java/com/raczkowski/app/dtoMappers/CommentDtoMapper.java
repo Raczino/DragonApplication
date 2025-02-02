@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommentDtoMapper {
-    public static CommentDto commentDtoMapper(Comment comment, int likesCount) {
+    public static CommentDto commentDtoMapper(Comment comment) {
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
                 comment.getPostedDate(),
                 comment.getArticle().getId(),
-                likesCount,
+                comment.getLikesCount(),
                 new AuthorDto(
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),
@@ -27,13 +27,13 @@ public class CommentDtoMapper {
         );
     }
 
-    public static CommentDto commentDtoMapperWithAdditionalFields(Comment comment, boolean isLiked, int likesCount) {
+    public static CommentDto commentDtoMapperWithAdditionalFields(Comment comment, boolean isLiked) {
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
                 comment.getPostedDate(),
                 comment.getArticle().getId(),
-                likesCount,
+                comment.getLikesCount(),
                 new AuthorDto(
                         comment.getAppUser().getId(),
                         comment.getAppUser().getFirstName(),

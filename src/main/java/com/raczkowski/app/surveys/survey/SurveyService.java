@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class SurveyService {
-    private SurveysRepository surveyRepository;
-    private UserService userService;
+    private final SurveysRepository surveyRepository;
+    private final UserService userService;
 
     @Transactional
     public Survey createNewSurvey(SurveyRequest surveyRequest) {

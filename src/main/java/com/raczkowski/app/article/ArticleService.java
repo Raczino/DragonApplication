@@ -2,7 +2,6 @@ package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
-import com.raczkowski.app.comment.CommentService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
@@ -38,11 +37,10 @@ public class ArticleService {
     private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
     private final HashtagService hashtagService;
-    private final CommentService commentService;
-    private final ArticleStatisticsService articleStatisticsService;
+    private final ArticleRequestValidator articleRequestValidator;
 
     public ArticleToConfirm create(ArticleRequest request) {
-        ArticleRequestValidator.validateCreationRequest(request);
+        articleRequestValidator.validateArticleRequest(request);
         AppUser user = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
@@ -76,9 +74,7 @@ public class ArticleService {
                 .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
                 .map(article -> ArticleDtoMapper.articleDtoMapperWithAdditionalFieldsMapper(
                         article,
-                        isArticleLiked(article, user),
-                        commentService.getNumberCommentsOfArticle(article.getId()),
-                        articleStatisticsService.getLikesCountForArticle(article)
+                        isArticleLiked(article, user)
                 ))
                 .toList();
 
@@ -124,13 +120,19 @@ public class ArticleService {
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
             articleLikeRepository.save(new ArticleLike(user, article, true));
+            if (articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
+                articleRepository.updateArticleLikesCount(article.getId(), 1);
+            }
         } else {
             articleLikeRepository.delete(articleLikeRepository.findByArticleAndAppUser(article, user));
+            if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
+                articleRepository.updateArticleLikesCount(article.getId(), -1);
+            }
         }
     }
 
     public void updateArticle(ArticleRequest articleRequest) {
-        ArticleRequestValidator.validateUpdateRequest(articleRequest);
+        articleRequestValidator.validateArticleRequest(articleRequest);
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {

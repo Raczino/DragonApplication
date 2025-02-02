@@ -76,11 +76,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
-    public List<AppUser> getFollowers(Long userId) {
+    public List<AppUser> getFollowersCount(Long userId) {
         return userRepository.findFollowersByUserId(userId);
     }
 
-    public List<AppUser> getFollowing(Long userId) {
+    public List<AppUser> getFollowingUsersByUserCount(Long userId) {
         return userRepository.findFollowingByUserId(userId);
     }
 

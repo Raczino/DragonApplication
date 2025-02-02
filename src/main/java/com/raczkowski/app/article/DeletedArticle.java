@@ -65,6 +65,8 @@ public class DeletedArticle {
     @OneToOne
     private AppUser deletedBy;
 
+    private int commentsCount;
+
     public DeletedArticle(
             String title,
             String content,
@@ -77,7 +79,8 @@ public class DeletedArticle {
             ZonedDateTime acceptedAt,
             AppUser acceptedBy,
             ZonedDateTime deletedAt,
-            AppUser deletedBy
+            AppUser deletedBy,
+            int commentsCount
     ) {
         this.title = title;
         this.content = content;

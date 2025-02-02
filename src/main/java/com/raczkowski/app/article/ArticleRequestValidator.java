@@ -1,42 +1,43 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.admin.adminSettings.AdminSettingsService;
 import com.raczkowski.app.exceptions.ResponseException;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@AllArgsConstructor
 public class ArticleRequestValidator {
-    private static final int TITLE_MAX_LENGTH = 250;
-    private static final int CONTENT_MAX_LENGTH = 2000;
-    private static final int HASHTAGS_MAX_LENGTH = 100;
 
-    public static void validateCreationRequest(ArticleRequest request) {
-        //Validation of content and title, those can't be null or empty
-        if (request.getTitle() == null
-                || request.getContent() == null
-                || request.getTitle().equals("")
-                || request.getContent().equals("")) {
+    private final AdminSettingsService adminSettingsService;
+
+    public void validateArticleRequest(ArticleRequest request) {
+        int contentMaxLength = Integer.parseInt(adminSettingsService.getSetting("article.content.max.length").getSettingValue());
+        int titleMaxLength = Integer.parseInt(adminSettingsService.getSetting("article.title.max.length").getSettingValue());
+        int hashtagsMaxLength = Integer.parseInt(adminSettingsService.getSetting("article.hashtag.max.length").getSettingValue());
+        int contentMinLength = Integer.parseInt(adminSettingsService.getSetting("article.content.min.length").getSettingValue());
+        int titleMinLength = Integer.parseInt(adminSettingsService.getSetting("article.title.min.length").getSettingValue());
+
+        if (request.getTitle() == null || request.getContent() == null || request.getTitle().isEmpty() || request.getContent().isEmpty()) {
             throw new ResponseException("Title or content can't be empty");
         }
 
-        //Validation maximum length of title and content
-        if (request.getTitle().length() > TITLE_MAX_LENGTH) {
-            throw new ResponseException("Title is longer than maximum length " + TITLE_MAX_LENGTH);
-        } else if (request.getContent().length() > CONTENT_MAX_LENGTH) {
-            throw new ResponseException("Content is longer than maximum length " + CONTENT_MAX_LENGTH);
-        }
+        validateLength("Title", request.getTitle().length(), titleMinLength, titleMaxLength);
+        validateLength("Content", request.getContent().length(), contentMinLength, contentMaxLength);
 
-        //Validation maximum length of hashtags
-        if(request.getHashtags() != null){
-            if(request.getHashtags().length()>HASHTAGS_MAX_LENGTH){
-                throw new ResponseException("Hashtags is longer than maximum length " + HASHTAGS_MAX_LENGTH);
+        if (request.getHashtags() != null) {
+            if (request.getHashtags().length() > hashtagsMaxLength) {
+                throw new ResponseException("Hashtags is longer than maximum length " + hashtagsMaxLength);
             }
         }
     }
 
-    public static void validateUpdateRequest(ArticleRequest request) {
-        //Validation of update, during update title or content both of them cant be empty or null
-        if ((request.getTitle() == null || request.getTitle().equals("")) &&
-                (request.getContent() == null || request.getContent().equals(""))) {
-            throw new ResponseException("Title or content can't be empty");
+    private void validateLength(String fieldName, int fieldLength, int minLength, int maxLength) {
+        if (fieldLength < minLength) {
+            throw new ResponseException(fieldName + " is shorter than minimum length " + minLength);
         }
-
+        if (fieldLength > maxLength) {
+            throw new ResponseException(fieldName + " is longer than maximum length " + maxLength);
+        }
     }
 }

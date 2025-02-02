@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class SurveyResponseService {
 
-    private SurveysRepository surveysRepository;
-    private UserRepository userRepository;
-    private SurveyResponseRepository surveyResponseRepository;
-    private AnswerResponseValidator answerResponseValidator;
+    private final SurveysRepository surveysRepository;
+    private final UserRepository userRepository;
+    private final SurveyResponseRepository surveyResponseRepository;
+    private final AnswerResponseValidator answerResponseValidator;
 
     @Transactional
     public void saveSurveyResponse(SurveyResponseRequest surveyResponseRequest) {

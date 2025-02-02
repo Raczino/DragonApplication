@@ -34,7 +34,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Comment c " +
-            "SET c.isPinned = true WHERE c.id = :id")
+    @Query("UPDATE Comment c SET c.isPinned = true WHERE c.id = :id")
     void pinComment(@Param("id") Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Comment c SET c.likesCount = c.likesCount + :likesValue WHERE c.id = :id")
+    void updateCommentLikesCount(@Param("id") Long id, @Param("likesValue") int likesValue);
 }
