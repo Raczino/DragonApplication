@@ -1,22 +1,22 @@
-package com.raczkowski.app.admin.moderation.comment;
+package com.raczkowski.app.admin.moderation.survey;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.admin.users.ModerationStatisticService;
-import com.raczkowski.app.comment.CommentService;
+import com.raczkowski.app.surveys.survey.SurveyService;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ModerationCommentService {
-    private final CommentService commentService;
+public class ModerationSurveyService {
+    private final SurveyService surveyService;
     private final PermissionValidator permissionValidator;
     private final ModerationStatisticService moderationStatisticService;
 
-    public void deleteComment(Long commentId) {
+    public void deleteSurvey(Long id) {
         AppUser user = permissionValidator.validateIfUserIsAdminOrOperator();
-        commentService.removeComment(commentId);
-        moderationStatisticService.commentDeletedCounterIncrease(user.getId());
+        surveyService.deleteSurvey(id);
+        moderationStatisticService.surveyDeletedCounterIncrease(user.getId());
     }
 }

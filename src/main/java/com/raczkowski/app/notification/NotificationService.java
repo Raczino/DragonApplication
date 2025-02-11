@@ -15,6 +15,10 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
+    public void saveNotification(Notification notification) {
+        notificationRepository.save(notification);
+    }
+
     public void sendNotification(String userId, Notification notification) {
         String destination = "/topic/notifications/" + userId;
         messagingTemplate.convertAndSend(destination, notification);

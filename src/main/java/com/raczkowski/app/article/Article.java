@@ -74,6 +74,10 @@ public class Article {
     @Column(columnDefinition = "boolean default false")
     private boolean isPinned;
 
+    @OneToOne
+    @JoinColumn(name = "pinned_by", nullable = true)
+    private AppUser pinnedBy;
+
     @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "article_hashtag",

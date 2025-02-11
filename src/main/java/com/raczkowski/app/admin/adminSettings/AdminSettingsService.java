@@ -1,6 +1,7 @@
 package com.raczkowski.app.admin.adminSettings;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.exceptions.ResponseException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ public class AdminSettingsService {
     }
 
     public List<AdminSetting> getSettings() {
-        permissionValidator.validateIfUserIaAdmin();
+        if (!permissionValidator.validateIfUserIaAdmin())
+            throw new ResponseException("You don't have permissions to do this action");
         return adminSettingsRepository.findAll();
     }
 
@@ -42,7 +44,9 @@ public class AdminSettingsService {
     }
 
     public void updateSettingValue(AdminSettingRequest adminSettingRequest) {
-        permissionValidator.validateIfUserIaAdmin();
+        if (!permissionValidator.validateIfUserIaAdmin()) {
+            throw new ResponseException("You don't have permissions to do this action");
+        }
         AdminSetting setting = adminSettingsRepository.findBySettingKey(adminSettingRequest.getSettingKey());
         setting.setSettingValue(adminSettingRequest.getSettingValue());
         adminSettingsRepository.save(setting);

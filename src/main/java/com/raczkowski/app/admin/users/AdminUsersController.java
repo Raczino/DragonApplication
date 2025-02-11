@@ -1,6 +1,8 @@
 package com.raczkowski.app.admin.users;
 
+import com.raczkowski.app.dto.ModeratorStatisticDto;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AdminUsersController {
     private final AdminUserService adminUserService;
+    private final ModerationStatisticService moderationStatisticService;
 
     @PostMapping("/change/permission")
     public void changeUserPermission(@RequestBody PermissionRequest permissionRequest) {
@@ -22,5 +25,10 @@ public class AdminUsersController {
     @PostMapping("/unblock")
     public void unBlockUser(@RequestParam Long id) {
         adminUserService.unBlockUser(id);
+    }
+
+    @GetMapping("/moderator/stats")
+    public ResponseEntity<ModeratorStatisticDto> getStatisticForModerator(@RequestParam Long id) {
+        return ResponseEntity.ok(moderationStatisticService.getStatisticsForUser(id));
     }
 }

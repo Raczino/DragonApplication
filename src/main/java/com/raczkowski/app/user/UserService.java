@@ -1,12 +1,8 @@
 package com.raczkowski.app.user;
 
-import com.raczkowski.app.article.ArticleService;
-import com.raczkowski.app.comment.CommentService;
-import com.raczkowski.app.dto.UserDto;
-import com.raczkowski.app.dtoMappers.UserDtoMapper;
+import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ResponseException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,5 +99,17 @@ public class UserService implements UserDetailsService {
 
         currentUser.unfollowUser(userToUnfollow);
         userRepository.save(currentUser);
+    }
+
+    public void updateAppUserByUserRole(Long id, UserRole userRole) {
+        userRepository.updateAppUserByUserRole(id, userRole);
+    }
+
+    public void blockUser(Long userId, ZonedDateTime date) {
+        userRepository.blockUser(userId, date);
+    }
+
+    public void unblockUser(Long userId) {
+        userRepository.unBlockUser(userId);
     }
 }

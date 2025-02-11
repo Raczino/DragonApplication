@@ -48,8 +48,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Article c " +
-            "SET c.isPinned = true WHERE c.id = :id")
-    void pinArticle(@Param("id") Long id);
+            "SET c.isPinned = true, c.pinnedBy = :user WHERE c.id = :id")
+    void pinArticle(@Param("id") Long id, AppUser user);
 
     @Transactional
     @Modifying

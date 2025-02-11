@@ -1,6 +1,7 @@
 package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.admin.users.ModerationStatisticService;
 import com.raczkowski.app.article.*;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
@@ -17,6 +18,7 @@ import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.notification.Notification;
 import com.raczkowski.app.notification.NotificationRepository;
 import com.raczkowski.app.notification.NotificationService;
+import com.raczkowski.app.surveys.survey.SurveyService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
@@ -36,15 +38,14 @@ import java.util.List;
 public class ModerationArticleService {
 
     private final ArticleToConfirmRepository articleToConfirmRepository;
-    private final ArticleRepository articleRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
     private final RejectedArticleRepository rejectedArticleRepository;
-    private final PermissionValidator permissionValidator;
-    private final DeletedArticleService deletedArticleService;
     private final DeletedArticleRepository deletedArticleRepository;
+    private final UserService userService;
+    private final PermissionValidator permissionValidator;
+    private final ArticleService articleService;
+    private final DeletedArticleService deletedArticleService;
     private final NotificationService notificationService;
-    private final NotificationRepository notificationRepository;
+    private final ModerationStatisticService moderationStatisticService;
 
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
@@ -53,12 +54,12 @@ public class ModerationArticleService {
     public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
         Page<ArticleToConfirm> article = GenericService
-                .pagination(
-                        articleToConfirmRepository,
+                .paginate(
                         pageNumber,
                         pageSize,
                         sortBy,
-                        sortDirection
+                        sortDirection,
+                        articleToConfirmRepository::findAll
                 );
 
         return new PageResponse<>(
@@ -97,7 +98,7 @@ public class ModerationArticleService {
         } else {
             article.setStatus(ArticleStatus.APPROVED);
         }
-        articleRepository.save(article);
+        articleService.saveArticle(article);
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         sendNotification(NotificationType.ARTICLE_PUBLISH,
                 String.valueOf(article.getAppUser().getId()),
@@ -105,6 +106,7 @@ public class ModerationArticleService {
                 "Your article has been accepted!",
                 "Accepted By",
                 "article/" + article.getId());
+        moderationStatisticService.articleApprovedCounterIncrease(article.getAcceptedBy().getId());
         return ArticleDtoMapper.articleDtoMapper(article);
     }
 
@@ -132,7 +134,7 @@ public class ModerationArticleService {
                 "Your article has been rejected!",
                 "Rejected By",
                 null);
-
+        moderationStatisticService.articleRejectedCounterIncrease(rejectedArticle.getRejectedBy().getId());
         return ArticleDtoMapper.rejectedArticleDtoMapper(rejectedArticle);
     }
 
@@ -140,12 +142,12 @@ public class ModerationArticleService {
         permissionValidator.validateIfUserIsAdminOrOperator();
 
         Page<RejectedArticle> article = GenericService
-                .pagination(
-                        rejectedArticleRepository,
+                .paginate(
                         pageNumber,
                         pageSize,
                         sortBy,
-                        sortDirection
+                        sortDirection,
+                        rejectedArticleRepository::findAll
                 );
 
         return new PageResponse<>(
@@ -163,19 +165,18 @@ public class ModerationArticleService {
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
-        AppUser user = userRepository.getAppUserById(id);
+        AppUser user = userService.getUserById(id);
         if (user == null) {
             throw new ResponseException("User doesn't exists");
         }
 
         Page<Article> articles = GenericService
-                .paginationOfElementsAcceptedByUser(
-                        user,
-                        articleRepository,
+                .paginate(
                         pageNumber,
                         pageSize,
                         sortBy,
-                        sortDirection
+                        sortDirection,
+                        pageable -> articleService.getArticlesAcceptedByUser(user, pageable)
                 );
 
         return new PageResponse<>(articles
@@ -194,17 +195,18 @@ public class ModerationArticleService {
         permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser user = userService.getLoggedUser();
         deletedArticleService.deleteArticle(articleId, ArticleStatus.DELETED_BY_ADMIN, user);
+        moderationStatisticService.articleDeletedCounterIncrease(user.getId());
     }
 
     public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
         Page<DeletedArticle> articles = GenericService
-                .paginationOfDeletedArticles(
-                        deletedArticleRepository,
+                .paginate(
                         page,
                         size,
                         sortBy,
-                        sortDirection
+                        sortDirection,
+                        deletedArticleRepository::findAll
                 );
         return new PageResponse<>(
                 articles
@@ -220,12 +222,13 @@ public class ModerationArticleService {
 
     public void pinArticle(Long id) {
         permissionValidator.validateIfUserIsAdminOrOperator();
-
-        if (articleRepository.findArticleById(id) == null) {
+        AppUser user = userService.getLoggedUser();
+        if (articleService.getArticleByID(id) == null) {
             throw new ResponseException("There is no article with provided id");
         }
 
-        articleRepository.pinArticle(id);
+        articleService.pinArticle(id, user);
+        moderationStatisticService.articlePinnedCounterIncrease(user.getId());
     }
 
     @Transactional
@@ -239,7 +242,7 @@ public class ModerationArticleService {
                 createdBy.getFirstName(),
                 targetUrl
         );
-        notificationRepository.save(notification);
+        notificationService.saveNotification(notification);
         notificationService.sendNotification(userId, notification);
     }
 

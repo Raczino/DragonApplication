@@ -144,7 +144,14 @@ public class ArticleDtoMapper {
                         article.getAcceptedBy().getEmail(),
                         article.getAcceptedBy().isAccountBlocked()
                 ),
-                article.isPinned()
+                article.isPinned(),
+                article.getPinnedBy() != null ? new AuthorDto(
+                        article.getPinnedBy().getId(),
+                        article.getPinnedBy().getFirstName(),
+                        article.getPinnedBy().getLastName(),
+                        article.getPinnedBy().getEmail(),
+                        article.getPinnedBy().isAccountBlocked()
+                ) : null
         );
     }
 }

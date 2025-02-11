@@ -1,6 +1,7 @@
 package com.raczkowski.app.dto;
 
 import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class ArticleDto {
     private ZonedDateTime acceptedAt;
     private AuthorDto acceptedBy;
     private boolean isPinned;
+    private AuthorDto pinnedBy;
 
     public ArticleDto
             (
@@ -71,7 +73,8 @@ public class ArticleDto {
                     int commentsCount,
                     ZonedDateTime acceptedAt,
                     AuthorDto acceptedBy,
-                    boolean isPinned
+                    boolean isPinned,
+                    AuthorDto pinnedBy
             ) {
         this.id = id;
         this.title = title;
@@ -87,6 +90,7 @@ public class ArticleDto {
         this.acceptedAt = acceptedAt;
         this.acceptedBy = acceptedBy;
         this.isPinned = isPinned;
+        this.pinnedBy = pinnedBy;
     }
 
     public ArticleDto(

@@ -13,12 +13,12 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/webapi/v1/article")
+@RequestMapping("/webapi/v1/moderator")
 public class ArticleModerationController {
 
     private final ModerationArticleService moderationArticleService;
 
-    @GetMapping("/toConfirm/get")
+    @GetMapping("articles/toConfirm/get")
     public ResponseEntity<PageResponse<NonConfirmedArticleDto>> getArticlesToConfirm(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -28,17 +28,17 @@ public class ArticleModerationController {
         return ResponseEntity.ok(moderationArticleService.getArticleToConfirm(page, size, sortBy, sortDirection));
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("article/confirm")
     public ResponseEntity<ArticleDto> confirmArticle(@RequestParam Long articleId) {
         return ResponseEntity.ok(moderationArticleService.confirmArticle(articleId));
     }
 
-    @PostMapping("/reject")
+    @PostMapping("article/reject")
     public ResponseEntity<RejectedArticleDto> rejectArticle(@RequestParam Long articleId) {
         return ResponseEntity.ok(moderationArticleService.rejectArticle(articleId));
     }
 
-    @GetMapping("/reject/get")
+    @GetMapping("article/reject/get")
     public ResponseEntity<PageResponse<RejectedArticleDto>> rejectArticle(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -59,12 +59,12 @@ public class ArticleModerationController {
         return ResponseEntity.ok(moderationArticleService.getAcceptedArticlesByUser(id, page, size, sortBy, sortDirection));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("article/delete")
     public void deleteArticle(@RequestParam Long id) {
         moderationArticleService.deleteArticle(id);
     }
 
-    @GetMapping("/deleted/get")
+    @GetMapping("article/deleted/get")
     public ResponseEntity<PageResponse<DeletedArticleDto>> getDeletedArticlesByAdmins(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -74,12 +74,12 @@ public class ArticleModerationController {
         return ResponseEntity.ok(moderationArticleService.getAllDeletedArticlesByAdmins(page, size, sortBy, sortDirection));
     }
 
-    @PostMapping("/pin")
+    @PostMapping("article/pin")
     public void getDeletedArticlesByAdmins(@RequestParam Long id) {
         moderationArticleService.pinArticle(id);
     }
 
-    @GetMapping("get/from/user")
+    @GetMapping("article/get/from/user")
     public ResponseEntity<List<NonConfirmedArticleDto>> getPendingArticlesForUser(@RequestParam Long id) {
         return ResponseEntity.ok(moderationArticleService.getPendingArticlesForUser(id));
     }

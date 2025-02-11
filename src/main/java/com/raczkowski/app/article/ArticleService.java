@@ -1,6 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
+import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
 import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
@@ -18,6 +19,7 @@ import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +36,14 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ArticleLikeRepository articleLikeRepository;
-    private final ModerationArticleService moderationArticleService;
     private final DeletedArticleService deletedArticleService;
     private final HashtagService hashtagService;
     private final ArticleRequestValidator articleRequestValidator;
+    private final ArticleToConfirmRepository articleToConfirmRepository;
+
+    public void saveArticle(Article article) {
+        articleRepository.save(article);
+    }
 
     public ArticleToConfirm create(ArticleRequest request) {
         articleRequestValidator.validateArticleRequest(request);
@@ -57,7 +63,7 @@ public class ArticleService {
             articleToConfirm.setHashtags(hashtags);
         }
 
-        moderationArticleService.addArticle(articleToConfirm);
+        articleToConfirmRepository.save(articleToConfirm);
         return articleToConfirm;
     }
 
@@ -95,6 +101,10 @@ public class ArticleService {
             throw new ResponseException("There is no user");
         }
         return articleRepository.findAllByAppUser(user);
+    }
+
+    public Page<Article> getArticlesAcceptedByUser(AppUser user, Pageable pageable) {
+        return articleRepository.getArticleByAcceptedBy(user, pageable);
     }
 
     @Transactional
@@ -166,6 +176,10 @@ public class ArticleService {
 
     public boolean isArticleLiked(Article article, AppUser user) {
         return articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article);
+    }
+
+    public void pinArticle(Long id, AppUser user) {
+        articleRepository.pinArticle(id, user);
     }
 
     public int getArticlesCountForUser(AppUser appUser) {
