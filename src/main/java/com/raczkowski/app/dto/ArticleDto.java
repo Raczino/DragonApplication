@@ -16,6 +16,7 @@ public class ArticleDto {
     private Long id;
     private String title;
     private String content;
+    private String contentHtml;
     private ZonedDateTime postedDate;
     private int likesCount;
     private int commentsCount;
@@ -34,6 +35,7 @@ public class ArticleDto {
                     Long id,
                     String title,
                     String content,
+                    String contentHtml,
                     ZonedDateTime postedDate,
                     int likesCount,
                     int commentsCount,
@@ -47,6 +49,7 @@ public class ArticleDto {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.likesCount = likesCount;
         this.commentsCount = commentsCount;
@@ -63,6 +66,7 @@ public class ArticleDto {
                     Long id,
                     String title,
                     String content,
+                    String contentHtml,
                     ZonedDateTime postedDate,
                     int likesCount,
                     AuthorDto author,
@@ -79,6 +83,7 @@ public class ArticleDto {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.likesCount = likesCount;
         this.author = author;
@@ -97,6 +102,7 @@ public class ArticleDto {
             Long id,
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             AuthorDto author,
             ArticleStatus status
@@ -104,6 +110,7 @@ public class ArticleDto {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.author = author;
         this.status = status;

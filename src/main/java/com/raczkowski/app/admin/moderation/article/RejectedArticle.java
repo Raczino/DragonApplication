@@ -33,6 +33,9 @@ public class RejectedArticle {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contentHtml;
+
     @Column(nullable = false)
     private ZonedDateTime postedDate;
 
@@ -51,6 +54,7 @@ public class RejectedArticle {
     public RejectedArticle(
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             AppUser appUser,
             ZonedDateTime rejectedAt,
@@ -58,6 +62,7 @@ public class RejectedArticle {
     ) {
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.rejectedAt = rejectedAt;

@@ -52,6 +52,7 @@ public class ArticleService {
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
                 request.getContent(),
+                request.getContentHtml(),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 request.getScheduledForDate(),
                 ArticleStatus.PENDING,

@@ -85,6 +85,7 @@ public class ModerationArticleService {
         Article article = new Article(
                 articleToConfirm.getTitle(),
                 articleToConfirm.getContent(),
+                articleToConfirm.getContentHtml(),
                 articleToConfirm.getPostedDate(),
                 articleToConfirm.getAppUser(),
                 ZonedDateTime.now(ZoneOffset.UTC),
@@ -122,6 +123,7 @@ public class ModerationArticleService {
         RejectedArticle rejectedArticle = new RejectedArticle(
                 articleToConfirm.getTitle(),
                 articleToConfirm.getContent(),
+                articleToConfirm.getContentHtml(),
                 articleToConfirm.getPostedDate(),
                 articleToConfirm.getAppUser(),
                 ZonedDateTime.now(ZoneOffset.UTC),

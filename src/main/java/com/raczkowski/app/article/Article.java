@@ -35,6 +35,9 @@ public class Article {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contentHtml;
+
     private ZonedDateTime postedDate;
 
     private ZonedDateTime scheduledForDate;
@@ -75,7 +78,7 @@ public class Article {
     private boolean isPinned;
 
     @OneToOne
-    @JoinColumn(name = "pinned_by", nullable = true)
+    @JoinColumn(name = "pinned_by")
     private AppUser pinnedBy;
 
     @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -105,6 +108,7 @@ public class Article {
     public Article(
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             AppUser appUser,
             ZonedDateTime acceptedAt,
@@ -113,6 +117,7 @@ public class Article {
     ) {
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.acceptedAt = acceptedAt;

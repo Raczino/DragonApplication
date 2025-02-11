@@ -24,6 +24,7 @@ public class DeletedArticleService {
             DeletedArticle deletedArticle = new DeletedArticle(
                     article.getTitle(),
                     article.getContent(),
+                    article.getContentHtml(),
                     article.getPostedDate(),
                     article.getAppUser(),
                     status,

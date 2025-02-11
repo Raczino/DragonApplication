@@ -14,6 +14,7 @@ public class ArticleDtoMapper {
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getContentHtml(),
                 article.getPostedDate(),
                 article.getLikesCount(),
                 article.getCommentsCount(),
@@ -43,6 +44,7 @@ public class ArticleDtoMapper {
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getContentHtml(),
                 article.getPostedDate(),
                 new AuthorDto(
                         article.getAppUser().getId(),
@@ -68,6 +70,7 @@ public class ArticleDtoMapper {
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getContentHtml(),
                 article.getPostedDate(),
                 new AuthorDto(
                         article.getAppUser().getId(),
@@ -85,6 +88,7 @@ public class ArticleDtoMapper {
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getContentHtml(),
                 article.getPostedDate(),
                 article.getLikesNumber(),
                 article.getCommentsCount(),
@@ -122,6 +126,7 @@ public class ArticleDtoMapper {
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getContentHtml(),
                 article.getPostedDate(),
                 article.getLikesCount(),
                 new AuthorDto(

@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 public class ArticleRequest {
     private String title;
     private String content;
+    private String contentHtml;
     private Long id;
     private String hashtags;
     private ZonedDateTime scheduledForDate;

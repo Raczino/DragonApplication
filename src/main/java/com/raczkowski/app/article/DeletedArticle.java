@@ -35,6 +35,9 @@ public class DeletedArticle {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private String contentHtml;
+
     private ZonedDateTime postedDate;
 
     @OneToOne
@@ -70,6 +73,7 @@ public class DeletedArticle {
     public DeletedArticle(
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             AppUser appUser,
             ArticleStatus status,
@@ -84,6 +88,7 @@ public class DeletedArticle {
     ) {
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.appUser = appUser;
         this.status = status;

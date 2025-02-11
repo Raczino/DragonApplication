@@ -13,10 +13,11 @@ public class NonConfirmedArticleDto extends ArticleDto {
             Long id,
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             AuthorDto user,
             ArticleStatus status
     ) {
-        super(id, title, content, postedDate, user, status);
+        super(id, title, content, contentHtml, postedDate, user, status);
     }
 }

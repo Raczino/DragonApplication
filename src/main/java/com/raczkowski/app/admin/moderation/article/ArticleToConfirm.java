@@ -35,6 +35,9 @@ public class ArticleToConfirm {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contentHtml;
+
     @Column(nullable = false)
     private ZonedDateTime postedDate;
 
@@ -47,7 +50,7 @@ public class ArticleToConfirm {
 
     ZonedDateTime scheduledForDate;
 
-    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE} )
+    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE})
     @JoinTable(
             name = "article_to_confirm_hashtag",
             joinColumns = @JoinColumn(name = "article_to_confirm_id"),
@@ -58,6 +61,7 @@ public class ArticleToConfirm {
     public ArticleToConfirm(
             String title,
             String content,
+            String contentHtml,
             ZonedDateTime postedDate,
             ZonedDateTime scheduledForDate,
             ArticleStatus articleStatus,
@@ -65,6 +69,7 @@ public class ArticleToConfirm {
     ) {
         this.title = title;
         this.content = content;
+        this.contentHtml = contentHtml;
         this.postedDate = postedDate;
         this.scheduledForDate = scheduledForDate;
         this.status = articleStatus;
