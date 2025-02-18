@@ -21,7 +21,8 @@ public class UserDtoMapper {
                 appUser.isAccountBlocked(),
                 appUser.getBlockedDate(),
                 followersCount,
-                followingCount
+                followingCount,
+                appUser.getAccountType()
         );
     }
 }

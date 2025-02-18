@@ -18,7 +18,8 @@ public class ArticleRequestValidator {
         int contentMinLength = Integer.parseInt(adminSettingsService.getSetting("article.content.min.length").getSettingValue());
         int titleMinLength = Integer.parseInt(adminSettingsService.getSetting("article.title.min.length").getSettingValue());
 
-        if (request.getTitle() == null || request.getContent() == null || request.getContentHtml() == null || request.getTitle().isEmpty() || request.getContent().isEmpty()) {
+        if (request.getTitle() == null || request.getContent() == null || request.getContentHtml() == null
+                || request.getTitle().isEmpty() || request.getContent().isEmpty()) {
             throw new ResponseException("Title or content can't be empty");
         }
 

@@ -1,5 +1,6 @@
 package com.raczkowski.app.dto;
 
+import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,4 +28,5 @@ public class UserDto {
     private ZonedDateTime blockedDate;
     private int followersCount;
     private int followsCount;
+    private AccountType isPremium;
 }

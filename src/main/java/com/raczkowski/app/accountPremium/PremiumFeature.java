@@ -21,4 +21,6 @@ public class PremiumFeature {
 
     @ManyToMany(mappedBy = "premiumFeatures")
     private Set<SubscriptionPlan> subscriptionPlans;
+
+    private String featureKey;
 }

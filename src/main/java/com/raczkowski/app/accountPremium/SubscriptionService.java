@@ -5,7 +5,6 @@ import com.raczkowski.app.enums.PremiumAccountRange;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
-import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
