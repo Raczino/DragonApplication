@@ -2,25 +2,26 @@ package com.raczkowski.app.admin.adminSettings;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.redis.RedisService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
 public class AdminSettingsService {
     private final AdminSettingsRepository adminSettingsRepository;
     private final PermissionValidator permissionValidator;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
 
     @PostConstruct
     public void loadSettingsToCache() {
         List<AdminSetting> allSettings = adminSettingsRepository.findAll();
         for (AdminSetting setting : allSettings) {
-            redisTemplate.opsForValue().set(setting.getSettingKey(), setting.getSettingValue());
+            redisService.setValue(setting.getSettingKey(), setting.getSettingValue(), 1, TimeUnit.DAYS);
         }
     }
 
@@ -31,14 +32,14 @@ public class AdminSettingsService {
     }
 
     public AdminSetting getSetting(String key) {
-        String settingValue = redisTemplate.opsForValue().get(key);
+        String settingValue = redisService.getValue(key);
         if (settingValue != null) {
             return new AdminSetting(key, settingValue);
         }
 
         AdminSetting setting = adminSettingsRepository.findBySettingKey(key);
         if (setting != null) {
-            redisTemplate.opsForValue().set(key, setting.getSettingValue());
+            redisService.setValue(key, setting.getSettingValue(), 1, TimeUnit.DAYS);
         }
         return setting;
     }
@@ -51,6 +52,6 @@ public class AdminSettingsService {
         setting.setSettingValue(adminSettingRequest.getSettingValue());
         adminSettingsRepository.save(setting);
 
-        redisTemplate.opsForValue().set(setting.getSettingKey(), setting.getSettingValue());
+        redisService.setValue(setting.getSettingKey(), setting.getSettingValue(), 1, TimeUnit.DAYS);
     }
 }

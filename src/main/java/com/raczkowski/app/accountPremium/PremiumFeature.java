@@ -23,4 +23,6 @@ public class PremiumFeature {
     private Set<SubscriptionPlan> subscriptionPlans;
 
     private String featureKey;
+
+    private int value;
 }

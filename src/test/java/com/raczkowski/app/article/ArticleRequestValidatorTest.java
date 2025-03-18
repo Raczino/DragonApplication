@@ -1,6 +1,5 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.Reddit.RedditClientConfig;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -9,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,10 +43,10 @@ class ArticleRequestValidatorTest {
 
         doThrow(new ResponseException("Title or content can't be empty"))
                 .when(articleRequestValidator)
-                .validateArticleRequest(any());
+                .validateArticleRequest(any(), userService.getLoggedUser());
 
         // when
-        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest));
+        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest, userService.getLoggedUser()));
 
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
@@ -61,10 +61,10 @@ class ArticleRequestValidatorTest {
 
         doThrow(new ResponseException("Title or content can't be empty"))
                 .when(articleRequestValidator)
-                .validateArticleRequest(any());
+                .validateArticleRequest(any(), userService.getLoggedUser());
 
         // when
-        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest));
+        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest, userService.getLoggedUser()));
 
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
@@ -79,9 +79,9 @@ class ArticleRequestValidatorTest {
 
         doThrow(new ResponseException("Title or content can't be empty"))
                 .when(articleRequestValidator)
-                .validateArticleRequest(any());
+                .validateArticleRequest(any(), userService.getLoggedUser());
         // when
-        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest));
+        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest, userService.getLoggedUser()));
 
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());
@@ -96,9 +96,9 @@ class ArticleRequestValidatorTest {
 
         doThrow(new ResponseException("Title or content can't be empty"))
                 .when(articleRequestValidator)
-                .validateArticleRequest(any());
+                .validateArticleRequest(any(), userService.getLoggedUser());
         // when
-        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest));
+        ResponseException exception = assertThrows(ResponseException.class, () -> articleRequestValidator.validateArticleRequest(emptyRequest, userService.getLoggedUser()));
 
         // then
         assertEquals("Title or content can't be empty", exception.getMessage());

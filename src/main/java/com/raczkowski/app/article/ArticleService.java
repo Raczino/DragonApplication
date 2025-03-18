@@ -1,8 +1,9 @@
 package com.raczkowski.app.article;
 
+import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.accountPremium.FeatureLimitHelperService;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
@@ -40,14 +41,15 @@ public class ArticleService {
     private final HashtagService hashtagService;
     private final ArticleRequestValidator articleRequestValidator;
     private final ArticleToConfirmRepository articleToConfirmRepository;
+    private final FeatureLimitHelperService featureLimitHelperService;
 
     public void saveArticle(Article article) {
         articleRepository.save(article);
     }
 
     public ArticleToConfirm create(ArticleRequest request) {
-        articleRequestValidator.validateArticleRequest(request);
         AppUser user = userService.getLoggedUser();
+        articleRequestValidator.validateArticleRequest(request, user);
 
         ArticleToConfirm articleToConfirm = new ArticleToConfirm(
                 request.getTitle(),
@@ -65,6 +67,8 @@ public class ArticleService {
         }
 
         articleToConfirmRepository.save(articleToConfirm);
+        featureLimitHelperService.incrementFeatureUsage(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK);
+
         return articleToConfirm;
     }
 
@@ -143,12 +147,13 @@ public class ArticleService {
     }
 
     public void updateArticle(ArticleRequest articleRequest) {
-        articleRequestValidator.validateArticleRequest(articleRequest);
+        AppUser user = userService.getLoggedUser();
+        articleRequestValidator.validateArticleRequest(articleRequest, user);
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {
             throw new ResponseException("There is no article with provided id:" + articleRequest.getId());
-        } else if (!article.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
+        } else if (!article.getAppUser().getId().equals(user.getId())) {
             throw new ResponseException("User doesn't have permission to update this comment");
         }
 

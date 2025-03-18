@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -48,7 +49,7 @@ public class SubscriptionService {
     @Transactional
     public void activateSubscription(Long id) {
         Subscription subscription = subscriptionRepository.findByUserId(id)
-                .orElseThrow(() -> new ResponseException("Subscription plan not found"));
+                .orElseThrow(() -> new ResponseException("User has not a subscription"));
 
         if (subscription.isActive()) {
             throw new ResponseException("Plan already activated");
@@ -56,5 +57,16 @@ public class SubscriptionService {
 
         subscription.setActive(true);
         subscriptionRepository.save(subscription);
+    }
+
+    public boolean isSubscriptionActive(Long userId) {
+        Optional<Subscription> subscription = subscriptionRepository.findByUserId(userId);
+
+        if (subscription.isPresent()) {
+            if (subscription.get().isActive()) {
+                return !subscription.get().getEndDate().isBefore(ZonedDateTime.now(ZoneOffset.UTC));
+            }
+        }
+        return false;
     }
 }
