@@ -24,9 +24,9 @@ public class CommentRequestValidator {
     private final FeatureLimitHelperService featureLimitHelperService;
 
     public void validateCreationRequest(CommentRequest commentRequest, AppUser user) {
-        Limits limit = featureLimitHelperService.getLimits(user.getId());
+        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
-        if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
+        if (featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
             throw new ResponseException("You have reached the weekly comment limit.");
         }
 

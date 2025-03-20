@@ -7,15 +7,18 @@ import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 @Component
 @AllArgsConstructor
 public class ArticleRequestValidator {
     private final FeatureLimitHelperService featureLimitHelperService;
 
     public void validateArticleRequest(ArticleRequest request, AppUser user) {
-        Limits limit = featureLimitHelperService.getLimits(user.getId());
+        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
-        if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK)) {
+        if (featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK)) {
             throw new ResponseException("You have reached the weekly article limit. If you need more articles buy premium account.");
         }
 
@@ -30,6 +33,12 @@ public class ArticleRequestValidator {
         if (request.getHashtags() != null) {
             if (request.getHashtags().length() > limit.getArticleContentMaxLength()) {
                 throw new ResponseException("Hashtags is longer than maximum length " + limit.getHashtagsMaxLength());
+            }
+        }
+
+        if (request.getScheduledForDate() != null) {
+            if (request.getScheduledForDate().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
+                throw new ResponseException("Scheduled for cannot be before now!");
             }
         }
     }

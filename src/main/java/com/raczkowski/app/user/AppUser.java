@@ -1,7 +1,6 @@
 package com.raczkowski.app.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.UserRole;
