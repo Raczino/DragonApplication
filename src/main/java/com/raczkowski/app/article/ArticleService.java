@@ -1,7 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.accountPremium.FeatureLimitHelperService;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
 import com.raczkowski.app.common.GenericService;

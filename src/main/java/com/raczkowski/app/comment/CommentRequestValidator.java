@@ -3,8 +3,8 @@ package com.raczkowski.app.comment;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.accountPremium.FeatureLimitHelperService;
-import com.raczkowski.app.article.Limits;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
+import com.raczkowski.app.limits.Limits;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
@@ -24,11 +24,12 @@ public class CommentRequestValidator {
     private final FeatureLimitHelperService featureLimitHelperService;
 
     public void validateCreationRequest(CommentRequest commentRequest, AppUser user) {
-        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
-        if (featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
+        if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
             throw new ResponseException("You have reached the weekly comment limit.");
         }
+
+        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
         if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
             throw new ResponseException("Content cannot be null");

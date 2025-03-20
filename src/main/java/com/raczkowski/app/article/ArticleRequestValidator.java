@@ -1,8 +1,9 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.accountPremium.FeatureLimitHelperService;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.limits.Limits;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,11 +17,11 @@ public class ArticleRequestValidator {
     private final FeatureLimitHelperService featureLimitHelperService;
 
     public void validateArticleRequest(ArticleRequest request, AppUser user) {
-        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
-
-        if (featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK)) {
+        if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK)) {
             throw new ResponseException("You have reached the weekly article limit. If you need more articles buy premium account.");
         }
+
+        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
         if (request.getTitle() == null || request.getContent() == null || request.getContentHtml() == null
                 || request.getTitle().isEmpty() || request.getContent().isEmpty()) {

@@ -6,11 +6,14 @@ import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -57,6 +60,21 @@ public class SubscriptionService {
 
         subscription.setActive(true);
         subscriptionRepository.save(subscription);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void checkDeactivatedSubscription() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+
+        for (Subscription subscription : subscriptions) {
+            if (subscription.getEndDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
+                    subscription.getEndDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
+                subscription.setActive(false);
+                subscriptionRepository.save(subscription);
+            }
+        }
     }
 
     public boolean isSubscriptionActive(Long userId) {

@@ -1,4 +1,4 @@
-package com.raczkowski.app.article;
+package com.raczkowski.app.limits;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +15,7 @@ public class Limits {
     private final int commentContentMaxLength;
     private final int articleLimit;
     private final int commentLimit;
+    private final int surveyLimit;
+    private final int surveyQuestionLimit;
+    private final int surveyQuestionAnswerLimit;
 }

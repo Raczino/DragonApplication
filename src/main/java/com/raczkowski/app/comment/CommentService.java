@@ -1,7 +1,7 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.accountPremium.FeatureLimitHelperService;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
