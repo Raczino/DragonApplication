@@ -20,4 +20,6 @@ public class SurveyDto {
     private ZonedDateTime endTime;
     private AuthorDto author;
     private List<QuestionDto> questions;
+    private ZonedDateTime scheduledFor;
+    private boolean isActive;
 }
