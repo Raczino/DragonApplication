@@ -1,8 +1,8 @@
 package com.raczkowski.app.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -70,6 +70,9 @@ public class AppUser implements UserDetails {
     private String linkedInUrl;
 
     private String twitterUrl;
+
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType = AccountType.BASIC;
 
     @ManyToMany
     @JoinTable(

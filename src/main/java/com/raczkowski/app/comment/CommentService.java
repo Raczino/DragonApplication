@@ -1,5 +1,7 @@
 package com.raczkowski.app.comment;
 
+import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
@@ -24,6 +26,7 @@ public class CommentService {
     private final UserService userService;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRequestValidator commentRequestValidator;
+    private final FeatureLimitHelperService featureLimitHelperService;
 
     public List<CommentDto> getAllCommentsFromArticle(Long id) {
         return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id))
@@ -37,9 +40,9 @@ public class CommentService {
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
-        commentRequestValidator.validateCreationRequest(commentRequest);
-
         AppUser user = userService.getLoggedUser();
+        commentRequestValidator.validateCreationRequest(commentRequest, user);
+
 
         if (!articleRepository.existsById(commentRequest.getId())) {
             throw new ResponseException("Article with this id doesnt exists");
@@ -53,6 +56,7 @@ public class CommentService {
 
         commentRepository.save(comment);
         articleRepository.updateArticleLikesCount(commentRequest.getId(), 1);
+        featureLimitHelperService.incrementFeatureUsage(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK);
 
         return CommentDtoMapper.commentDtoMapper(comment);
     }

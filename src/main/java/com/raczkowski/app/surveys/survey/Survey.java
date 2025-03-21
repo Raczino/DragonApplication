@@ -31,6 +31,8 @@ public class Survey {
 
     private ZonedDateTime endTime;
 
+    private ZonedDateTime scheduledFor;
+
     @OneToOne
     @JoinColumn(
             nullable = false
@@ -44,5 +46,3 @@ public class Survey {
         this.owner = owner;
     }
 }
-
-//TODO: add scheduled date for survey

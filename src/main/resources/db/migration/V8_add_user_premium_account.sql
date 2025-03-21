@@ -1,0 +1,1 @@
+ALTER TABLE premium_feature ADD COLUMN value INT DEFAULT null;

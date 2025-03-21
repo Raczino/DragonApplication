@@ -1,7 +1,9 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.accountPremium.SubscriptionService;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dtoMappers.UserDtoMapper;
+import com.raczkowski.app.enums.PremiumAccountRange;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,10 @@ public class userController {
 
     private final UserService userService;
     private final UserStatisticsService userStatisticsService;
+    private final SubscriptionService subscriptionService;
 
     @GetMapping("/get")
-    ResponseEntity<UserDto> getUserById(@RequestParam Long id){
+    ResponseEntity<UserDto> getUserById(@RequestParam Long id) {
         AppUser user = userService.getUserById(id);
         return ResponseEntity.ok(UserDtoMapper.userDto(
                 user,
@@ -26,11 +29,11 @@ public class userController {
                 userStatisticsService.getCommentsCount(user),
                 userStatisticsService.getFollowersCount(user),
                 userStatisticsService.getFollowingCount(user)
-                ));
+        ));
     }
 
     @GetMapping("/get/login")
-    ResponseEntity<AppUser> getLoggedUser(){
+    ResponseEntity<AppUser> getLoggedUser() {
         return ResponseEntity.ok(userService.getLoggedUser());
     }
 
@@ -67,5 +70,15 @@ public class userController {
                         userStatisticsService.getFollowersCount(user),
                         userStatisticsService.getFollowingCount(user)
                 )).collect(Collectors.toList()));
+    }
+
+    @PostMapping("/save")
+    public void createSub(@RequestParam Long id, @RequestParam PremiumAccountRange type) {
+        subscriptionService.create(id, type);
+    }
+
+    @PostMapping("/activate")
+    public void activate(@RequestParam Long id) {
+        subscriptionService.activateSubscription(id);
     }
 }

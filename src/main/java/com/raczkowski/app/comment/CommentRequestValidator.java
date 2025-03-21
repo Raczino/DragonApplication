@@ -2,8 +2,11 @@ package com.raczkowski.app.comment;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.raczkowski.app.admin.adminSettings.AdminSettingsService;
+import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
+import com.raczkowski.app.limits.Limits;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -18,10 +21,15 @@ public class CommentRequestValidator {
     private static final String BANNED_WORDS_FILE_PATH = "/bannedWords.json";
     private final List<String> BANNED_WORDS = loadBannedWords();
 
-    private final AdminSettingsService adminSettingsService;
+    private final FeatureLimitHelperService featureLimitHelperService;
 
-    public void validateCreationRequest(CommentRequest commentRequest) {
-        int contentMaxLength = Integer.parseInt(adminSettingsService.getSetting("comment.content.max.length").getSettingValue());
+    public void validateCreationRequest(CommentRequest commentRequest, AppUser user) {
+
+        if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
+            throw new ResponseException("You have reached the weekly comment limit.");
+        }
+
+        Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
         if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
             throw new ResponseException("Content cannot be null");
@@ -31,7 +39,7 @@ public class CommentRequestValidator {
 
         validateCommentContentForBannedWords(commentRequest.getContent());
 
-        if (commentRequest.getContent().length() > contentMaxLength) {
+        if (commentRequest.getContent().length() > limit.getArticleContentMaxLength()) {
             throw new ResponseException("Comment content length is longer than 1000 characters");
         }
     }

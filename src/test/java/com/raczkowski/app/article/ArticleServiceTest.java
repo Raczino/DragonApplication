@@ -250,7 +250,7 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
 
-        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest, user);
         articleService.updateArticle(articleRequest);
 
         verify(articleRepository).updateArticle(
@@ -279,7 +279,7 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
 
-        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest, user);
 
         articleService.updateArticle(articleRequest);
 
@@ -308,7 +308,7 @@ public class ArticleServiceTest {
         when(articleRepository.findArticleById(1L)).thenReturn(article);
         when(userService.getLoggedUser()).thenReturn(user);
 
-        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest);
+        doNothing().when(articleRequestValidator).validateArticleRequest(articleRequest, user);
 
         articleService.updateArticle(articleRequest);
 

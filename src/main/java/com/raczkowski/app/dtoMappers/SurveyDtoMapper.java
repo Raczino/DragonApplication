@@ -7,6 +7,8 @@ import com.raczkowski.app.dto.SurveyDto;
 import com.raczkowski.app.surveys.questions.Question;
 import com.raczkowski.app.surveys.survey.Survey;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,9 @@ public class SurveyDtoMapper {
         surveyDto.setEndTime(survey.getEndTime());
         surveyDto.setAuthor(authorDto);
         surveyDto.setQuestions(questionDTOs);
-
+        surveyDto.setScheduledFor(survey.getScheduledFor());
+        surveyDto.setActive(survey.getScheduledFor().isBefore(ZonedDateTime.now(ZoneOffset.UTC))
+                && survey.getEndTime().isAfter(ZonedDateTime.now(ZoneOffset.UTC)));
         return surveyDto;
     }
 
