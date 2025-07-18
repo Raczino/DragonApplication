@@ -1,7 +1,8 @@
 package com.raczkowski.app.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
 import com.raczkowski.app.common.GenericService;
@@ -13,8 +14,10 @@ import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.hashtags.HashtagService;
+import com.raczkowski.app.history.HistoryService;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
@@ -29,6 +32,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +46,7 @@ public class ArticleService {
     private final ArticleRequestValidator articleRequestValidator;
     private final ArticleToConfirmRepository articleToConfirmRepository;
     private final FeatureLimitHelperService featureLimitHelperService;
+    private final HistoryService historyService;
 
     public void saveArticle(Article article) {
         articleRepository.save(article);
@@ -68,6 +73,23 @@ public class ArticleService {
 
         articleToConfirmRepository.save(articleToConfirm);
         featureLimitHelperService.incrementFeatureUsage(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Przygotowanie danych do zapisu w JSON
+            String payload = objectMapper.writeValueAsString(
+                    Map.of("title", request.getTitle(), "content", request.getContent())
+            );
+
+            // Wywołanie HistoryService.create z nowym JSON payload
+            historyService.create(
+                    user,
+                    articleToConfirm.getId(),
+                    "ARTICLE",
+                    payload // tutaj payload jest typu String, tak jak oczekuje HistoryService
+            );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return articleToConfirm;
     }
