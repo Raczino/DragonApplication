@@ -36,7 +36,6 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
     private final ArticleLikeRepository articleLikeRepository;
     private final DeletedArticleService deletedArticleService;

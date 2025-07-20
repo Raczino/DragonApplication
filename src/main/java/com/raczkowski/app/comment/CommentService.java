@@ -162,16 +162,6 @@ public class CommentService {
         );
     }
 
-    private List<CommentDto> mapCommentsWithLikes(List<Comment> comments, Set<Long> likedCommentIds) {
-        return comments.stream()
-                .map(comment -> {
-                    CommentDto dto = commentDtoMapper.toCommentDto(comment);
-                    dto.setLiked(likedCommentIds.contains(comment.getId()));
-                    return dto;
-                })
-                .toList();
-    }
-
     private PageResponse<CommentDto> paginateAndMapCommentsWithLikes(
             int pageNumber,
             int pageSize,

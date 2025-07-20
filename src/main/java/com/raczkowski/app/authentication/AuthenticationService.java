@@ -23,7 +23,7 @@ public class AuthenticationService {
         if (request.getEmail() == null || request.getPassword() == null) {
             throw new ResponseException("Email and password can't be null");
         }
-        if (!request.getEmail().equals("") && !request.getPassword().equals("")) {
+        if (!request.getEmail().isEmpty() && !request.getPassword().isEmpty()) {
             final UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
             if (userDetails != null) {
                 authenticationManager.authenticate(
