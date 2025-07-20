@@ -7,18 +7,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/articles")
 @AllArgsConstructor
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleDtoMapper articleDtoMapper;
 
     @PostMapping("/add")
     ResponseEntity<ArticleDto> create(@RequestBody ArticleRequest request) {
-        return ResponseEntity.ok(ArticleDtoMapper.nonConfirmedArticleMapper(articleService.create(request)));
+        return ResponseEntity.ok(articleDtoMapper.toNonConfirmedArticleDto(articleService.create(request)));
     }
 
     @GetMapping("/get/all")
@@ -29,21 +28,24 @@ public class ArticleController {
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
     ) {
 
-        return ResponseEntity.ok(articleService.getAllPaginatedArticles(page, size, sortBy, sortDirection));
+        return ResponseEntity.ok(articleService.getAllArticles(page, size, sortBy, sortDirection));
     }
 
     @GetMapping("/get/from")
-    ResponseEntity<List<ArticleDto>> getAllArticlesFromUser(@RequestParam Long id) {
-        return ResponseEntity.ok(
-                articleService.getArticlesFromUser(id).stream()
-                        .map(ArticleDtoMapper::articleDtoMapper)
-                        .toList());
+    ResponseEntity<PageResponse<ArticleDto>> getAllArticlesFromUser(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "likesCount") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "desc") String sortDirection
+    ) {
+        return ResponseEntity.ok(articleService.getArticlesFromUser(userId, page, size, sortBy, sortDirection));
     }
 
     @GetMapping("/get")
     ResponseEntity<ArticleDto> getArticleByID(@RequestParam Long id) {
         Article article = articleService.getArticleByID(id);
-        return ResponseEntity.ok(ArticleDtoMapper.articleDtoMapper(article));
+        return ResponseEntity.ok(articleDtoMapper.toArticleDto(article));
     }
 
     @DeleteMapping("/delete")

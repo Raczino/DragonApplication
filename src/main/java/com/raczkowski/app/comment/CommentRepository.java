@@ -15,14 +15,12 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("SELECT a FROM Comment a ORDER BY a.isPinned DESC")
-    Page<Comment> findAllWithPinnedFirst(Pageable pageable);
+    @Query("SELECT a FROM Comment a WHERE a.article.id = :articleId ORDER BY a.isPinned DESC, a.likesCount DESC")
+    Page<Comment> findCommentsByArticleWithPinnedFirst(@Param("articleId") Long articleId, Pageable pageable);
 
     Comment findCommentById(Long id);
 
-    List<Comment> getCommentsByArticle(Article article);
-
-    List<Comment> getCommentsByAppUser(AppUser user);
+    Page<Comment> getCommentsByAppUser(AppUser user, Pageable pageable);
 
     List<Comment> findAllByAppUser(AppUser appUser);
 

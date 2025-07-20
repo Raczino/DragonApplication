@@ -2,10 +2,7 @@ package com.raczkowski.app.dto;
 
 import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 
@@ -13,6 +10,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserDto {
     private Long id;
     private String firstName;
@@ -24,9 +22,9 @@ public class UserDto {
     private UserRole userRole;
     private int articlesCount;
     private int commentsCount;
-    private boolean isBlocked;
+    private boolean accountBlocked;
     private ZonedDateTime blockedDate;
     private int followersCount;
-    private int followsCount;
-    private AccountType isPremium;
+    private int followingCount;
+    private AccountType accountType;
 }

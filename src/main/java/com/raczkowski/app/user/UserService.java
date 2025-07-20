@@ -43,10 +43,6 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
-    public List<AppUser> loadAllUser() {
-        return userRepository.findAll();
-    }
-
     public AppUser getLoggedUser() {
         return userRepository.findByEmail(
                 SecurityContextHolder

@@ -32,7 +32,7 @@ public class SubscriptionService {
         }
 
         if (subscriptionRepository.findByUserId(user.getId()).isPresent()) {
-            throw new ResponseException("User already has an active subscription");
+            throw new ResponseException("User already has an active subscription"); // to jest chyba błędne
         }
 
         SubscriptionPlan subscriptionPlan = subscriptionPlanRepository.getSubscriptionPlanBySubscriptionType(premiumAccountType)
@@ -80,11 +80,6 @@ public class SubscriptionService {
     public boolean isSubscriptionActive(Long userId) {
         Optional<Subscription> subscription = subscriptionRepository.findByUserId(userId);
 
-        if (subscription.isPresent()) {
-            if (subscription.get().isActive()) {
-                return !subscription.get().getEndDate().isBefore(ZonedDateTime.now(ZoneOffset.UTC));
-            }
-        }
-        return false;
+        return subscription.map(Subscription::isActive).orElse(false);
     }
 }

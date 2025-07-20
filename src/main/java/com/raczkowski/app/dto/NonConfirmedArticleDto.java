@@ -1,23 +1,13 @@
 package com.raczkowski.app.dto;
 
-import com.raczkowski.app.enums.ArticleStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.ZonedDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@SuperBuilder
 public class NonConfirmedArticleDto extends ArticleDto {
-    public NonConfirmedArticleDto(
-            Long id,
-            String title,
-            String content,
-            String contentHtml,
-            ZonedDateTime postedDate,
-            AuthorDto user,
-            ArticleStatus status
-    ) {
-        super(id, title, content, contentHtml, postedDate, user, status);
-    }
 }

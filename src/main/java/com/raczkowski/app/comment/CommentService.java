@@ -1,22 +1,29 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.common.GenericService;
+import com.raczkowski.app.common.MetaData;
+import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.likes.CommentLike;
 import com.raczkowski.app.likes.CommentLikeRepository;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Service
@@ -27,16 +34,18 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRequestValidator commentRequestValidator;
     private final FeatureLimitHelperService featureLimitHelperService;
+    private final CommentDtoMapper commentDtoMapper;
 
-    public List<CommentDto> getAllCommentsFromArticle(Long id) {
-        return commentRepository.getCommentsByArticle(articleRepository.findArticleById(id))
-                .stream()
-                .map(
-                        comment ->
-                                CommentDtoMapper.commentDtoMapperWithAdditionalFields(
-                                        comment,
-                                        isCommentLiked(comment, userService.getLoggedUser()))
-                ).toList();
+    public PageResponse<CommentDto> getCommentsForArticle(Long articleId, int pageNumber, int pageSize) {
+        AppUser user = userService.getLoggedUser();
+
+        return paginateAndMapCommentsWithLikes(
+                pageNumber,
+                pageSize,
+                "likesCount",
+                pageable -> commentRepository.findCommentsByArticleWithPinnedFirst(articleId, pageable),
+                user
+        );
     }
 
     public CommentDto addComment(CommentRequest commentRequest) {
@@ -58,7 +67,7 @@ public class CommentService {
         articleRepository.updateArticleLikesCount(commentRequest.getId(), 1);
         featureLimitHelperService.incrementFeatureUsage(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK);
 
-        return CommentDtoMapper.commentDtoMapper(comment);
+        return commentDtoMapper.toCommentDto(comment);
     }
 
     public void createComment(Comment comment) {
@@ -105,9 +114,9 @@ public class CommentService {
         return "Removed";
     }
 
-    public String updateComment(CommentRequest commentRequest) {
+    public void updateComment(CommentRequest commentRequest) {
 
-        if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
+        if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
             throw new ResponseException("Comment can't be empty");
         }
 
@@ -124,29 +133,71 @@ public class CommentService {
                 commentRequest.getContent(),
                 ZonedDateTime.now(ZoneOffset.UTC)
         );
-        return "Updated";
-    }
-
-    private boolean isCommentLiked(Comment comment, AppUser user) {
-        return commentLikeRepository.existsCommentLikeByAppUserAndComment(user, comment);
     }
 
     public void pinComment(Long id) {
         commentRepository.pinComment(id);
     }
 
-    public List<CommentDto> getAllCommentsForUser(Long id) {
-        AppUser user = userService.getUserById(id);
+    public PageResponse<CommentDto> getCommentsForUser(Long userId, int pageNumber, int pageSize) {
+        AppUser user = userService.getUserById(userId);
 
-        return commentRepository.getCommentsByAppUser(user).stream()
-                .map(
-                        comment -> CommentDtoMapper.commentDtoMapperWithAdditionalFields(
-                                comment,
-                                isCommentLiked(comment, user)))
-                .toList();
+        return paginateAndMapCommentsWithLikes(
+                pageNumber,
+                pageSize,
+                "postedDate",
+                pageable -> commentRepository.getCommentsByAppUser(user, pageable),
+                user
+        );
     }
 
     public int getCommentsCountForUser(AppUser appUser) {
         return commentRepository.findAllByAppUser(appUser).size();
+    }
+
+    private Set<Long> getLikedCommentIdsByUser(List<Comment> comments, AppUser user) {
+        return commentLikeRepository.findLikedCommentIdsByUserAndCommentIds(
+                user,
+                comments.stream().map(Comment::getId).toList()
+        );
+    }
+
+    private List<CommentDto> mapCommentsWithLikes(List<Comment> comments, Set<Long> likedCommentIds) {
+        return comments.stream()
+                .map(comment -> {
+                    CommentDto dto = commentDtoMapper.toCommentDto(comment);
+                    dto.setLiked(likedCommentIds.contains(comment.getId()));
+                    return dto;
+                })
+                .toList();
+    }
+
+    private PageResponse<CommentDto> paginateAndMapCommentsWithLikes(
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            Function<Pageable, Page<Comment>> pageSupplier,
+            AppUser user
+    ) {
+        Page<Comment> page = GenericService.paginate(pageNumber, pageSize, sortBy, "DESC", pageSupplier);
+        Set<Long> likedCommentIds = getLikedCommentIdsByUser(page.getContent(), user);
+
+        List<CommentDto> commentDtos = page.getContent().stream()
+                .map(comment -> {
+                    CommentDto dto = commentDtoMapper.toCommentDto(comment);
+                    dto.setLiked(likedCommentIds.contains(comment.getId()));
+                    return dto;
+                })
+                .toList();
+
+        return new PageResponse<>(
+                commentDtos,
+                new MetaData(
+                        page.getTotalElements(),
+                        page.getTotalPages(),
+                        page.getNumber() + 1,
+                        page.getSize()
+                )
+        );
     }
 }

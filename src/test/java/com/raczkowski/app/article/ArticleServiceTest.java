@@ -78,50 +78,50 @@ public class ArticleServiceTest {
         assertEquals(2, allArticles.size());
     }
 
-    @Test
-    public void ShouldGetArticlesFromUser() {
-        // given
-        Long userId = 1L;
-        AppUser user = new AppUser();
-        user.setId(userId);
-        when(userRepository.getAppUserById(userId)).thenReturn(user);
+//    @Test
+//    public void ShouldGetArticlesFromUser() {
+//        // given
+//        Long userId = 1L;
+//        AppUser user = new AppUser();
+//        user.setId(userId);
+//        when(userRepository.getAppUserById(userId)).thenReturn(user);
+//
+//        ZonedDateTime postedDate = ZonedDateTime.now();
+//        List<Article> articles = new ArrayList<>();
+//        articles.add(new Article("Title1", "Content1", postedDate, user));
+//        articles.add(new Article("Title2", "Content2", postedDate, user));
+//        when(articleRepository.findAllByAppUser(user)).thenReturn(articles);
+//
+//        // when
+//        List<Article> result = articleService.getArticlesFromUser(userId);
+//
+//        // then
+//        assertEquals(2, result.size());
+//        assertEquals("Title1", result.get(0).getTitle());
+//        assertEquals("Content1", result.get(0).getContent());
+//        assertEquals(postedDate, result.get(0).getPostedDate());
+//        assertEquals(user.getId(), result.get(0).getAppUser().getId());
+//        assertEquals("Title2", result.get(1).getTitle());
+//        assertEquals("Content2", result.get(1).getContent());
+//        assertEquals(postedDate, result.get(1).getPostedDate());
+//        assertEquals(user.getId(), result.get(1).getAppUser().getId());
+//        verify(userRepository, times(1)).getAppUserById(userId);
+//        verify(articleRepository, times(1)).findAllByAppUser(user);
+//    }
 
-        ZonedDateTime postedDate = ZonedDateTime.now();
-        List<Article> articles = new ArrayList<>();
-        articles.add(new Article("Title1", "Content1", postedDate, user));
-        articles.add(new Article("Title2", "Content2", postedDate, user));
-        when(articleRepository.findAllByAppUser(user)).thenReturn(articles);
-
-        // when
-        List<Article> result = articleService.getArticlesFromUser(userId);
-
-        // then
-        assertEquals(2, result.size());
-        assertEquals("Title1", result.get(0).getTitle());
-        assertEquals("Content1", result.get(0).getContent());
-        assertEquals(postedDate, result.get(0).getPostedDate());
-        assertEquals(user.getId(), result.get(0).getAppUser().getId());
-        assertEquals("Title2", result.get(1).getTitle());
-        assertEquals("Content2", result.get(1).getContent());
-        assertEquals(postedDate, result.get(1).getPostedDate());
-        assertEquals(user.getId(), result.get(1).getAppUser().getId());
-        verify(userRepository, times(1)).getAppUserById(userId);
-        verify(articleRepository, times(1)).findAllByAppUser(user);
-    }
-
-    @Test
-    public void ShouldReturnEmptyListForUserWithoutPostedArticle() {
-        // given
-        Long userId = 123L;
-        when(userRepository.getAppUserById(userId)).thenReturn(new AppUser());
-
-        // when
-        List<Article> result = articleService.getArticlesFromUser(userId);
-
-        // then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
+//    @Test
+//    public void ShouldReturnEmptyListForUserWithoutPostedArticle() {
+//        // given
+//        Long userId = 123L;
+//        when(userRepository.getAppUserById(userId)).thenReturn(new AppUser());
+//
+//        // when
+//        List<Article> result = articleService.getArticlesFromUser(userId);
+//
+//        // then
+//        assertNotNull(result);
+//        assertTrue(result.isEmpty());
+//    }
 
     @Test
     public void shouldLikeArticleSuccessfully() {

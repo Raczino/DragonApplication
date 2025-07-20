@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class ModerationStatisticService {
     private final ModeratorStatisticRepository moderatorStatisticRepository;
     private final UserService userService;
+    private final StatisticsMapper statisticsMapper;
 
     public void createStatisticForUser(Long userId) {
         AppUser user = userService.getUserById(userId);
@@ -22,7 +23,7 @@ public class ModerationStatisticService {
     }
 
     public ModeratorStatisticDto getStatisticsForUser(Long id) {
-        return StatisticsMapper.moderatorStatisticDto(moderatorStatisticRepository.getModeratorStatisticByAppUser(userService.getUserById(id)));
+        return statisticsMapper.toModeratorStatisticDto(moderatorStatisticRepository.getModeratorStatisticByAppUser(userService.getUserById(id)));
     }
 
     public void articleApprovedCounterIncrease(Long userId) {
