@@ -1,7 +1,7 @@
 package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
-import com.raczkowski.app.admin.users.ModerationStatisticService;
+import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleService;
 import com.raczkowski.app.article.DeletedArticleRepository;

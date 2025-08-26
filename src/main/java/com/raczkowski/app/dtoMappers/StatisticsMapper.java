@@ -1,6 +1,6 @@
 package com.raczkowski.app.dtoMappers;
 
-import com.raczkowski.app.admin.users.ModeratorStatistic;
+import com.raczkowski.app.admin.operator.users.ModeratorStatistic;
 import com.raczkowski.app.dto.ModeratorStatisticDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

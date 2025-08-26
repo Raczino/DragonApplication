@@ -1,6 +1,6 @@
-package com.raczkowski.app.accountPremium;
+package com.raczkowski.app.accountPremium.repository;
 
-import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.accountPremium.entity.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

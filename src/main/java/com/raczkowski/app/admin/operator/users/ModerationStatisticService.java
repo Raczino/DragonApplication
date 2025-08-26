@@ -1,4 +1,4 @@
-package com.raczkowski.app.admin.users;
+package com.raczkowski.app.admin.operator.users;
 
 import com.raczkowski.app.dto.ModeratorStatisticDto;
 import com.raczkowski.app.dtoMappers.StatisticsMapper;

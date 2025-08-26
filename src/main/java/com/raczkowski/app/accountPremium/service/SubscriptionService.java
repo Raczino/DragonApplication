@@ -1,5 +1,9 @@
-package com.raczkowski.app.accountPremium;
+package com.raczkowski.app.accountPremium.service;
 
+import com.raczkowski.app.accountPremium.repository.SubscriptionPlanRepository;
+import com.raczkowski.app.accountPremium.repository.SubscriptionRepository;
+import com.raczkowski.app.accountPremium.entity.Subscription;
+import com.raczkowski.app.accountPremium.entity.SubscriptionPlan;
 import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.PremiumAccountRange;
 import com.raczkowski.app.exceptions.ResponseException;

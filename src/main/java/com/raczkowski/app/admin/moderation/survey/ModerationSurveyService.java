@@ -1,7 +1,7 @@
 package com.raczkowski.app.admin.moderation.survey;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
-import com.raczkowski.app.admin.users.ModerationStatisticService;
+import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.surveys.survey.SurveyService;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;

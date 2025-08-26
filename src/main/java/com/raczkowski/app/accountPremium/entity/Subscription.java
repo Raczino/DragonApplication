@@ -1,8 +1,6 @@
-package com.raczkowski.app.accountPremium;
+package com.raczkowski.app.accountPremium.entity;
 
-import com.raczkowski.app.enums.PremiumAccountRange;
 import com.raczkowski.app.user.AppUser;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

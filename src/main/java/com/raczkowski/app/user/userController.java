@@ -1,6 +1,6 @@
 package com.raczkowski.app.user;
 
-import com.raczkowski.app.accountPremium.SubscriptionService;
+import com.raczkowski.app.accountPremium.service.SubscriptionService;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dto.UserDtoAssembler;
 import com.raczkowski.app.enums.PremiumAccountRange;
