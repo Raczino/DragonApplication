@@ -23,6 +23,7 @@ logs/**
 *.ipr
 *.properties
 *.yml
+!.github/workflows/*.yml
 
 ### NetBeans ###
 /nbproject/private/
