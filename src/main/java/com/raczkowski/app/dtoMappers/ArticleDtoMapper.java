@@ -4,159 +4,81 @@ import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.RejectedArticle;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.DeletedArticle;
-import com.raczkowski.app.dto.*;
+import com.raczkowski.app.dto.ArticleDto;
+import com.raczkowski.app.dto.DeletedArticleDto;
+import com.raczkowski.app.dto.NonConfirmedArticleDto;
+import com.raczkowski.app.dto.RejectedArticleDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ArticleDtoMapper {
-    public static ArticleDto articleDtoMapper(Article article) {
-        return new ArticleDto(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getContentHtml(),
-                article.getPostedDate(),
-                article.getLikesCount(),
-                article.getCommentsCount(),
-                new AuthorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
-                ),
-                article.getUpdatedAt(),
-                article.isUpdated(),
-                article.getStatus(),
-                article.getAcceptedAt(),
-                new AuthorDto(
-                        article.getAcceptedBy().getId(),
-                        article.getAcceptedBy().getFirstName(),
-                        article.getAcceptedBy().getLastName(),
-                        article.getAcceptedBy().getEmail(),
-                        article.getAcceptedBy().isAccountBlocked()
-                )
-        );
+
+    private final AuthorDtoMapper authorDtoMapper;
+
+    public ArticleDto toArticleDto(Article article) {
+        return ArticleDto.builder()
+                .id(article.getId())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .contentHtml(article.getContentHtml())
+                .postedDate(article.getPostedDate())
+                .likesCount(article.getLikesCount())
+                .commentsCount(article.getCommentsCount())
+                .author(authorDtoMapper.toAuthorDto(article.getAppUser()))
+                .updatedAt(article.getUpdatedAt())
+                .isUpdated(article.isUpdated())
+                .status(article.getStatus())
+                .acceptedAt(article.getAcceptedAt())
+                .acceptedBy(authorDtoMapper.toAuthorDto(article.getAcceptedBy()))
+                .isPinned(article.isPinned())
+                .pinnedBy(authorDtoMapper.toAuthorDto(article.getPinnedBy()))
+                .build();
     }
 
-    public static RejectedArticleDto rejectedArticleDtoMapper(RejectedArticle article) {
-        return new RejectedArticleDto(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getContentHtml(),
-                article.getPostedDate(),
-                new AuthorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
-                ),
-                article.getStatus(),
-                article.getRejectedAt(),
-                new AuthorDto(
-                        article.getRejectedBy().getId(),
-                        article.getRejectedBy().getFirstName(),
-                        article.getRejectedBy().getLastName(),
-                        article.getRejectedBy().getEmail(),
-                        article.getRejectedBy().isAccountBlocked()
-                )
-        );
+    public RejectedArticleDto toRejectedArticleDto(RejectedArticle article) {
+        return RejectedArticleDto.builder()
+                .id(article.getId())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .contentHtml(article.getContentHtml())
+                .postedDate(article.getPostedDate())
+                .author(authorDtoMapper.toAuthorDto(article.getAppUser()))
+                .status(article.getStatus())
+                .rejectedAt(article.getRejectedAt())
+                .rejectedBy(authorDtoMapper.toAuthorDto(article.getRejectedBy()))
+                .build();
     }
 
-    public static NonConfirmedArticleDto nonConfirmedArticleMapper(ArticleToConfirm article) {
-        return new NonConfirmedArticleDto(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getContentHtml(),
-                article.getPostedDate(),
-                new AuthorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
-                ),
-                article.getStatus()
-        );
+    public NonConfirmedArticleDto toNonConfirmedArticleDto(ArticleToConfirm article) {
+        return NonConfirmedArticleDto.builder()
+                .id(article.getId())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .contentHtml(article.getContentHtml())
+                .postedDate(article.getPostedDate())
+                .author(authorDtoMapper.toAuthorDto(article.getAppUser()))
+                .status(article.getStatus())
+                .build();
     }
 
-    public static DeletedArticleDto deletedArticle(DeletedArticle article) {
-        return new DeletedArticleDto(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getContentHtml(),
-                article.getPostedDate(),
-                article.getLikesNumber(),
-                article.getCommentsCount(),
-                new AuthorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
-                ),
-                article.getUpdatedAt(),
-                article.isUpdated(),
-                article.getStatus(),
-                article.getAcceptedAt(),
-                new AuthorDto(
-                        article.getAcceptedBy().getId(),
-                        article.getAcceptedBy().getFirstName(),
-                        article.getAcceptedBy().getLastName(),
-                        article.getAcceptedBy().getEmail(),
-                        article.getAcceptedBy().isAccountBlocked()
-                ),
-                article.getDeletedAt(),
-                new AuthorDto(
-                        article.getDeletedBy().getId(),
-                        article.getDeletedBy().getFirstName(),
-                        article.getDeletedBy().getLastName(),
-                        article.getDeletedBy().getEmail(),
-                        article.getDeletedBy().isAccountBlocked()
-                )
-        );
-    }
-
-    public static ArticleDto articleDtoMapperWithAdditionalFieldsMapper(Article article, boolean isLiked) {
-        return new ArticleDto(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getContentHtml(),
-                article.getPostedDate(),
-                article.getLikesCount(),
-                new AuthorDto(
-                        article.getAppUser().getId(),
-                        article.getAppUser().getFirstName(),
-                        article.getAppUser().getLastName(),
-                        article.getAppUser().getEmail(),
-                        article.getAppUser().isAccountBlocked()
-                ),
-                article.getUpdatedAt(),
-                article.isUpdated(),
-                article.getStatus(),
-                isLiked,
-                article.getCommentsCount(),
-                article.getAcceptedAt(),
-                new AuthorDto(
-                        article.getAcceptedBy().getId(),
-                        article.getAcceptedBy().getFirstName(),
-                        article.getAcceptedBy().getLastName(),
-                        article.getAcceptedBy().getEmail(),
-                        article.getAcceptedBy().isAccountBlocked()
-                ),
-                article.isPinned(),
-                article.getPinnedBy() != null ? new AuthorDto(
-                        article.getPinnedBy().getId(),
-                        article.getPinnedBy().getFirstName(),
-                        article.getPinnedBy().getLastName(),
-                        article.getPinnedBy().getEmail(),
-                        article.getPinnedBy().isAccountBlocked()
-                ) : null
-        );
+    public DeletedArticleDto toDeletedArticleDto(DeletedArticle article) {
+        return DeletedArticleDto.builder()
+                .id(article.getId())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .contentHtml(article.getContentHtml())
+                .postedDate(article.getPostedDate())
+                .likesCount(article.getLikesNumber())
+                .commentsCount(article.getCommentsCount())
+                .author(authorDtoMapper.toAuthorDto(article.getAppUser()))
+                .updatedAt(article.getUpdatedAt())
+                .status(article.getStatus())
+                .acceptedAt(article.getAcceptedAt())
+                .acceptedBy(authorDtoMapper.toAuthorDto(article.getAcceptedBy()))
+                .deletedAt(article.getDeletedAt())
+                .deletedBy(authorDtoMapper.toAuthorDto(article.getDeletedBy()))
+                .build();
     }
 }

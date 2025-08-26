@@ -2,13 +2,9 @@ package com.raczkowski.app.comment;
 
 import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
-import com.raczkowski.app.hashtags.Hashtag;
-import com.raczkowski.app.hashtags.HashtagService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -23,13 +19,21 @@ public class CommentController {
     }
 
     @GetMapping("/article")
-    ResponseEntity<List<CommentDto>> getAllCommentsByArticleId(@RequestParam Long id) {
-        return ResponseEntity.ok(commentService.getAllCommentsFromArticle(id));
+    ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
+            @RequestParam Long articleId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(commentService.getCommentsForArticle(articleId, page, size));
     }
 
     @GetMapping("/user")
-    ResponseEntity<List<CommentDto>> getAllCommentsForUser(Long id) {
-        return ResponseEntity.ok(commentService.getAllCommentsForUser(id));
+    ResponseEntity<PageResponse<CommentDto>> getAllCommentsForUser(
+            @RequestParam Long userId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(commentService.getCommentsForUser(userId, page, size));
     }
 
     @PostMapping("/like")
@@ -43,8 +47,8 @@ public class CommentController {
     }
 
     @PutMapping("/update")
-    ResponseEntity<String> updateComment(@RequestBody CommentRequest commentRequest) {
-        return ResponseEntity.ok(commentService.updateComment(commentRequest));
+    void updateComment(@RequestBody CommentRequest commentRequest) {
+        commentService.updateComment(commentRequest);
     }
 
     @PostMapping("/pin")

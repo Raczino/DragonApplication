@@ -2,7 +2,10 @@ package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.admin.users.ModerationStatisticService;
-import com.raczkowski.app.article.*;
+import com.raczkowski.app.article.Article;
+import com.raczkowski.app.article.ArticleService;
+import com.raczkowski.app.article.DeletedArticleRepository;
+import com.raczkowski.app.article.DeletedArticleService;
 import com.raczkowski.app.common.GenericService;
 import com.raczkowski.app.common.MetaData;
 import com.raczkowski.app.common.PageResponse;
@@ -16,11 +19,8 @@ import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.notification.Notification;
-import com.raczkowski.app.notification.NotificationRepository;
 import com.raczkowski.app.notification.NotificationService;
-import com.raczkowski.app.surveys.survey.SurveyService;
 import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,6 +46,7 @@ public class ModerationArticleService {
     private final DeletedArticleService deletedArticleService;
     private final NotificationService notificationService;
     private final ModerationStatisticService moderationStatisticService;
+    private final ArticleDtoMapper articleDtoMapper;
 
     public void addArticle(ArticleToConfirm articleToConfirm) {
         articleToConfirmRepository.save(articleToConfirm);
@@ -53,24 +54,14 @@ public class ModerationArticleService {
 
     public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
-        Page<ArticleToConfirm> article = GenericService
-                .paginate(
-                        pageNumber,
-                        pageSize,
-                        sortBy,
-                        sortDirection,
-                        articleToConfirmRepository::findAll
-                );
 
-        return new PageResponse<>(
-                article.stream()
-                        .map(ArticleDtoMapper::nonConfirmedArticleMapper)
-                        .toList(),
-                new MetaData(
-                        article.getTotalElements(),
-                        article.getTotalPages(),
-                        article.getNumber() + 1,
-                        article.getSize())
+        return paginateAndMap(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                articleToConfirmRepository::findAll,
+                articleDtoMapper::toNonConfirmedArticleDto
         );
     }
 
@@ -78,10 +69,8 @@ public class ModerationArticleService {
         permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser appUser = userService.getLoggedUser();
 
-        ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
-        if (articleToConfirm == null) {
-            throw new ResponseException("Article with provided id doesn't not exists");
-        }
+        ArticleToConfirm articleToConfirm = getArticleToConfirmOrThrow(articleId);
+
         Article article = new Article(
                 articleToConfirm.getTitle(),
                 articleToConfirm.getContent(),
@@ -108,17 +97,15 @@ public class ModerationArticleService {
                 "Accepted By",
                 "article/" + article.getId());
         moderationStatisticService.articleApprovedCounterIncrease(article.getAcceptedBy().getId());
-        return ArticleDtoMapper.articleDtoMapper(article);
+        return articleDtoMapper.toArticleDto(article);
     }
 
     public RejectedArticleDto rejectArticle(Long articleId) {
         permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser user = userService.getLoggedUser();
 
-        ArticleToConfirm articleToConfirm = articleToConfirmRepository.getArticleToConfirmById(articleId);
-        if (articleToConfirm == null) {
-            throw new ResponseException("Article with provided id doesn't not exists");
-        }
+        ArticleToConfirm articleToConfirm = getArticleToConfirmOrThrow(articleId);
+
         articleToConfirmRepository.deleteArticleToConfirmById(articleId);
         RejectedArticle rejectedArticle = new RejectedArticle(
                 articleToConfirm.getTitle(),
@@ -137,59 +124,37 @@ public class ModerationArticleService {
                 "Rejected By",
                 null);
         moderationStatisticService.articleRejectedCounterIncrease(rejectedArticle.getRejectedBy().getId());
-        return ArticleDtoMapper.rejectedArticleDtoMapper(rejectedArticle);
+        return articleDtoMapper.toRejectedArticleDto(rejectedArticle);
     }
 
     public PageResponse<RejectedArticleDto> getRejectedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
 
-        Page<RejectedArticle> article = GenericService
-                .paginate(
-                        pageNumber,
-                        pageSize,
-                        sortBy,
-                        sortDirection,
-                        rejectedArticleRepository::findAll
-                );
-
-        return new PageResponse<>(
-                article
-                        .stream()
-                        .map(ArticleDtoMapper::rejectedArticleDtoMapper)
-                        .toList(),
-                new MetaData(
-                        article.getTotalElements(),
-                        article.getTotalPages(),
-                        article.getNumber() + 1,
-                        article.getSize())
+        return paginateAndMap(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                rejectedArticleRepository::findAll,
+                articleDtoMapper::toRejectedArticleDto
         );
     }
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
         AppUser user = userService.getUserById(id);
+
         if (user == null) {
             throw new ResponseException("User doesn't exists");
         }
 
-        Page<Article> articles = GenericService
-                .paginate(
-                        pageNumber,
-                        pageSize,
-                        sortBy,
-                        sortDirection,
-                        pageable -> articleService.getArticlesAcceptedByUser(user, pageable)
-                );
-
-        return new PageResponse<>(articles
-                .stream()
-                .map(ArticleDtoMapper::articleDtoMapper)
-                .toList(),
-                new MetaData(
-                        articles.getTotalElements(),
-                        articles.getTotalPages(),
-                        articles.getNumber() + 1,
-                        articles.getSize())
+        return paginateAndMap(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                pageable -> articleService.getArticlesAcceptedByUser(user, pageable),
+                articleDtoMapper::toArticleDto
         );
     }
 
@@ -200,25 +165,16 @@ public class ModerationArticleService {
         moderationStatisticService.articleDeletedCounterIncrease(user.getId());
     }
 
-    public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int page, int size, String sortBy, String sortDirection) {
+    public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         permissionValidator.validateIfUserIsAdminOrOperator();
-        Page<DeletedArticle> articles = GenericService
-                .paginate(
-                        page,
-                        size,
-                        sortBy,
-                        sortDirection,
-                        deletedArticleRepository::findAll
-                );
-        return new PageResponse<>(
-                articles
-                        .stream()
-                        .map(ArticleDtoMapper::deletedArticle)
-                        .toList(),
-                new MetaData(articles.getTotalElements(),
-                        articles.getTotalPages(),
-                        articles.getNumber() + 1,
-                        articles.getSize())
+
+        return paginateAndMap(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                deletedArticleRepository::findAll,
+                articleDtoMapper::toDeletedArticleDto
         );
     }
 
@@ -252,7 +208,33 @@ public class ModerationArticleService {
         return articleToConfirmRepository.findAll()
                 .stream()
                 .filter(articleToConfirm -> articleToConfirm.getAppUser().getId().equals(id))
-                .map(ArticleDtoMapper::nonConfirmedArticleMapper)
+                .map(articleDtoMapper::toNonConfirmedArticleDto)
                 .toList();
+    }
+
+    private ArticleToConfirm getArticleToConfirmOrThrow(Long id) {
+        ArticleToConfirm article = articleToConfirmRepository.getArticleToConfirmById(id);
+        if (article == null) {
+            throw new ResponseException("Article with provided id doesn't exist");
+        }
+        return article;
+    }
+
+    private <T, R> PageResponse<R> paginateAndMap(
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            String sortDirection,
+            java.util.function.Function<org.springframework.data.domain.Pageable, Page<T>> pageSupplier,
+            java.util.function.Function<T, R> mapper
+    ) {
+        Page<T> page = GenericService.paginate(pageNumber, pageSize, sortBy, sortDirection, pageSupplier);
+        List<R> content = page.stream().map(mapper).toList();
+        return new PageResponse<>(content, new MetaData(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.getNumber() + 1,
+                page.getSize()
+        ));
     }
 }

@@ -39,20 +39,6 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
             "WHERE c.id = :id")
     void unBlockUser(Long id);
 
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE AppUser u " +
-//            "SET u.articlesCount = u.articlesCount + 1" +
-//            "WHERE u.id = :id")
-//    void updateArticlesCount(@Param("id") Long id);
-//
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE AppUser u " +
-//            "SET u.commentsCount = u.commentsCount + 1" +
-//            "WHERE u.id = :id")
-//    void updateCommentsCount(@Param("id") Long id);
-
     @Query("SELECT uf FROM AppUser u JOIN u.followers uf WHERE u.id = :userId")
     List<AppUser> findFollowersByUserId(@Param("userId") Long userId);
 

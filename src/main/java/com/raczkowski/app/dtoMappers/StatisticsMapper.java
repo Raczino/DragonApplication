@@ -1,27 +1,26 @@
 package com.raczkowski.app.dtoMappers;
 
 import com.raczkowski.app.admin.users.ModeratorStatistic;
-import com.raczkowski.app.dto.AuthorDto;
 import com.raczkowski.app.dto.ModeratorStatisticDto;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@AllArgsConstructor
+@Component
 public class StatisticsMapper {
-    public static ModeratorStatisticDto moderatorStatisticDto(ModeratorStatistic moderatorStatistic) {
-        return new ModeratorStatisticDto(
-                moderatorStatistic.getId(),
-                moderatorStatistic.getApprovedArticleCounter(),
-                moderatorStatistic.getRejectedArticleCounter(),
-                moderatorStatistic.getDeletedArticleCounter(),
-                moderatorStatistic.getDeletedCommentCounter(),
-                moderatorStatistic.getDeletedSurveyCounter(),
-                moderatorStatistic.getEditedArticleCounter(),
-                moderatorStatistic.getPinnedArticleCounter(),
-                new AuthorDto(
-                        moderatorStatistic.getAppUser().getId(),
-                        moderatorStatistic.getAppUser().getFirstName(),
-                        moderatorStatistic.getAppUser().getLastName(),
-                        moderatorStatistic.getAppUser().getEmail(),
-                        moderatorStatistic.getAppUser().isAccountBlocked()
-                )
-        );
+    private final AuthorDtoMapper authorDtoMapper;
+
+    public ModeratorStatisticDto toModeratorStatisticDto(ModeratorStatistic moderatorStatistic) {
+        return ModeratorStatisticDto.builder()
+                .id(moderatorStatistic.getId())
+                .approvedArticleCounter(moderatorStatistic.getApprovedArticleCounter())
+                .rejectedArticleCounter(moderatorStatistic.getRejectedArticleCounter())
+                .deletedArticleCounter(moderatorStatistic.getDeletedArticleCounter())
+                .deletedCommentCounter(moderatorStatistic.getDeletedCommentCounter())
+                .deletedSurveyCounter(moderatorStatistic.getDeletedSurveyCounter())
+                .editedArticleCounter(moderatorStatistic.getEditedArticleCounter())
+                .pinnedArticleCounter(moderatorStatistic.getPinnedArticleCounter())
+                .moderator(authorDtoMapper.toAuthorDto(moderatorStatistic.getAppUser()))
+                .build();
     }
 }

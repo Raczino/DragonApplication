@@ -1,11 +1,12 @@
 package com.raczkowski.app.authentication;
 
 import com.raczkowski.app.config.JwtUtil;
+import com.raczkowski.app.dto.AuthorDto;
 import com.raczkowski.app.dto.LoginResponseDto;
+import com.raczkowski.app.dtoMappers.LoginResponseMapper;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
-import com.sun.security.auth.UserPrincipal;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,13 +14,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class AuthenticationServiceTest {
     @Mock
@@ -30,6 +27,9 @@ class AuthenticationServiceTest {
 
     @Mock
     private JwtUtil jwtUtil;
+
+    @Mock
+    private LoginResponseMapper loginResponseMapper;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -49,12 +49,28 @@ class AuthenticationServiceTest {
         user.setPassword("password");
         user.setUserRole(UserRole.USER);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getPrincipal()).thenReturn(user);
 
         when(userService.loadUserByUsername("test@example.com")).thenReturn(user);
-        when(userService.getUserByEmail("test@example.com")).thenReturn(user);  // Mockowanie getUserByEmail
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(userService.getUserByEmail("test@example.com")).thenReturn(user);
+
+        when(authenticationManager.authenticate(
+                argThat(token ->
+                        token instanceof UsernamePasswordAuthenticationToken &&
+                                token.getPrincipal().equals("test@example.com") &&
+                                token.getCredentials().equals("password")
+                )
+        )).thenReturn(authentication);
+
         when(jwtUtil.generateToken(user)).thenReturn("jwt_token");
+        AuthorDto authorDto = new AuthorDto();
+        authorDto.setId(1L);
+        authorDto.setEmail("test@example.com");
+
+        LoginResponseDto expectedResponse = new LoginResponseDto("jwt_token", authorDto);
+        when(loginResponseMapper.toResponseDto("jwt_token", user)).thenReturn(expectedResponse);
 
         // when
         LoginResponseDto response = authenticationService.authenticate(request);
@@ -62,7 +78,7 @@ class AuthenticationServiceTest {
         // then
         assertNotNull(response);
         assertEquals("jwt_token", response.getToken());
-        assertEquals(1L, response.getUser().getId());  // Sprawdzamy, czy ID użytkownika się zgadza
+        assertEquals(1L, response.getUser().getId());
     }
 
     @Test

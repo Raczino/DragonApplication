@@ -13,19 +13,20 @@ import java.util.List;
 @RequestMapping("/api/v1/surveys")
 public class SurveyController {
     private final SurveyService surveyService;
+    private final SurveyDtoMapper surveyDtoMapper;
 
     @PostMapping("/create")
     ResponseEntity<SurveyDto> create(@RequestBody SurveyRequest surveyRequest){
-        return ResponseEntity.ok(SurveyDtoMapper.toDTO(surveyService.createNewSurvey(surveyRequest)));
+        return ResponseEntity.ok(surveyDtoMapper.toDTO(surveyService.createNewSurvey(surveyRequest)));
     }
 
     @GetMapping("/get")
     ResponseEntity<SurveyDto> getSurvey(@RequestParam Long id){
-        return ResponseEntity.ok(SurveyDtoMapper.toDTO(surveyService.getSurveyById(id)));
+        return ResponseEntity.ok(surveyDtoMapper.toDTO(surveyService.getSurveyById(id)));
     }
 
     @GetMapping("/getAll")
     ResponseEntity<List<SurveyDto>> getAllSurveys(){
-        return ResponseEntity.ok(surveyService.getAllSurveys().stream().map(SurveyDtoMapper::toDTO).toList());
+        return ResponseEntity.ok(surveyService.getAllSurveys().stream().map(surveyDtoMapper::toDTO).toList());
     }
 }
