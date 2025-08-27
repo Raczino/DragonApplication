@@ -25,7 +25,7 @@ public class AdminUserService {
 
         if (!isUserAdmin) { //TODO: Zamienic na PermissonValidator
             if (userRole.equals(UserRole.ADMIN) || userRole.equals(UserRole.MODERATOR)) {
-                throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
+                throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
             } else {
                 userService.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.getUserRole());
             }
