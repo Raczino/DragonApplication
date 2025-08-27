@@ -26,7 +26,7 @@ public class AdminSettingsService {
     }
 
     public List<AdminSetting> getSettings() {
-        if (!permissionValidator.validateIfUserIaAdmin())
+        if (!permissionValidator.validateAdmin())
             throw new ResponseException("You don't have permissions to do this action");
         return adminSettingsRepository.findAll();
     }
@@ -45,7 +45,7 @@ public class AdminSettingsService {
     }
 
     public void updateSettingValue(AdminSettingRequest adminSettingRequest) {
-        if (!permissionValidator.validateIfUserIaAdmin()) {
+        if (!permissionValidator.validateAdmin()) {
             throw new ResponseException("You don't have permissions to do this action");
         }
         AdminSetting setting = adminSettingsRepository.findBySettingKey(adminSettingRequest.getSettingKey());

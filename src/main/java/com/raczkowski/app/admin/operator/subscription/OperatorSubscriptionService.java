@@ -1,7 +1,7 @@
 package com.raczkowski.app.admin.operator.subscription;
 
+import com.raczkowski.app.accountPremium.entity.ChangePriceRequest;
 import com.raczkowski.app.accountPremium.entity.PlanPrice;
-import com.raczkowski.app.accountPremium.entity.PlanPriceDto;
 import com.raczkowski.app.accountPremium.entity.PlanPriceHistory;
 import com.raczkowski.app.accountPremium.entity.SubscriptionPlan;
 import com.raczkowski.app.accountPremium.repository.PlanPriceHistoryRepository;
@@ -12,7 +12,6 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -25,64 +24,59 @@ public class OperatorSubscriptionService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final PlanPriceRepository planPriceRepository;
     private final UserService userService;
+    private final PlanPriceChaneValidator planPriceChaneValidator;
 
-    //TODO: Dodac walidacje permissions na operatora
     @Transactional
-    public void changePlanPrice(PlanPriceDto.ChangePriceRequest req) {
-        if (req.getNewAmount() == null || req.getNewAmount() <= 0) {
-            throw new ResponseException("newAmount must be > 0");
-        }
-        if (req.getCurrency() == null) {
-            throw new ResponseException("currency is required");
-        }
-
-        SubscriptionPlan plan = subscriptionPlanRepository
-                .findById(req.getSubscriptionPlan())
-                .orElseThrow(() -> new ResponseException("Plan not found"));
-
+    public void changePlanPrice(ChangePriceRequest request) {
         AppUser user = userService.getLoggedUser();
 
-        Optional<PlanPrice> opt = planPriceRepository.lockByPlanAndCurrency(plan.getId(), req.getCurrency());
+        planPriceChaneValidator.validate(request, user);
+
+        SubscriptionPlan plan = subscriptionPlanRepository
+                .findById(request.getSubscriptionPlan())
+                .orElseThrow(() -> new ResponseException("Plan not found"));
+
+        Optional<PlanPrice> planPrice = planPriceRepository.lockByPlanAndCurrency(plan.getId(), request.getCurrency());
 
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        if (opt.isEmpty()) {
+        if (planPrice.isEmpty()) {
             PlanPrice created = new PlanPrice();
             created.setSubscriptionPlan(plan);
-            created.setCurrency(req.getCurrency());
-            created.setAmount(req.getNewAmount());
+            created.setCurrency(request.getCurrency());
+            created.setAmount(request.getNewAmount());
             created.setCreatedAt(now);
             planPriceRepository.save(created);
 
-            PlanPriceHistory hist = new PlanPriceHistory();
-            hist.setSubscriptionPlan(plan);
-            hist.setCurrency(req.getCurrency());
-            hist.setOldAmount(null);
-            hist.setNewAmount(req.getNewAmount());
-            hist.setCreatedAt(now);
-            hist.setChangedBy(user);
-            hist.setReason(req.getReason());
-            planPriceHistoryRepository.save(hist);
+            PlanPriceHistory history = new PlanPriceHistory();
+            history.setSubscriptionPlan(plan);
+            history.setCurrency(request.getCurrency());
+            history.setOldAmount(null);
+            history.setNewAmount(request.getNewAmount());
+            history.setCreatedAt(now);
+            history.setChangedBy(user);
+            history.setReason(request.getReason());
+            planPriceHistoryRepository.save(history);
             return;
         }
 
-        PlanPrice current = opt.get();
+        PlanPrice current = planPrice.get();
         Long oldAmount = current.getAmount();
-        Long newAmount = req.getNewAmount();
+        Long newAmount = request.getNewAmount();
 
         if (oldAmount != null && oldAmount.equals(newAmount)) {
             return;
         }
 
-        PlanPriceHistory hist = new PlanPriceHistory();
-        hist.setSubscriptionPlan(plan);
-        hist.setCurrency(req.getCurrency());
-        hist.setOldAmount(oldAmount);
-        hist.setNewAmount(newAmount);
-        hist.setCreatedAt(now);
-        hist.setChangedBy(user);
-        hist.setReason(req.getReason());
-        planPriceHistoryRepository.save(hist);
+        PlanPriceHistory history = new PlanPriceHistory();
+        history.setSubscriptionPlan(plan);
+        history.setCurrency(request.getCurrency());
+        history.setOldAmount(oldAmount);
+        history.setNewAmount(newAmount);
+        history.setCreatedAt(now);
+        history.setChangedBy(user);
+        history.setReason(request.getReason());
+        planPriceHistoryRepository.save(history);
 
         current.setAmount(newAmount);
         current.setUpdatedAt(now);

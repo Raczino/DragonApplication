@@ -31,7 +31,7 @@ public class PermissionValidatorTest {
         when(userService.getLoggedUser()).thenReturn(adminUser);
 
         // When
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
 
         // Then: No exception should be thrown
     }
@@ -44,7 +44,7 @@ public class PermissionValidatorTest {
         when(userService.getLoggedUser()).thenReturn(moderatorUser);
 
         // When
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
 
         // Then: No exception should be thrown
     }
@@ -57,6 +57,6 @@ public class PermissionValidatorTest {
         when(userService.getLoggedUser()).thenReturn(regularUser);
 
         // When & Then: Expecting a ResponseException to be thrown
-        assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrOperator());
+        assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrModerator());
     }
 }

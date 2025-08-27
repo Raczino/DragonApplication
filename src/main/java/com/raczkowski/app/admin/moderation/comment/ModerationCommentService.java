@@ -15,7 +15,7 @@ public class ModerationCommentService {
     private final ModerationStatisticService moderationStatisticService;
 
     public void deleteComment(Long commentId) {
-        AppUser user = permissionValidator.validateIfUserIsAdminOrOperator();
+        AppUser user = permissionValidator.validateIfUserIsAdminOrModerator();
         commentService.removeComment(commentId);
         moderationStatisticService.commentDeletedCounterIncrease(user.getId());
     }

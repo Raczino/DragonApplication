@@ -12,15 +12,19 @@ import org.springframework.stereotype.Component;
 public class PermissionValidator {
     private final UserService userService;
 
-    public AppUser validateIfUserIsAdminOrOperator() {
+    public AppUser validateIfUserIsAdminOrModerator() {
         AppUser user = userService.getLoggedUser();
-        if (user.getUserRole() != UserRole.ADMIN && user.getUserRole() != UserRole.MODERATOR) {
+        if (user.getUserRole() != UserRole.ADMIN && user.getUserRole() != UserRole.MODERATOR && user.getUserRole() != UserRole.OPERATOR) {
             throw new ResponseException("You don't have permissions to do this action");
         }
         return user;
     }
 
-    public boolean validateIfUserIaAdmin() {
+    public boolean validateAdmin() {
         return userService.getLoggedUser().getUserRole() == UserRole.ADMIN;
+    }
+
+    public boolean validateOperatorOrAdmin(AppUser user) {
+        return user.getUserRole() == UserRole.OPERATOR || user.getUserRole() == UserRole.ADMIN;
     }
 }

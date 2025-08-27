@@ -70,7 +70,7 @@ public class TestArticleToConfirmService {
         loggedUser.setUserRole(UserRole.ADMIN);
         when(userService.getLoggedUser()).thenReturn(loggedUser);
 
-        when(permissionValidator.validateIfUserIsAdminOrOperator()).thenReturn(loggedUser);
+        when(permissionValidator.validateIfUserIsAdminOrModerator()).thenReturn(loggedUser);
 
         doAnswer(invocation -> {
             Article art = invocation.getArgument(0);

@@ -19,7 +19,7 @@ public class AdminUserService {
     private final UserService userService;
 
     public void changeUserPermission(PermissionRequest permissionRequest) {
-        boolean isUserAdmin = permissionValidator.validateIfUserIaAdmin();
+        boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(permissionRequest.getId());
 
         if (!isUserAdmin) {
@@ -37,7 +37,7 @@ public class AdminUserService {
     }
 
     public void blockUser(Long id) {
-        boolean isUserAdmin = permissionValidator.validateIfUserIaAdmin();
+        boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(id);
         if (userService.getUserById(id) == null) {
             throw new ResponseException("User doesn't exists");
@@ -54,7 +54,7 @@ public class AdminUserService {
     }
 
     public void unBlockUser(Long id) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         if (userService.getUserById(id) == null) {
             throw new ResponseException("User doesn't exists");
         }

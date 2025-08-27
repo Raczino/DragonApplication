@@ -53,8 +53,8 @@ public class userController {
     }
 
     @PostMapping("/save")
-    public void createSub(@RequestParam Long id, @RequestParam PremiumAccountRange type) {
-        subscriptionService.create(id, type);
+    public void createSubscriptionForUser(@RequestParam Long id, @RequestParam PremiumAccountRange type) {
+        subscriptionService.createSubscriptionForUser(id, type);
     }
 
     @PostMapping("/activate")

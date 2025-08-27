@@ -1,11 +1,8 @@
 package com.raczkowski.app.admin.operator.subscription;
 
-import com.raczkowski.app.accountPremium.entity.PlanPriceDto;
+import com.raczkowski.app.accountPremium.entity.ChangePriceRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -15,7 +12,7 @@ public class OperatorSubscriptionController {
     private final OperatorSubscriptionService operatorSubscriptionService;
 
     @PutMapping("/change/plan/price")
-    void changePlanPrice(@RequestBody PlanPriceDto.ChangePriceRequest changePriceRequest) {
+    void changePlanPrice(@RequestBody ChangePriceRequest changePriceRequest) {
         operatorSubscriptionService.changePlanPrice(changePriceRequest);
     }
 }

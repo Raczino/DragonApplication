@@ -15,7 +15,7 @@ public class ModerationSurveyService {
     private final ModerationStatisticService moderationStatisticService;
 
     public void deleteSurvey(Long id) {
-        AppUser user = permissionValidator.validateIfUserIsAdminOrOperator();
+        AppUser user = permissionValidator.validateIfUserIsAdminOrModerator();
         surveyService.deleteSurvey(id);
         moderationStatisticService.surveyDeletedCounterIncrease(user.getId());
     }
