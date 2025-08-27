@@ -17,5 +17,5 @@ public final class ErrorMessages {
     /**
      * Permissions validator
      */
-    public static final String WRONG_PERMISSION = "Invalid currency";
+    public static final String WRONG_PERMISSION = "You don't have permissions to do this action";
 }
