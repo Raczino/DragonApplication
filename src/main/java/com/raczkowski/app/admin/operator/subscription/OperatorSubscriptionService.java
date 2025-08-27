@@ -7,12 +7,14 @@ import com.raczkowski.app.accountPremium.entity.SubscriptionPlan;
 import com.raczkowski.app.accountPremium.repository.PlanPriceHistoryRepository;
 import com.raczkowski.app.accountPremium.repository.PlanPriceRepository;
 import com.raczkowski.app.accountPremium.repository.SubscriptionPlanRepository;
+import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -23,14 +25,13 @@ public class OperatorSubscriptionService {
     private final PlanPriceHistoryRepository planPriceHistoryRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final PlanPriceRepository planPriceRepository;
-    private final UserService userService;
-    private final PlanPriceChaneValidator planPriceChaneValidator;
+    private final PlanPriceChangeValidator planPriceChangeValidator;
+    private final PermissionValidator validator;
 
     @Transactional
     public void changePlanPrice(ChangePriceRequest request) {
-        AppUser user = userService.getLoggedUser();
-
-        planPriceChaneValidator.validate(request, user);
+        AppUser user = validator.validateOperatorOrAdmin();
+        planPriceChangeValidator.validate(request);
 
         SubscriptionPlan plan = subscriptionPlanRepository
                 .findById(request.getSubscriptionPlan())
@@ -61,8 +62,8 @@ public class OperatorSubscriptionService {
         }
 
         PlanPrice current = planPrice.get();
-        Long oldAmount = current.getAmount();
-        Long newAmount = request.getNewAmount();
+        BigDecimal oldAmount = current.getAmount();
+        BigDecimal newAmount = request.getNewAmount();
 
         if (oldAmount != null && oldAmount.equals(newAmount)) {
             return;

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -34,10 +35,10 @@ public class PlanPriceHistory {
 
 
     @Column(name = "old_amount")
-    private Long oldAmount;
+    private BigDecimal oldAmount;
 
     @Column(name = "new_amount", nullable = false)
-    private Long newAmount;
+    private BigDecimal newAmount;
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt;
@@ -52,8 +53,8 @@ public class PlanPriceHistory {
 
     public PlanPriceHistory(SubscriptionPlan subscriptionPlan,
                             CurrencyCode currency,
-                            Long oldAmount,
-                            Long newAmount,
+                            BigDecimal oldAmount,
+                            BigDecimal newAmount,
                             ZonedDateTime createdAt,
                             AppUser changedBy,
                             String reason) {

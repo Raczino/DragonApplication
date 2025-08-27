@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -34,7 +35,7 @@ public class PlanPrice {
     private CurrencyCode currency;
 
     @Column(name = "amount", nullable = false)
-    private Long amount;
+    private BigDecimal amount;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
@@ -42,7 +43,7 @@ public class PlanPrice {
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt;
 
-    public PlanPrice(SubscriptionPlan subscriptionPlan, CurrencyCode currency, Long amount, ZonedDateTime updatedAt, ZonedDateTime createdAt) {
+    public PlanPrice(SubscriptionPlan subscriptionPlan, CurrencyCode currency, BigDecimal amount, ZonedDateTime updatedAt, ZonedDateTime createdAt) {
         this.subscriptionPlan = subscriptionPlan;
         this.currency = currency;
         this.amount = amount;
