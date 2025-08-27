@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,15 +25,16 @@ public class PermissionValidatorTest {
 
     @Test
     public void shouldValidateIfUserIsAdmin() {
-        AppUser adminUser = new AppUser();
         // Given
+        AppUser adminUser = new AppUser();
         adminUser.setUserRole(UserRole.ADMIN);
         when(userService.getLoggedUser()).thenReturn(adminUser);
 
         // When
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        AppUser result = permissionValidator.validateIfUserIsAdminOrModerator();
 
-        // Then: No exception should be thrown
+        // then
+        assertSame(adminUser, result);
     }
 
     @Test
@@ -44,9 +45,10 @@ public class PermissionValidatorTest {
         when(userService.getLoggedUser()).thenReturn(moderatorUser);
 
         // When
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        AppUser result = permissionValidator.validateIfUserIsAdminOrModerator();
 
-        // Then: No exception should be thrown
+        // Then:
+        assertSame(moderatorUser, result);
     }
 
     @Test
@@ -57,6 +59,37 @@ public class PermissionValidatorTest {
         when(userService.getLoggedUser()).thenReturn(regularUser);
 
         // When & Then: Expecting a ResponseException to be thrown
-        assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrOperator());
+        ResponseException exception = assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrModerator());
+        assertEquals("You don't have permissions to do this action", exception.getMessage());
+    }
+
+    @Test
+    void ShouldThrowExceptionWhenUserIsNotOperatorOrAdmin() {
+        //Given:
+        AppUser user = new AppUser();
+        user.setUserRole(UserRole.USER);
+        when(userService.getLoggedUser()).thenReturn(user);
+
+        //When & Then:
+        ResponseException exception = assertThrows(ResponseException.class, () -> permissionValidator.validateOperatorOrAdmin());
+        assertEquals("You don't have permissions to do this action", exception.getMessage());
+    }
+
+    @Test
+    void ShouldReturnTrueWhenUserIsOperatorOrAdmin() {
+        //Given:
+        AppUser admin = new AppUser();
+        AppUser operator = new AppUser();
+        admin.setUserRole(UserRole.ADMIN);
+        operator.setUserRole(UserRole.ADMIN);
+        when(userService.getLoggedUser()).thenReturn(admin, operator);
+
+        // When
+        AppUser first = permissionValidator.validateOperatorOrAdmin();
+        AppUser second = permissionValidator.validateOperatorOrAdmin();
+
+        // Then
+        assertSame(admin, first);
+        assertSame(operator, second);
     }
 }

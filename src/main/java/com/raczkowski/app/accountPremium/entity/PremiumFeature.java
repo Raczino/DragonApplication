@@ -1,4 +1,4 @@
-package com.raczkowski.app.accountPremium;
+package com.raczkowski.app.accountPremium.entity;
 
 import lombok.Getter;
 import lombok.Setter;

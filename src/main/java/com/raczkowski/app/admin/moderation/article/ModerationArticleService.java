@@ -1,7 +1,7 @@
 package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
-import com.raczkowski.app.admin.users.ModerationStatisticService;
+import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleService;
 import com.raczkowski.app.article.DeletedArticleRepository;
@@ -53,7 +53,7 @@ public class ModerationArticleService {
     }
 
     public PageResponse<NonConfirmedArticleDto> getArticleToConfirm(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
 
         return paginateAndMap(
                 pageNumber,
@@ -66,7 +66,7 @@ public class ModerationArticleService {
     }
 
     public ArticleDto confirmArticle(Long articleId) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser appUser = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = getArticleToConfirmOrThrow(articleId);
@@ -101,7 +101,7 @@ public class ModerationArticleService {
     }
 
     public RejectedArticleDto rejectArticle(Long articleId) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser user = userService.getLoggedUser();
 
         ArticleToConfirm articleToConfirm = getArticleToConfirmOrThrow(articleId);
@@ -128,7 +128,7 @@ public class ModerationArticleService {
     }
 
     public PageResponse<RejectedArticleDto> getRejectedArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
 
         return paginateAndMap(
                 pageNumber,
@@ -141,7 +141,7 @@ public class ModerationArticleService {
     }
 
     public PageResponse<ArticleDto> getAcceptedArticlesByUser(Long id, int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser user = userService.getUserById(id);
 
         if (user == null) {
@@ -159,14 +159,14 @@ public class ModerationArticleService {
     }
 
     public void deleteArticle(Long articleId) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser user = userService.getLoggedUser();
         deletedArticleService.deleteArticle(articleId, ArticleStatus.DELETED_BY_ADMIN, user);
         moderationStatisticService.articleDeletedCounterIncrease(user.getId());
     }
 
     public PageResponse<DeletedArticleDto> getAllDeletedArticlesByAdmins(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
 
         return paginateAndMap(
                 pageNumber,
@@ -179,7 +179,7 @@ public class ModerationArticleService {
     }
 
     public void pinArticle(Long id) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser user = userService.getLoggedUser();
         if (articleService.getArticleByID(id) == null) {
             throw new ResponseException("There is no article with provided id");

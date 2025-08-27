@@ -1,7 +1,8 @@
-package com.raczkowski.app.admin.users;
+package com.raczkowski.app.admin.operator.users;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.enums.UserRole;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -19,12 +20,12 @@ public class AdminUserService {
     private final UserService userService;
 
     public void changeUserPermission(PermissionRequest permissionRequest) {
-        boolean isUserAdmin = permissionValidator.validateIfUserIaAdmin();
+        boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(permissionRequest.getId());
 
-        if (!isUserAdmin) {
+        if (!isUserAdmin) { //TODO: Zamienic na PermissonValidator
             if (userRole.equals(UserRole.ADMIN) || userRole.equals(UserRole.MODERATOR)) {
-                throw new ResponseException("You don't have permission");
+                throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
             } else {
                 userService.updateAppUserByUserRole(permissionRequest.getId(), permissionRequest.getUserRole());
             }
@@ -37,14 +38,14 @@ public class AdminUserService {
     }
 
     public void blockUser(Long id) {
-        boolean isUserAdmin = permissionValidator.validateIfUserIaAdmin();
+        boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(id);
         if (userService.getUserById(id) == null) {
             throw new ResponseException("User doesn't exists");
         }
         if (!isUserAdmin) {
             if (userRole.equals(UserRole.ADMIN)) {
-                throw new ResponseException("You don't have permission to block admin");
+                throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
             } else {
                 userService.blockUser(id, ZonedDateTime.now(ZoneOffset.UTC));
             }
@@ -54,9 +55,9 @@ public class AdminUserService {
     }
 
     public void unBlockUser(Long id) {
-        permissionValidator.validateIfUserIsAdminOrOperator();
+        permissionValidator.validateIfUserIsAdminOrModerator();
         if (userService.getUserById(id) == null) {
-            throw new ResponseException("User doesn't exists");
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
         userService.unblockUser(id);
     }
@@ -64,7 +65,7 @@ public class AdminUserService {
     private UserRole invokeUserRole(Long id) {
         AppUser user = userService.getUserById(id);
         if (user == null) {
-            throw new ResponseException("User doesn't exists");
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
         return user.getUserRole();
     }

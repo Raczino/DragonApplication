@@ -1,6 +1,6 @@
 package com.raczkowski.app.user;
 
-import com.raczkowski.app.accountPremium.SubscriptionService;
+import com.raczkowski.app.accountPremium.service.SubscriptionService;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dto.UserDtoAssembler;
 import com.raczkowski.app.enums.PremiumAccountRange;
@@ -53,8 +53,8 @@ public class userController {
     }
 
     @PostMapping("/save")
-    public void createSub(@RequestParam Long id, @RequestParam PremiumAccountRange type) {
-        subscriptionService.create(id, type);
+    public void createSubscriptionForUser(@RequestParam Long id, @RequestParam PremiumAccountRange type) {
+        subscriptionService.createSubscriptionForUser(id, type);
     }
 
     @PostMapping("/activate")
