@@ -18,4 +18,10 @@ public final class ErrorMessages {
      * Permissions validator
      */
     public static final String WRONG_PERMISSION = "You don't have permissions to do this action";
+
+
+    /**
+     * User service
+     */
+    public static final String USER_NOT_EXITS = "User doesn't exists";
 }

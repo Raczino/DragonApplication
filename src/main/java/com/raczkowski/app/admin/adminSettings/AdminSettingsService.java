@@ -1,6 +1,7 @@
 package com.raczkowski.app.admin.adminSettings;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.redis.RedisService;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class AdminSettingsService {
 
     public List<AdminSetting> getSettings() {
         if (!permissionValidator.validateAdmin())
-            throw new ResponseException("You don't have permissions to do this action");
+            throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
         return adminSettingsRepository.findAll();
     }
 
@@ -46,7 +47,7 @@ public class AdminSettingsService {
 
     public void updateSettingValue(AdminSettingRequest adminSettingRequest) {
         if (!permissionValidator.validateAdmin()) {
-            throw new ResponseException("You don't have permissions to do this action");
+            throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
         }
         AdminSetting setting = adminSettingsRepository.findBySettingKey(adminSettingRequest.getSettingKey());
         setting.setSettingValue(adminSettingRequest.getSettingValue());
