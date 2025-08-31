@@ -115,10 +115,10 @@ public class SubscriptionService {
     @Transactional
     public void activateSubscription(Long id) {
         Subscription subscription = subscriptionRepository.findByUserId(id)
-                .orElseThrow(() -> new ResponseException("User has not a subscription"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.USER_HAS_NO_SUBSCRIPTION));
 
         if (subscription.isActive()) {
-            throw new ResponseException("Plan already activated");
+            throw new ResponseException(ErrorMessages.PLAN_ALREADY_ACTIVATED);
         }
 
         subscription.setActive(true);

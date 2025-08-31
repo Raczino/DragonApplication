@@ -1,5 +1,6 @@
 package com.raczkowski.app.notification;
 
+import com.raczkowski.app.enums.NotificationType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,10 +23,48 @@ public class NotificationServiceTest {
     private NotificationRepository notificationRepository;
 
     @Mock
-    private SimpMessagingTemplate messagingTemplate;
+    SimpMessagingTemplate template;
 
     @InjectMocks
     private NotificationService notificationService;
+
+    @Test
+    void send_shouldConvertAndSendToUserTopic() {
+        // given
+        Notification n = new Notification();
+
+        // when
+        notificationService.sendNotification("123", n);
+
+        // then
+        verify(template).convertAndSend(eq("/topic/notifications/123"), same(n));
+    }
+
+    @Test
+    void sendShouldUseProperDestinationForAnyUserId() {
+        Notification n = new Notification();
+        notificationService.sendNotification("999", n);
+        verify(template).convertAndSend(eq("/topic/notifications/999"), same(n));
+    }
+
+    @Test
+    void save_shouldDelegateToRepo() {
+        Notification n = new Notification();
+        notificationService.saveNotification(n);
+        verify(notificationRepository).save(n);
+    }
+
+    @Test
+    void markAsRead_shouldCallRepoWithNow() {
+        notificationService.markNotificationAsRead(42L);
+        verify(notificationRepository).markNotificationAsRead(eq(42L), any());
+    }
+
+    @Test
+    void listForUser_shouldDelegateToRepo() {
+        notificationService.getAllNotificationsForUser("7");
+        verify(notificationRepository).getAllNotificationsForUser("7");
+    }
 
     @Test
     public void shouldSaveNotification() {
@@ -42,14 +81,14 @@ public class NotificationServiceTest {
     @Test
     public void shouldSendNotificationToUserTopic() {
         // Given
-        String userId = "123";
-        Notification n = new Notification();
+        Notification n = new Notification("123", NotificationType.ARTICLE_PUBLISH, "title", "msg",
+                ZonedDateTime.now(), "me", "/target");
 
         // When
-        notificationService.sendNotification(userId, n);
+        notificationService.sendNotification("123", n);
 
         // Then
-        verify(messagingTemplate).convertAndSend("/topic/notifications/" + userId, n);
+        verify(template).convertAndSend(eq("/topic/notifications/123"), same(n));
     }
 
     @Test

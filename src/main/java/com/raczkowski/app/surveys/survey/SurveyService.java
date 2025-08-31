@@ -1,6 +1,7 @@
 package com.raczkowski.app.surveys.survey;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.surveys.answers.Answers;
@@ -62,7 +63,7 @@ public class SurveyService {
     @Transactional
     public void deleteSurvey(Long surveyId) {
         Survey survey = surveyRepository.findById(surveyId)
-                .orElseThrow(() -> new ResponseException("Survey not found"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.SURVEY_NOT_FOUND));
 
         surveyRepository.delete(survey);
     }
@@ -70,7 +71,7 @@ public class SurveyService {
     public Survey getSurveyById(Long id) {
         Survey survey = surveyRepository.findSurveyById(id);
         if (survey == null) {
-            throw new ResponseException("Survey with provided id doesn't exists");
+            throw new ResponseException(ErrorMessages.SURVEY_NOT_FOUND);
         }
         return survey;
     }

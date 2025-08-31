@@ -51,6 +51,22 @@ public class CommentServiceTest {
     @InjectMocks
     private CommentService commentService;
 
+    private AppUser user(long id) {
+        AppUser u = new AppUser();
+        u.setId(id);
+        return u;
+    }
+
+    private Comment comment(long id) {
+        Comment c = new Comment();
+        c.setId(id);
+        Article a = new Article();
+        a.setId(111L);
+        c.setArticle(a);
+        c.setAppUser(user(99L));
+        return c;
+    }
+
     @Test
     public void shouldGetCommentsForArticleWithPaginationAndLikedFlag() {
         // Given
@@ -439,5 +455,102 @@ public class CommentServiceTest {
 
         // Then
         assertEquals(2, count);
+    }
+
+    @Test
+    void shouldThrowWhenCommentNotFound() {
+        when(commentRepository.findCommentById(5L)).thenReturn(null);
+
+        ResponseException ex = assertThrows(ResponseException.class,
+                () -> commentService.likeComment(5L));
+
+        assertEquals(ErrorMessages.COMMENT_NOT_EXISTS, ex.getMessage());
+        verifyNoInteractions(commentLikeRepository);
+    }
+
+    @Test
+    void shouldLikeWhenNotYetLiked_thenSaveAndIncrement() {
+        // Given
+        AppUser u = user(1L);
+        Comment c = comment(10L);
+
+        when(userService.getLoggedUser()).thenReturn(u);
+        when(commentRepository.findCommentById(10L)).thenReturn(c);
+
+        when(commentLikeRepository.existsCommentLikeByAppUserAndComment(u, c))
+                .thenReturn(false, true);
+
+        // When
+        commentService.likeComment(10L);
+
+        // Then
+        verify(commentLikeRepository).save(argThat(cl ->
+                cl.getAppUser().equals(u) &&
+                        cl.getComment().equals(c) &&
+                        Boolean.TRUE.equals(cl.isLiked())
+        ));
+
+        verify(commentRepository).updateCommentLikesCount(10L, 1);
+    }
+
+    @Test
+    void shouldUnlikeWhenAlreadyLiked_thenDeleteAndDecrement() {
+        // Given
+        AppUser u = user(2L);
+        Comment c = comment(20L);
+
+        when(userService.getLoggedUser()).thenReturn(u);
+        when(commentRepository.findCommentById(20L)).thenReturn(c);
+
+        when(commentLikeRepository.existsCommentLikeByAppUserAndComment(u, c))
+                .thenReturn(true, false);
+
+        CommentLike existing = new CommentLike(u, c, true);
+        when(commentLikeRepository.findByCommentAndAppUser(c, u)).thenReturn(existing);
+
+        // When
+        commentService.likeComment(20L);
+
+        // Then
+        verify(commentLikeRepository).delete(existing);
+        verify(commentRepository).updateCommentLikesCount(20L, -1);
+    }
+
+    @Test
+    void shouldNotIncrementIfExistsStillFalseAfterSave() {
+        // Given
+        AppUser u = user(3L);
+        Comment c = comment(30L);
+
+        when(userService.getLoggedUser()).thenReturn(u);
+        when(commentRepository.findCommentById(30L)).thenReturn(c);
+
+        when(commentLikeRepository.existsCommentLikeByAppUserAndComment(u, c))
+                .thenReturn(false, false);
+
+        // When
+        commentService.likeComment(30L);
+
+        // Then
+        verify(commentLikeRepository).save(any(CommentLike.class));
+        verify(commentRepository, never()).updateCommentLikesCount(anyLong(), eq(1));
+    }
+
+    @Test
+    void removeCommentSuccessDeletesAndDecrements() {
+        AppUser logged = new AppUser(); logged.setId(1L); logged.setUserRole(UserRole.ADMIN);
+        when(userService.getLoggedUser()).thenReturn(logged);
+
+        Comment c = new Comment(); c.setId(5L);
+        Article a = new Article(); a.setId(100L); c.setArticle(a);
+        AppUser owner = new AppUser(); owner.setId(1L); c.setAppUser(owner);
+
+        when(commentRepository.findCommentById(5L)).thenReturn(c, null); // po delete zwróci null
+
+        String res = commentService.removeComment(5L);
+
+        assertEquals("Removed", res);
+        verify(commentRepository).deleteById(5L);
+        verify(articleRepository).updateArticleLikesCount(100L, -1);
     }
 }

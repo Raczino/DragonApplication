@@ -24,7 +24,6 @@ public class SubscriptionPlanDtoMapper {
 
     private Set<PremiumFeatureDto> mapFeatures(Set<PremiumFeature> features) {
         if (features == null) return Set.of();
-        System.out.println("Features count for plan: {}"+ features.size());
         return features.stream()
                 .map(f -> PremiumFeatureDto.builder()
                         .id(f.getId())

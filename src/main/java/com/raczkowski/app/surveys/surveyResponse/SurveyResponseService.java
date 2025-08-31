@@ -1,5 +1,6 @@
 package com.raczkowski.app.surveys.surveyResponse;
 
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.surveys.answers.Answers;
 import com.raczkowski.app.surveys.questions.Question;
@@ -33,7 +34,7 @@ public class SurveyResponseService {
         AppUser user = userRepository.getAppUserById(surveyResponseRequest.getUserId());
 
         if (survey == null || user == null) {
-            throw new ResponseException("Survey or user not found");
+            throw new ResponseException(ErrorMessages.SURVEY_OR_USER_NOT_FOUND);
         }
         answerResponseValidator.checkResponseDate(survey);
 
@@ -61,7 +62,7 @@ public class SurveyResponseService {
             Question question = answerResponseValidator.findQuestionById(answerRequest.getQuestionId(), survey.getQuestions());
 
             if (surveyResponseRepository.existsBySurveyAndUser(survey, user)) {
-                throw new ResponseException("User has already answered this question.");
+                throw new ResponseException(ErrorMessages.USER_ALREADY_ANSWERED);
             }
 
             if (answerRequest.getAnswerValues() == null && !question.isRequired()) continue;
@@ -80,7 +81,7 @@ public class SurveyResponseService {
         Survey survey = surveysRepository.findSurveyById(surveyId);
 
         if (survey == null) {
-            throw new ResponseException("Survey not found");
+            throw new ResponseException(ErrorMessages.SURVEY_NOT_FOUND);
         }
 
         List<SurveyResults.QuestionResult> questionResults = new ArrayList<>();

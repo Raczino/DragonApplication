@@ -42,7 +42,9 @@ public final class ErrorMessages {
      * Subsciptions
      */
     public static final String USER_HAS_SUBSCRIPTION = "User already has an active subscription";
+    public static final String USER_HAS_NO_SUBSCRIPTION = "User has not a subscription";
     public static final String SUBSCRIPTION_NOT_FOUND = "Subscription plan not found";
+    public static final String PLAN_ALREADY_ACTIVATED = "Plan already activated";
 
     /**
      * Admin
@@ -68,6 +70,8 @@ public final class ErrorMessages {
     public static final String SURVEY_MUST_HAS_QUESTION = "Survey must have at least one question.";
     public static final String TO_MANY_QUESTIONS = "To many questions of max: ";
     public static final String TO_MANY_ANSWERS = "To many answers of max: ";
+    public static final String SURVEY_OR_USER_NOT_FOUND = "Survey or user not found";
+    public static final String USER_ALREADY_ANSWERED = "User has already answered this question.";
 
     /**
      * Common
