@@ -50,6 +50,9 @@ public class AdminSettingsService {
             throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
         }
         AdminSetting setting = adminSettingsRepository.findBySettingKey(adminSettingRequest.getSettingKey());
+        if (setting == null) {
+            throw new ResponseException(ErrorMessages.SETTING_NOT_FOUND);
+        }
         setting.setSettingValue(adminSettingRequest.getSettingValue());
         adminSettingsRepository.save(setting);
 

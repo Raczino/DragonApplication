@@ -2,6 +2,7 @@ package com.raczkowski.app.surveys;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.enums.SurveyQuestionType;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
@@ -94,7 +95,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("End time must be in the future.", exception.getMessage());
+        assertEquals(ErrorMessages.END_DATE_MUST_BE_IN_THE_FUTURE, exception.getMessage());
     }
 
     @Test
@@ -198,7 +199,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("End time must be in the future.", exception.getMessage());
+        assertEquals(ErrorMessages.END_DATE_MUST_BE_IN_THE_FUTURE, exception.getMessage());
     }
 
     @Test
@@ -211,7 +212,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("Survey must have at least one question.", exception.getMessage());
+        assertEquals(ErrorMessages.SURVEY_MUST_HAS_QUESTION, exception.getMessage());
     }
 
     @Test
@@ -224,7 +225,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("Survey must have at least one question.", exception.getMessage());
+        assertEquals(ErrorMessages.SURVEY_MUST_HAS_QUESTION, exception.getMessage());
     }
 
     @Test
@@ -251,7 +252,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("To many questions of max: " + limits.getSurveyQuestionLimit(), exception.getMessage());
+        assertEquals(ErrorMessages.TO_MANY_QUESTIONS + limits.getSurveyQuestionLimit(), exception.getMessage());
     }
 
     @Test
@@ -287,7 +288,7 @@ class SurveyRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
 
-        assertEquals("To many answers of max: " + limits.getSurveyQuestionAnswerLimit(), exception.getMessage());
+        assertEquals(ErrorMessages.TO_MANY_ANSWERS + limits.getSurveyQuestionAnswerLimit(), exception.getMessage());
     }
 
     @Test
@@ -298,7 +299,7 @@ class SurveyRequestValidatorTest {
 
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 surveyRequestValidator.validateSurveyRequest(request, user));
-        assertEquals("Title and description is required", ex.getMessage());
+        assertEquals(ErrorMessages.REQUIRED_TITLE_AND_DESCRIPTION, ex.getMessage());
     }
 
     @Test

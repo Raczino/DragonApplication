@@ -3,21 +3,23 @@ package com.raczkowski.app.registration;
 import lombok.*;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class RegistrationRequest {
     @NonNull
-    private final String firstName;
+    private String firstName;
     @NonNull
-    private final String lastName;
+    private String lastName;
     @NonNull
-    private final String password;
+    private String password;
     @NonNull
-    private final String email;
+    private String email;
 
-    private final String description;
+    private String description;
 
-    private final String birthDate;
+    private String birthDate;
 
-    private final String city;
+    private String city;
 }

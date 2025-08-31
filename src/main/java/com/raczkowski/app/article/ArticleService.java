@@ -9,6 +9,7 @@ import com.raczkowski.app.common.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.hashtags.HashtagService;
@@ -16,7 +17,6 @@ import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.likes.ArticleLikeRepository;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.user.AppUser;
-import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -116,7 +116,7 @@ public class ArticleService {
     public Article getArticleByID(Long id) {
         Article article = articleRepository.findArticleById(id);
         if (article == null) {
-            throw new ResponseException("There is no article with provided id");
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
         return article;
     }
@@ -126,7 +126,7 @@ public class ArticleService {
         Article article = articleRepository.findArticleById(id);
 
         if (article == null) {
-            throw new ResponseException("Article doesnt exists");
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
 
         if (!articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article)) {
@@ -148,9 +148,9 @@ public class ArticleService {
         Article article = articleRepository.findArticleById(articleRequest.getId());
 
         if (article == null) {
-            throw new ResponseException("There is no article with provided id:" + articleRequest.getId());
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         } else if (!article.getAppUser().getId().equals(user.getId())) {
-            throw new ResponseException("User doesn't have permission to update this comment");
+            throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
         }
 
         if (articleRequest.getTitle() == null) {

@@ -14,6 +14,7 @@ import com.raczkowski.app.dtoMappers.SubscriptionPlanDtoMapper;
 import com.raczkowski.app.enums.AccountType;
 import com.raczkowski.app.enums.CurrencyCode;
 import com.raczkowski.app.enums.PremiumAccountRange;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
@@ -90,15 +91,15 @@ public class SubscriptionService {
         AppUser user = userRepository.getAppUserById(userId);
 
         if (user == null) {
-            throw new ResponseException("User doesn't exists");
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
 
         if (subscriptionRepository.findByUserId(user.getId()).isPresent()) {
-            throw new ResponseException("User already has an active subscription");
+            throw new ResponseException(ErrorMessages.USER_HAS_SUBSCRIPTION);
         }
 
         SubscriptionPlan subscriptionPlan = subscriptionPlanRepository.getSubscriptionPlanBySubscriptionType(premiumAccountType)
-                .orElseThrow(() -> new ResponseException("Subscription plan not found"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.SUBSCRIPTION_NOT_FOUND));
 
         subscriptionRepository.save(new Subscription(user,
                 subscriptionPlan,

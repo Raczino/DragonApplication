@@ -16,6 +16,7 @@ import com.raczkowski.app.dto.RejectedArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.enums.NotificationType;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.notification.Notification;
@@ -145,7 +146,7 @@ public class ModerationArticleService {
         AppUser user = userService.getUserById(id);
 
         if (user == null) {
-            throw new ResponseException("User doesn't exists");
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
 
         return paginateAndMap(
@@ -182,7 +183,7 @@ public class ModerationArticleService {
         permissionValidator.validateIfUserIsAdminOrModerator();
         AppUser user = userService.getLoggedUser();
         if (articleService.getArticleByID(id) == null) {
-            throw new ResponseException("There is no article with provided id");
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
 
         articleService.pinArticle(id, user);
@@ -215,7 +216,7 @@ public class ModerationArticleService {
     private ArticleToConfirm getArticleToConfirmOrThrow(Long id) {
         ArticleToConfirm article = articleToConfirmRepository.getArticleToConfirmById(id);
         if (article == null) {
-            throw new ResponseException("Article with provided id doesn't exist");
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
         return article;
     }

@@ -1,6 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.enums.ArticleStatus;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,7 @@ public class DeletedArticleService {
             );
             deletedArticleRepository.save(deletedArticle);
         } else {
-            throw new ResponseException("Article with this id doesn't exists");
+            throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
     }
 }
