@@ -62,8 +62,6 @@ public class ModerationStatisticServiceTest {
         verify(moderatorStatisticRepository, never()).save(any());
     }
 
-    // ===== getStatisticsForUser =====
-
     @Test
     public void shouldGetStatisticsForUserAndMapToDto() {
         // Given

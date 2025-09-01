@@ -85,10 +85,8 @@ public class SurveyServiceTest {
         Survey saved = surveyService.createNewSurvey(req);
 
         // Then
-        // walidacja
         verify(surveyRequestValidator).validateSurveyRequest(req, user);
 
-        // mapping pól ankiety
         assertEquals("Survey T", saved.getTitle());
         assertEquals("Desc", saved.getDescription());
         assertEquals(user, saved.getOwner());
@@ -96,7 +94,6 @@ public class SurveyServiceTest {
         assertEquals(schedule, saved.getScheduledFor());
         assertNotNull(saved.getCreatedAt());
 
-        // mapping pytań i odpowiedzi
         assertEquals(2, saved.getQuestions().size());
 
         Question qSaved1 = saved.getQuestions().get(0);
@@ -123,7 +120,6 @@ public class SurveyServiceTest {
         assertEquals("B1", qSaved2.getAnswers().get(0).getValue());
         assertSame(qSaved2, qSaved2.getAnswers().get(0).getQuestion());
 
-        // zapis + limit
         verify(surveyRepository).save(any(Survey.class));
         verify(featureLimitHelperService).incrementFeatureUsage(77L, FeatureKeys.SURVEY_COUNT_PER_WEEK);
     }
