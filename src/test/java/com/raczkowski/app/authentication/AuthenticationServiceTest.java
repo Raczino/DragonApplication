@@ -5,6 +5,7 @@ import com.raczkowski.app.dto.AuthorDto;
 import com.raczkowski.app.dto.LoginResponseDto;
 import com.raczkowski.app.dtoMappers.LoginResponseMapper;
 import com.raczkowski.app.enums.UserRole;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -91,7 +92,7 @@ class AuthenticationServiceTest {
         Exception exception = assertThrows(Exception.class, () -> authenticationService.authenticate(request));
 
         //then
-        assertEquals("User with this email doesn't exists", exception.getMessage());
+        assertEquals(ErrorMessages.EMAIL_NOT_EXISTS, exception.getMessage());
     }
 
     @Test
@@ -104,8 +105,8 @@ class AuthenticationServiceTest {
         Exception emailException = assertThrows(Exception.class, () -> authenticationService.authenticate(requestWithNullEmailValue));
         Exception passwordException = assertThrows(Exception.class, () -> authenticationService.authenticate(requestWithNullPasswordValue));
         //then
-        assertEquals("Email and password can't be null", emailException.getMessage());
-        assertEquals("Email and password can't be null", passwordException.getMessage());
+        assertEquals(ErrorMessages.EMAIL_AND_PASSWORD_CANNOT_BE_NULL, emailException.getMessage());
+        assertEquals(ErrorMessages.EMAIL_AND_PASSWORD_CANNOT_BE_NULL, passwordException.getMessage());
     }
 
     @Test
@@ -118,7 +119,7 @@ class AuthenticationServiceTest {
         Exception emailException = assertThrows(Exception.class, () -> authenticationService.authenticate(requestWithNullEmailValue));
         Exception passwordException = assertThrows(Exception.class, () -> authenticationService.authenticate(requestWithNullPasswordValue));
         //then
-        assertEquals("Invalid Credentials", emailException.getMessage());
-        assertEquals("Invalid Credentials", passwordException.getMessage());
+        assertEquals(ErrorMessages.INVALID_CREDENTIALS, emailException.getMessage());
+        assertEquals(ErrorMessages.INVALID_CREDENTIALS, passwordException.getMessage());
     }
 }

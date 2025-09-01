@@ -99,5 +99,6 @@ public class DeletedArticle {
         this.acceptedBy = acceptedBy;
         this.deletedAt = deletedAt;
         this.deletedBy = deletedBy;
+        this.commentsCount = commentsCount;
     }
 }

@@ -3,9 +3,10 @@ package com.raczkowski.app.comment;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.exceptions.ErrorMessages;
+import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
-import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -26,28 +27,28 @@ public class CommentRequestValidator {
     public void validateCreationRequest(CommentRequest commentRequest, AppUser user) {
 
         if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.COMMENT_COUNT_PER_WEEK)) {
-            throw new ResponseException("You have reached the weekly comment limit.");
+            throw new ResponseException(ErrorMessages.LIMIT_REACHED);
         }
 
         Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
-        if (commentRequest.getContent() == null || commentRequest.getContent().equals("")) {
-            throw new ResponseException("Content cannot be null");
+        if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
+            throw new ResponseException(ErrorMessages.COMMENT_CANNOT_BE_NULL);
         } else if (commentRequest.getId() == null) {
-            throw new ResponseException("Article id cannot be null");
+            throw new ResponseException(ErrorMessages.ARTICLE_CANNOT_BE_NULL);
         }
 
         validateCommentContentForBannedWords(commentRequest.getContent());
 
         if (commentRequest.getContent().length() > limit.getArticleContentMaxLength()) {
-            throw new ResponseException("Comment content length is longer than 1000 characters");
+            throw new ResponseException(ErrorMessages.COMMENT_TOO_LONG);
         }
     }
 
     private void validateCommentContentForBannedWords(String content) {
         for (String word : BANNED_WORDS) {
             if (content.toLowerCase().contains(word.toLowerCase())) {
-                throw new ResponseException("Comment contains banned words");
+                throw new ResponseException(ErrorMessages.COMMENT_CONTAINS_BANNED_WORDS);
             }
         }
     }

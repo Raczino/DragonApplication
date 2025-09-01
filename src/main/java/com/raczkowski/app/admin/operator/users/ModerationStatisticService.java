@@ -16,7 +16,6 @@ public class ModerationStatisticService {
 
     public void createStatisticForUser(Long userId) {
         AppUser user = userService.getUserById(userId);
-        System.out.println(moderatorStatisticRepository.existsByAppUser(user));
         if (!moderatorStatisticRepository.existsByAppUser(user)) {
             moderatorStatisticRepository.save(new ModeratorStatistic(user));
         }

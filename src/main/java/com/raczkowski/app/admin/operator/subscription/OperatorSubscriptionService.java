@@ -8,6 +8,7 @@ import com.raczkowski.app.accountPremium.repository.PlanPriceHistoryRepository;
 import com.raczkowski.app.accountPremium.repository.PlanPriceRepository;
 import com.raczkowski.app.accountPremium.repository.SubscriptionPlanRepository;
 import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,7 @@ public class OperatorSubscriptionService {
 
         SubscriptionPlan plan = subscriptionPlanRepository
                 .findById(request.getSubscriptionPlan())
-                .orElseThrow(() -> new ResponseException("Plan not found"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.PLAN_NOT_FOUND));
 
         Optional<PlanPrice> planPrice = planPriceRepository.lockByPlanAndCurrency(plan.getId(), request.getCurrency());
 

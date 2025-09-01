@@ -1,5 +1,6 @@
 package com.raczkowski.app.registration;
 
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -15,12 +16,17 @@ public class RegistrationService {
 
     private final UserService userService;
     private final EmailValidator emailValidator;
+    private final DefaultPasswordValidator passwordValidator;
 
     public String register(RegistrationRequest request) {
-        boolean isValidEmail = emailValidator.test(request.getEmail());
-        if (!isValidEmail) {
-            throw new ResponseException("Invalid Email");
+        userService.checkIfEmailExists(request.getEmail());
+        if (!emailValidator.test(request.getEmail())) {
+            throw new ResponseException(ErrorMessages.INVALID_EMAIL);
         }
+        if (!passwordValidator.test(request.getPassword())) {
+            throw new ResponseException(ErrorMessages.INVALID_PASSWORD);
+        }
+
         return userService.signUpUser(
                 new AppUser(
                         request.getFirstName(),

@@ -23,7 +23,7 @@ public class AdminUserService {
         boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(permissionRequest.getId());
 
-        if (!isUserAdmin) { //TODO: Zamienic na PermissonValidator
+        if (!isUserAdmin) {
             if (userRole.equals(UserRole.ADMIN) || userRole.equals(UserRole.MODERATOR)) {
                 throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
             } else {
@@ -41,7 +41,7 @@ public class AdminUserService {
         boolean isUserAdmin = permissionValidator.validateAdmin();
         UserRole userRole = invokeUserRole(id);
         if (userService.getUserById(id) == null) {
-            throw new ResponseException("User doesn't exists");
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
         if (!isUserAdmin) {
             if (userRole.equals(UserRole.ADMIN)) {

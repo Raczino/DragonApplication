@@ -1,9 +1,6 @@
-package com.raczkowski.app.admin;
+package com.raczkowski.app.admin.moderation.article;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
-import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
-import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.admin.moderation.article.ModerationArticleService;
 import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleService;
@@ -26,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TestArticleToConfirmService {
+public class ArticleToConfirmServiceTest {
 
     @Mock
     private PermissionValidator permissionValidator;

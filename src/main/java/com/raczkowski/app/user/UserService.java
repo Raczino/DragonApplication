@@ -1,6 +1,7 @@
 package com.raczkowski.app.user;
 
 import com.raczkowski.app.enums.UserRole;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,21 +25,19 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
-    public String signUpUser(AppUser appUser) {
-        if (userRepository.findByEmail(appUser.getEmail()) != null) {
-            throw new ResponseException("User already exists");
+    public void checkIfEmailExists(String email) {
+        if (userRepository.findByEmail(email) != null) {
+            throw new ResponseException(ErrorMessages.USER_ALREADY_EXITS);
         }
+    }
 
-        if (appUser.getPassword().length() < 8) {
-            throw new ResponseException("Shorter than minimum length 8");
-        }
-
+    public String signUpUser(AppUser user) {
         String encodedPassword = bCryptPasswordEncoder
-                .encode(appUser.getPassword());
+                .encode(user.getPassword());
 
-        appUser.setPassword(encodedPassword);
+        user.setPassword(encodedPassword);
 
-        userRepository.save(appUser);
+        userRepository.save(user);
 
         return null;
     }
@@ -78,10 +77,10 @@ public class UserService implements UserDetailsService {
     public void followUser(Long userIdToFollow) {
         AppUser currentUser = getLoggedUser();
         AppUser userToFollow = userRepository.findById(userIdToFollow)
-                .orElseThrow(() -> new ResponseException("User not found"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.USER_NOT_FOUND));
 
         if (currentUser.equals(userToFollow)) {
-            throw new ResponseException("You cannot follow yourself.");
+            throw new ResponseException(ErrorMessages.CANNOT_FOLLOW_YOURSELF);
         }
 
         currentUser.followUser(userToFollow);
@@ -91,7 +90,7 @@ public class UserService implements UserDetailsService {
     public void unfollowUser(Long userIdToUnfollow) {
         AppUser currentUser = getLoggedUser();
         AppUser userToUnfollow = userRepository.findById(userIdToUnfollow)
-                .orElseThrow(() -> new ResponseException("User not found"));
+                .orElseThrow(() -> new ResponseException(ErrorMessages.USER_NOT_FOUND));
 
         currentUser.unfollowUser(userToUnfollow);
         userRepository.save(currentUser);
