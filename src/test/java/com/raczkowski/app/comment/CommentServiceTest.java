@@ -318,7 +318,7 @@ public class CommentServiceTest {
 
         // When & Then
         ResponseException ex = assertThrows(ResponseException.class, () -> commentService.updateComment(req));
-        assertEquals("Comment can't be empty", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_CANT_BE_EMPTY, ex.getMessage());
     }
 
     @Test
@@ -332,7 +332,7 @@ public class CommentServiceTest {
 
         // When & Then
         ResponseException ex = assertThrows(ResponseException.class, () -> commentService.updateComment(req));
-        assertEquals("There is no comment with provided id:2", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_ID_NOT_FOUND + "2", ex.getMessage());
     }
 
     @Test
@@ -382,8 +382,6 @@ public class CommentServiceTest {
         // Then
         verify(commentRepository).updateCommentContent(eq(4L), eq("new content"), any());
     }
-
-    // ===== pinComment =====
 
     @Test
     public void shouldPinComment() {
@@ -545,7 +543,7 @@ public class CommentServiceTest {
         Article a = new Article(); a.setId(100L); c.setArticle(a);
         AppUser owner = new AppUser(); owner.setId(1L); c.setAppUser(owner);
 
-        when(commentRepository.findCommentById(5L)).thenReturn(c, null); // po delete zwróci null
+        when(commentRepository.findCommentById(5L)).thenReturn(c, (Comment) null);
 
         String res = commentService.removeComment(5L);
 

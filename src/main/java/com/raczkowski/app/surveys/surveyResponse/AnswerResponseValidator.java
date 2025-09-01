@@ -1,5 +1,6 @@
 package com.raczkowski.app.surveys.surveyResponse;
 
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.surveys.answers.Answers;
 import com.raczkowski.app.surveys.questions.Question;
@@ -16,7 +17,7 @@ public class AnswerResponseValidator {
 
     public void checkResponseDate(Survey survey) {
         if (survey.getEndTime().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
-            throw new ResponseException("Survey already ended");
+            throw new ResponseException(ErrorMessages.SURVEY_ENDED);
         }
     }
 
@@ -32,17 +33,17 @@ public class AnswerResponseValidator {
     public void validateAnswerResponse(AnswerResponseRequest answerResponseRequest, List<Question> questions) {
         Question question = findQuestionById(answerResponseRequest.getQuestionId(), questions);
         if (question == null) {
-            throw new ResponseException("Question not found for ID: " + answerResponseRequest.getQuestionId());
+            throw new ResponseException(ErrorMessages.SURVEY_NOT_FOUND + " for ID: " + answerResponseRequest.getQuestionId());
         }
 
         if (question.isRequired() && (answerResponseRequest.getAnswerValues() == null || answerResponseRequest.getAnswerValues().isEmpty())) {
-            throw new ResponseException("Answer is required for this question.");
+            throw new ResponseException(ErrorMessages.ANSWER_IS_REQUIRED);
         }
 
         if (answerResponseRequest.getAnswerValues() != null) {
             int selectedCount = answerResponseRequest.getAnswerValues().size();
             if (selectedCount < question.getMinSelected() || selectedCount > question.getMaxSelected()) {
-                throw new ResponseException("Number of selected answers must be between " + question.getMinSelected() + " and " + question.getMaxSelected());
+                throw new ResponseException(ErrorMessages.ANSWER_MUST_BE_BETWEEN + question.getMinSelected() + " and " + question.getMaxSelected());
             }
 
             validateAnswerValues(answerResponseRequest.getAnswerValues(), question);
@@ -56,7 +57,7 @@ public class AnswerResponseValidator {
 
         for (String answer : answerValues) {
             if (!validAnswers.contains(answer)) {
-                throw new ResponseException("Invalid answer value: " + answer);
+                throw new ResponseException(ErrorMessages.INVALID_ANSWER_VALUE + answer);
             }
         }
     }

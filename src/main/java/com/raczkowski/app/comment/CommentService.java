@@ -118,13 +118,13 @@ public class CommentService {
     public void updateComment(CommentRequest commentRequest) {
 
         if (commentRequest.getContent() == null || commentRequest.getContent().isEmpty()) {
-            throw new ResponseException("Comment can't be empty");
+            throw new ResponseException(ErrorMessages.COMMENT_CANT_BE_EMPTY);
         }
 
         Comment comment = commentRepository.findCommentById(commentRequest.getId());
 
         if (comment == null) {
-            throw new ResponseException("There is no comment with provided id:" + commentRequest.getId());
+            throw new ResponseException(ErrorMessages.COMMENT_ID_NOT_FOUND + commentRequest.getId());
         } else if (!comment.getAppUser().getId().equals(userService.getLoggedUser().getId())) {
             throw new ResponseException(ErrorMessages.WRONG_PERMISSION);
         }

@@ -3,6 +3,7 @@ package com.raczkowski.app.authentication;
 import com.raczkowski.app.config.JwtUtil;
 import com.raczkowski.app.dto.LoginResponseDto;
 import com.raczkowski.app.dtoMappers.LoginResponseMapper;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class AuthenticationService {
 
     public LoginResponseDto authenticate(AuthenticationRequest request) {
         if (request.getEmail() == null || request.getPassword() == null) {
-            throw new ResponseException("Email and password can't be null");
+            throw new ResponseException(ErrorMessages.EMAIL_AND_PASSWORD_CANNOT_BE_NULL);
         }
         if (!request.getEmail().isEmpty() && !request.getPassword().isEmpty()) {
             final UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
@@ -31,9 +32,9 @@ public class AuthenticationService {
                 ).isAuthenticated();
                 return loginResponseMapper.toResponseDto(jwtUtil.generateToken(userDetails), userService.getUserByEmail(userDetails.getUsername()));
             }
-            throw new ResponseException("User with this email doesn't exists");
+            throw new ResponseException(ErrorMessages.EMAIL_NOT_EXISTS);
         } else {
-            throw new ResponseException("Invalid Credentials");
+            throw new ResponseException(ErrorMessages.INVALID_CREDENTIALS);
         }
     }
 }

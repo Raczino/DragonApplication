@@ -61,7 +61,6 @@ public class RedditClient {
                     ? post.get("selftext").getAsString() : null;
 
             if (description != null) {
-                // kluczowe pola muszą istnieć
                 if (!post.has("title") || !post.has("url")) {
                     continue;
                 }

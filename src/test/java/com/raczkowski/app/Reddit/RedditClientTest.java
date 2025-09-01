@@ -30,10 +30,6 @@ class RedditClientTest {
 
     @Mock
     private HttpConnectionFactory httpConnectionFactory;
-    @Mock
-    HttpConnectionFactory factory;
-    @Mock
-    HttpURLConnection conn;
     @InjectMocks
     RedditClient client;
 

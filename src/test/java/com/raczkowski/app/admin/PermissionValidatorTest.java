@@ -2,6 +2,7 @@ package com.raczkowski.app.admin;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.enums.UserRole;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -60,7 +61,7 @@ public class PermissionValidatorTest {
 
         // When & Then: Expecting a ResponseException to be thrown
         ResponseException exception = assertThrows(ResponseException.class, () -> permissionValidator.validateIfUserIsAdminOrModerator());
-        assertEquals("You don't have permissions to do this action", exception.getMessage());
+        assertEquals(ErrorMessages.WRONG_PERMISSION, exception.getMessage());
     }
 
     @Test
@@ -72,7 +73,7 @@ public class PermissionValidatorTest {
 
         //When & Then:
         ResponseException exception = assertThrows(ResponseException.class, () -> permissionValidator.validateOperatorOrAdmin());
-        assertEquals("You don't have permissions to do this action", exception.getMessage());
+        assertEquals(ErrorMessages.WRONG_PERMISSION, exception.getMessage());
     }
 
     @Test

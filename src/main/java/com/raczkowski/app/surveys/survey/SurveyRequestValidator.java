@@ -2,6 +2,7 @@ package com.raczkowski.app.surveys.survey;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.enums.SurveyQuestionType;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
@@ -25,7 +26,7 @@ public class SurveyRequestValidator {
 
     public void validateSurveyRequest(SurveyRequest surveyRequest, AppUser user) {
         if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.SURVEY_COUNT_PER_WEEK)) {
-            throw new ResponseException("You have reached the weekly Survey limit. If you need more survey buy premium account.");
+            throw new ResponseException(ErrorMessages.LIMIT_REACHED);
         }
 
         Limits limits = featureLimitHelperService.getFeaturesLimits(user.getId());
@@ -33,23 +34,23 @@ public class SurveyRequestValidator {
         int surveyDescriptionMaxLength = 256;
         int surveyTitleMaxLength = 100;
         if (null == surveyRequest.getTitle() || null == surveyRequest.getDescription()) {
-            throw new ResponseException("Title and description is required");
+            throw new ResponseException(ErrorMessages.REQUIRED_TITLE_AND_DESCRIPTION);
         } else if (surveyRequest.getTitle().length() < MIN_LENGTH || surveyRequest.getDescription().length() < MIN_LENGTH) {
-            throw new ResponseException("Title or description is lower than min length: " + MIN_LENGTH);
+            throw new ResponseException(ErrorMessages.TITLE_AND_DESCRIPTION_TOO_SHORT + MIN_LENGTH);
         } else if (surveyRequest.getTitle().length() > surveyTitleMaxLength || surveyRequest.getDescription().length() > surveyDescriptionMaxLength) {
-            throw new ResponseException("Title or description is bigger than maximum length: " + surveyTitleMaxLength + ". " + surveyDescriptionMaxLength);
+            throw new ResponseException(ErrorMessages.TITLE_AND_DESCRIPTION_TOO_LONG + surveyTitleMaxLength + ". " + surveyDescriptionMaxLength);
         }
 
         if (null == surveyRequest.getEndTime()
                 || surveyRequest.getEndTime().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
-            throw new ResponseException("End time must be in the future.");
+            throw new ResponseException(ErrorMessages.END_DATE_MUST_BE_IN_THE_FUTURE);
         }
 
         List<QuestionRequest> questions = surveyRequest.getQuestions();
         if (null == questions || questions.isEmpty()) {
-            throw new ResponseException("Survey must have at least one question.");
+            throw new ResponseException(ErrorMessages.SURVEY_MUST_HAS_QUESTION);
         } else if (questions.size() > limits.getSurveyQuestionLimit()) {
-            throw new ResponseException("To many questions of max: " + limits.getSurveyQuestionLimit());
+            throw new ResponseException(ErrorMessages.TO_MANY_QUESTIONS + limits.getSurveyQuestionLimit());
         }
 
         for (QuestionRequest question : questions) {
@@ -59,23 +60,23 @@ public class SurveyRequestValidator {
 
     public void validateQuestionRequest(QuestionRequest questionRequest, Limits limits) {
         if (null == questionRequest.getValue() || questionRequest.getValue().isEmpty()) {
-            throw new ResponseException("Question value cannot be null or empty.");
+            throw new ResponseException(ErrorMessages.QUESTION_VALUE_IS_NULL);
         }
 
         if (null == questionRequest.getType()) {
-            throw new ResponseException("Question type is required");
+            throw new ResponseException(ErrorMessages.QUESTION_TYPE_IS_REQUIRED);
         }
 
         int questionMaxLength = 150;
         if (questionRequest.getValue().length() < MIN_LENGTH) {
-            throw new ResponseException("Question value must be at least: " + MIN_LENGTH);
+            throw new ResponseException(ErrorMessages.QUESTION_VALUE_TOO_SHORT + MIN_LENGTH);
         } else if (questionRequest.getValue().length() > questionMaxLength) {
-            throw new ResponseException("Question is longer than maximum length: " + questionMaxLength);
+            throw new ResponseException(ErrorMessages.QUESTION_VALUE_TOO_LONG + questionMaxLength);
         }
 
         if (questionRequest.getType() == SurveyQuestionType.MULTIPLE_CHOICE) {
             if (questionRequest.getMinSelected() < 1) {
-                throw new ResponseException("MinSelected cannot be lower than 1.");
+                throw new ResponseException(ErrorMessages.MIN_SELECTED_TOO_LOW);
             }
             if (questionRequest.getMaxSelected() < questionRequest.getMinSelected()) {
                 throw new ResponseException("MaxSelected " + questionRequest.getMaxSelected()
@@ -85,7 +86,7 @@ public class SurveyRequestValidator {
 
         List<AnswersRequest> answers = questionRequest.getAnswers();
         if (null == answers || answers.isEmpty()) {
-            throw new ResponseException("Question must have at least one answer.");
+            throw new ResponseException(ErrorMessages.QUESTION_ANSWER_REQUIRED);
         } else if (answers.size() > limits.getSurveyQuestionAnswerLimit()) {
             throw new ResponseException("To many answers of max: " + limits.getSurveyQuestionAnswerLimit());
         }
@@ -94,19 +95,19 @@ public class SurveyRequestValidator {
         for (AnswersRequest answer : answers) {
             validateAnswersRequest(answer);
             if (!uniqueAnswers.add(answer.getValue().toLowerCase())) {
-                throw new ResponseException("Response must be unique. Duplicated found");
+                throw new ResponseException(ErrorMessages.ANSWER_MUST_BE_UNIQUE);
             }
         }
     }
 
     public void validateAnswersRequest(AnswersRequest answersRequest) {
         if (null == answersRequest.getValue() || answersRequest.getValue().isEmpty()) {
-            throw new ResponseException("Answer value is required");
+            throw new ResponseException(ErrorMessages.ANSWER_VALUE_IS_REQUIRED);
         }
 
         int answerMaxLength = 100;
         if (answersRequest.getValue().length() > answerMaxLength) {
-            throw new ResponseException("Answer value is bigger than maximum length: " + answerMaxLength);
+            throw new ResponseException(ErrorMessages.ANSWER_VALUE_TOO_LONG + answerMaxLength);
         }
     }
 }

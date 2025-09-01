@@ -1,8 +1,9 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
-import com.raczkowski.app.limits.FeatureLimitHelperService;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
 import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
@@ -18,14 +19,14 @@ public class ArticleRequestValidator {
 
     public void validateArticleRequest(ArticleRequest request, AppUser user) {
         if (!featureLimitHelperService.canUseFeature(user.getId(), FeatureKeys.ARTICLE_COUNT_PER_WEEK)) {
-            throw new ResponseException("You have reached the weekly article limit. If you need more articles buy premium account.");
+            throw new ResponseException(ErrorMessages.LIMIT_REACHED);
         }
 
         Limits limit = featureLimitHelperService.getFeaturesLimits(user.getId());
 
         if (request.getTitle() == null || request.getContent() == null || request.getContentHtml() == null
                 || request.getTitle().isEmpty() || request.getContent().isEmpty()) {
-            throw new ResponseException("Title or content can't be empty");
+            throw new ResponseException(ErrorMessages.TITLE_AND_CONTENT_CANNOT_BE_EMPTY);
         }
 
         validateLength("Title", request.getTitle().length(), limit.getArticleTitleMinLength(), limit.getArticleContentMaxLength());
@@ -33,13 +34,13 @@ public class ArticleRequestValidator {
 
         if (request.getHashtags() != null) {
             if (request.getHashtags().length() > limit.getArticleContentMaxLength()) {
-                throw new ResponseException("Hashtags is longer than maximum length " + limit.getHashtagsMaxLength());
+                throw new ResponseException(ErrorMessages.HASHTAG_LENGTH_IS_TOO_LONG + limit.getHashtagsMaxLength());
             }
         }
 
         if (request.getScheduledForDate() != null) {
             if (request.getScheduledForDate().isBefore(ZonedDateTime.now(ZoneOffset.UTC))) {
-                throw new ResponseException("Scheduled for cannot be before now!");
+                throw new ResponseException(ErrorMessages.SCHEDULED_FOR_MUST_BE_IN_FUTURE);
             }
         }
     }

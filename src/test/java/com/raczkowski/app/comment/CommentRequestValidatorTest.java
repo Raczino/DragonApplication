@@ -1,6 +1,7 @@
 package com.raczkowski.app.comment;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
@@ -47,7 +48,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(1L, "ok content"), u));
 
-        assertEquals("You have reached the weekly comment limit.", ex.getMessage());
+        assertEquals(ErrorMessages.LIMIT_REACHED, ex.getMessage());
         verify(featureLimitHelperService).canUseFeature(10L, FeatureKeys.COMMENT_COUNT_PER_WEEK);
         verify(featureLimitHelperService, never()).getFeaturesLimits(anyLong());
     }
@@ -63,7 +64,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(2L, null), u));
 
-        assertEquals("Content cannot be null", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_CANNOT_BE_NULL, ex.getMessage());
     }
 
     @Test
@@ -77,7 +78,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(2L, ""), u));
 
-        assertEquals("Content cannot be null", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_CANNOT_BE_NULL, ex.getMessage());
     }
 
     @Test
@@ -91,7 +92,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(null, "whatever"), u));
 
-        assertEquals("Article id cannot be null", ex.getMessage());
+        assertEquals(ErrorMessages.ARTICLE_CANNOT_BE_NULL, ex.getMessage());
     }
 
     @Test
@@ -105,7 +106,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(3L, "This contains BADWORD inside"), u));
 
-        assertEquals("Comment contains banned words", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_CONTAINS_BANNED_WORDS, ex.getMessage());
     }
 
     @Test
@@ -120,7 +121,7 @@ class CommentRequestValidatorTest {
         ResponseException ex = assertThrows(ResponseException.class, () ->
                 validator.validateCreationRequest(req(3L, longContent), u));
 
-        assertEquals("Comment content length is longer than 1000 characters", ex.getMessage());
+        assertEquals(ErrorMessages.COMMENT_TOO_LONG, ex.getMessage());
     }
 
     @Test

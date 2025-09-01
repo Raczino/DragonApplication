@@ -1,6 +1,7 @@
 package com.raczkowski.app.article;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
 import com.raczkowski.app.limits.Limits;
@@ -12,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class ArticleRequestValidatorTest {
 
@@ -58,7 +59,7 @@ class ArticleRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class,
                 () -> articleRequestValidator.validateArticleRequest(request, user));
 
-        assertEquals("Title or content can't be empty", exception.getMessage());
+        assertEquals(ErrorMessages.TITLE_AND_CONTENT_CANNOT_BE_EMPTY, exception.getMessage());
     }
 
     @Test
@@ -73,7 +74,7 @@ class ArticleRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class,
                 () -> articleRequestValidator.validateArticleRequest(request, user));
 
-        assertEquals("Title or content can't be empty", exception.getMessage());
+        assertEquals(ErrorMessages.TITLE_AND_CONTENT_CANNOT_BE_EMPTY, exception.getMessage());
     }
 
     @Test
@@ -88,7 +89,7 @@ class ArticleRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class,
                 () -> articleRequestValidator.validateArticleRequest(request, user));
 
-        assertEquals("Title or content can't be empty", exception.getMessage());
+        assertEquals(ErrorMessages.TITLE_AND_CONTENT_CANNOT_BE_EMPTY, exception.getMessage());
     }
 
     @Test
@@ -103,7 +104,7 @@ class ArticleRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class,
                 () -> articleRequestValidator.validateArticleRequest(request, user));
 
-        assertEquals("Content is shorter than minimum length 10", exception.getMessage());
+        assertEquals(ErrorMessages.CONTENT_IS_TOO_SHORT + " 10", exception.getMessage());
     }
 
     @Test
@@ -119,7 +120,7 @@ class ArticleRequestValidatorTest {
         ResponseException exception = assertThrows(ResponseException.class,
                 () -> articleRequestValidator.validateArticleRequest(request, user));
 
-        assertEquals("Scheduled for cannot be before now!", exception.getMessage());
+        assertEquals(ErrorMessages.SCHEDULED_FOR_MUST_BE_IN_FUTURE, exception.getMessage());
     }
 
     @Test
