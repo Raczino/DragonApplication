@@ -1,4 +1,4 @@
-package com.raczkowski.app.Reddit;
+package com.raczkowski.app.reddit;
 
 import com.raczkowski.app.http.HttpConnectionFactory;
 import org.junit.jupiter.api.Test;

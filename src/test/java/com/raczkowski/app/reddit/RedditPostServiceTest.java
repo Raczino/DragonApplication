@@ -1,4 +1,4 @@
-package com.raczkowski.app.Reddit;
+package com.raczkowski.app.reddit;
 
 import com.raczkowski.app.article.Article;
 import com.raczkowski.app.article.ArticleService;

@@ -1,4 +1,4 @@
-package com.raczkowski.app.Reddit;
+package com.raczkowski.app.reddit;
 
 import lombok.Getter;
 import lombok.Setter;
