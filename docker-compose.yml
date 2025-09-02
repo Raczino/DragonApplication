@@ -15,6 +15,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
       # Redis
       SPRING_REDIS_URL: redis://redis:6379
+      # Rabbit
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASS: ${RABBIT_PASS}
       REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID}
       REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET}
       REDDIT_USER_AGENT: ${REDDIT_USER_AGENT}
@@ -52,5 +55,23 @@ services:
       timeout: 3s
       retries: 20
 
+  rabbit:
+    image: rabbitmq:3.13-management
+    container_name: dragon-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
+  rabbitmq_data:
