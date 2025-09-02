@@ -16,8 +16,13 @@ public class RedisService {
     }
 
     public int getIntValue(String key, int defaultValue) {
-        String value = redisTemplate.opsForValue().get(key);
-        return (value != null) ? Integer.parseInt(value) : defaultValue;
+        var v = redisTemplate.opsForValue().get(key);
+        if (v == null) return defaultValue;
+        try {
+            return Integer.parseInt(v);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     public void setValue(String key, String value, long duration, TimeUnit timeUnit) {

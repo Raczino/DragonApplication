@@ -1,0 +1,15 @@
+{
+	"id": "8e65741f-5c9b-4cfe-8a09-f7e21d36dfd7",
+	"name": "dragon_env",
+	"values": [
+		{
+			"key": "token",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-09-02T20:18:41.104Z",
+	"_postman_exported_using": "Postman/11.60.4"
+}

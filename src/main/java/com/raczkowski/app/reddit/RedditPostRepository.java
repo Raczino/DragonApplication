@@ -1,4 +1,4 @@
-package com.raczkowski.app.Reddit;
+package com.raczkowski.app.reddit;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
