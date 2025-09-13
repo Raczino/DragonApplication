@@ -1,6 +1,6 @@
 package com.raczkowski.app.admin.moderation.article;
 
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DeletedArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;

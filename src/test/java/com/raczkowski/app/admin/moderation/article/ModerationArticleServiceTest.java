@@ -3,8 +3,8 @@ package com.raczkowski.app.admin.moderation.article;
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.article.*;
-import com.raczkowski.app.common.GenericService;
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.GenericService;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DeletedArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
@@ -33,7 +33,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -132,7 +134,7 @@ public class ModerationArticleServiceTest {
         atc.setContentHtml("<p>C</p>");
         atc.setPostedDate(ZonedDateTime.now(ZoneOffset.UTC).minusDays(1));
         atc.setAppUser(author);
-        atc.setHashtags(List.of(new Hashtag("tag")));
+        atc.setHashtags(Set.of(new Hashtag("tag")));
 
         when(permissionValidator.validateIfUserIsAdminOrModerator()).thenReturn(approver);
         when(userService.getLoggedUser()).thenReturn(approver);
@@ -142,6 +144,12 @@ public class ModerationArticleServiceTest {
         when(articleDtoMapper.toArticleDto(any(Article.class))).thenReturn(mapped);
 
         ArgumentCaptor<Article> articleCaptor = ArgumentCaptor.forClass(Article.class);
+
+        doAnswer(inv -> {
+            Article a = inv.getArgument(0);
+            a.setId(123L);
+            return null;
+        }).when(articleService).saveArticle(any(Article.class));
 
         // When
         ArticleDto result = moderationArticleService.confirmArticle(1L);
@@ -157,8 +165,14 @@ public class ModerationArticleServiceTest {
         assertNotNull(saved.getAcceptedAt());
 
         verify(articleToConfirmRepository).deleteArticleToConfirmById(1L);
-        verify(notificationService).saveNotification(any(Notification.class));
-        verify(notificationService).sendNotification(eq(String.valueOf(author.getId())), any(Notification.class));
+        verify(notificationService).sendNotification(
+                eq(NotificationType.ARTICLE_PUBLISH),
+                eq(String.valueOf(author.getId())),
+                eq(approver),
+                eq("Your article has been accepted!"),
+                eq("Accepted By"),
+                eq("article/123")
+        );
         verify(moderationStatisticService).articleApprovedCounterIncrease(approver.getId());
     }
 
@@ -179,6 +193,7 @@ public class ModerationArticleServiceTest {
         atc.setPostedDate(ZonedDateTime.now(ZoneOffset.UTC).minusDays(2));
         atc.setAppUser(author);
         atc.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).plusDays(3));
+        atc.setHashtags(new HashSet<>());
 
         when(permissionValidator.validateIfUserIsAdminOrModerator()).thenReturn(approver);
         when(userService.getLoggedUser()).thenReturn(approver);
@@ -241,8 +256,14 @@ public class ModerationArticleServiceTest {
         assertSame(dto, res);
         verify(articleToConfirmRepository).deleteArticleToConfirmById(9L);
         verify(rejectedArticleRepository).save(any(RejectedArticle.class));
-        verify(notificationService).saveNotification(any(Notification.class));
-        verify(notificationService).sendNotification(eq(String.valueOf(author.getId())), any(Notification.class));
+        verify(notificationService).sendNotification(
+                eq(NotificationType.ARTICLE_REJECT),
+                eq(String.valueOf(author.getId())),
+                eq(moderator),
+                eq("Your article has been rejected!"),
+                eq("Rejected By"),
+                isNull()
+        );
         verify(moderationStatisticService).articleRejectedCounterIncrease(moderator.getId());
     }
 
@@ -411,35 +432,6 @@ public class ModerationArticleServiceTest {
         // Then
         verify(articleService).pinArticle(9L, mod);
         verify(moderationStatisticService).articlePinnedCounterIncrease(8L);
-    }
-
-    @Test
-    public void shouldSaveAndSendNotification() {
-        // Given
-        AppUser by = new AppUser();
-        by.setFirstName("Kate");
-
-        // When
-        moderationArticleService.sendNotification(
-                NotificationType.ARTICLE_PUBLISH,
-                "7",
-                by,
-                "t", "m", "/article/1"
-        );
-
-        // Then
-        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-        verify(notificationService).saveNotification(captor.capture());
-        verify(notificationService).sendNotification(eq("7"), any(Notification.class));
-
-        Notification n = captor.getValue();
-        assertEquals("7", n.getUserId());
-        assertEquals(NotificationType.ARTICLE_PUBLISH, n.getType());
-        assertEquals("t", n.getTitle());
-        assertEquals("m", n.getMessage());
-        assertEquals("Kate", n.getCreatedBy());
-        assertEquals("/article/1", n.getTargetUrl());
-        assertNotNull(n.getCreatedAt());
     }
 
     @Test

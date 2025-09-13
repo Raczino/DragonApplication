@@ -1,9 +1,17 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.common.offset.OffsetPagination;
+import com.raczkowski.app.common.offset.SliceResponse;
+import com.raczkowski.app.dto.UserDto;
+import com.raczkowski.app.dto.UserDtoAssembler;
+import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +27,9 @@ import java.util.List;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final NotificationService notificationService;
+    private final UserDtoAssembler userDtoAssembler;
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -29,6 +40,10 @@ public class UserService implements UserDetailsService {
         if (userRepository.findByEmail(email) != null) {
             throw new ResponseException(ErrorMessages.USER_ALREADY_EXITS);
         }
+    }
+
+    public List<AppUser> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public String signUpUser(AppUser user) {
@@ -70,8 +85,45 @@ public class UserService implements UserDetailsService {
         return userRepository.findFollowersByUserId(userId);
     }
 
+    public SliceResponse<UserDto> getFollowersListForUser(Long userId, int offset, int limit) {
+        return OffsetPagination.fetch(
+                offset,
+                limit,
+                null,
+                20,
+                200,
+                pageable -> {
+                    Slice<AppUser> slice = userRepository.findFollowersSliceByUserId(userId, pageable);
+
+                    List<UserDto> dto = slice.getContent().stream()
+                            .map(userDtoAssembler::assemble).toList();
+
+                    return new SliceImpl<>(dto, pageable, slice.hasNext());
+                }
+        );
+    }
+
     public List<AppUser> getFollowingUsersByUserCount(Long userId) {
         return userRepository.findFollowingByUserId(userId);
+    }
+
+
+    public SliceResponse<UserDto> getFollowingUsersPerUser(Long userId, int offset, int limit) {
+        return OffsetPagination.fetch(
+                offset,
+                limit,
+                null,
+                20,
+                200,
+                pageable -> {
+                    Slice<AppUser> slice = userRepository.findFollowingSliceByUserId(userId, pageable);
+
+                    List<UserDto> dto = slice.getContent().stream()
+                            .map(userDtoAssembler::assemble).toList();
+
+                    return new SliceImpl<>(dto, pageable, slice.hasNext());
+                }
+        );
     }
 
     public void followUser(Long userIdToFollow) {
@@ -85,6 +137,13 @@ public class UserService implements UserDetailsService {
 
         currentUser.followUser(userToFollow);
         userRepository.save(currentUser);
+
+        notificationService.sendNotification(NotificationType.USER_FOLLOWED,
+                String.valueOf(userToFollow.getId()),
+                currentUser,
+                "obserwuje Cię!",
+                "",
+                "profile/" + currentUser.getId());
     }
 
     public void unfollowUser(Long userIdToUnfollow) {
@@ -106,5 +165,10 @@ public class UserService implements UserDetailsService {
 
     public void unblockUser(Long userId) {
         userRepository.unBlockUser(userId);
+    }
+
+    public boolean isUserFollowing(Long userId) {
+        AppUser user = getLoggedUser();
+        return userRepository.findFollowUserById(user.getId(), userId);
     }
 }

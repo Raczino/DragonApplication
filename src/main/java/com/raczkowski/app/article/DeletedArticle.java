@@ -1,6 +1,5 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.comment.Comment;
 import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.user.AppUser;
 import lombok.Getter;
@@ -9,8 +8,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Setter
@@ -29,18 +28,17 @@ public class DeletedArticle {
     )
     private Long id;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String contentHtml;
 
     private ZonedDateTime postedDate;
 
-    @OneToOne
+    @ManyToOne(fetch = LAZY, optional = false)
     @JoinColumn(
             nullable = false
     )
@@ -55,17 +53,14 @@ public class DeletedArticle {
 
     private boolean isUpdated;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
     private ZonedDateTime acceptedAt;
 
-    @OneToOne
+    @ManyToOne(fetch = LAZY)
     private AppUser acceptedBy;
 
     private ZonedDateTime deletedAt;
 
-    @OneToOne
+    @ManyToOne
     private AppUser deletedBy;
 
     private int commentsCount;

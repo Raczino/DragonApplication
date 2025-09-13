@@ -1,5 +1,6 @@
 package com.raczkowski.app.notification;
 
+import com.raczkowski.app.common.offset.SliceResponse;
 import com.raczkowski.app.enums.NotificationType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.ZoneOffset;
@@ -17,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class NotificationServiceTest {
+class NotificationServiceTest {
 
     @Mock
     private NotificationRepository notificationRepository;
 
     @Mock
-    SimpMessagingTemplate template;
+    private SimpMessagingTemplate template;
 
     @InjectMocks
     private NotificationService notificationService;
@@ -61,13 +65,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    void listForUser_shouldDelegateToRepo() {
-        notificationService.getAllNotificationsForUser("7");
-        verify(notificationRepository).getAllNotificationsForUser("7");
-    }
-
-    @Test
-    public void shouldSaveNotification() {
+    void shouldSaveNotification() {
         // Given
         Notification n = new Notification();
 
@@ -79,7 +77,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void shouldSendNotificationToUserTopic() {
+    void shouldSendNotificationToUserTopic() {
         // Given
         Notification n = new Notification("123", NotificationType.ARTICLE_PUBLISH, "title", "msg",
                 ZonedDateTime.now(), "me", "/target");
@@ -92,7 +90,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void shouldMarkNotificationAsReadWithCurrentUtcTime() {
+    void shouldMarkNotificationAsReadWithCurrentUtcTime() {
         // Given
         Long id = 77L;
         ArgumentCaptor<ZonedDateTime> timeCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
@@ -111,20 +109,91 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void shouldGetAllNotificationsForUser() {
+    void getForUserOffset_shouldReturnItemsAndComputeNextOffset_whenHasNext() {
         // Given
         String userId = "42";
+        int offset = 0;
+        int limit = 2;
+
         Notification n1 = new Notification();
+        n1.setId(1L);
         Notification n2 = new Notification();
-        when(notificationRepository.getAllNotificationsForUser(userId)).thenReturn(List.of(n1, n2));
+        n2.setId(2L);
+
+        // Odpowiedź repo: 2 elementy i hasNext = true
+        when(notificationRepository.findForUser(eq(userId), any(Pageable.class)))
+                .thenAnswer(inv -> {
+                    Pageable p = inv.getArgument(1);
+                    return new SliceImpl<>(List.of(n1, n2), p, true);
+                });
 
         // When
-        List<Notification> out = notificationService.getAllNotificationsForUser(userId);
+        SliceResponse<Notification> resp = notificationService.getForUserOffset(userId, offset, limit);
 
         // Then
-        assertEquals(2, out.size());
-        assertSame(n1, out.get(0));
-        assertSame(n2, out.get(1));
-        verify(notificationRepository).getAllNotificationsForUser(userId);
+        assertNotNull(resp);
+        assertEquals(2, resp.items().size());
+        assertTrue(resp.hasNext());
+        assertEquals(2, resp.nextOffset());
+
+        // sprawdź poprawny Pageable
+        ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(notificationRepository).findForUser(eq(userId), pageCaptor.capture());
+        Pageable used = pageCaptor.getValue();
+        assertEquals(offset / limit, used.getPageNumber());
+        assertEquals(limit, used.getPageSize());
+        // sort: createdAt DESC, id DESC
+        Sort.Order first = used.getSort().getOrderFor("createdAt");
+        Sort.Order second = used.getSort().getOrderFor("id");
+        assertNotNull(first);
+        assertEquals(Sort.Direction.DESC, first.getDirection());
+        assertNotNull(second);
+        assertEquals(Sort.Direction.DESC, second.getDirection());
+    }
+
+    @Test
+    void getForUserOffset_shouldSetHasNextFalseAndNextOffsetMinusOne_onLastChunk() {
+        // Given
+        String userId = "42";
+        int offset = 20;
+        int limit = 20;
+
+        List<Notification> chunk = List.of(); // ostatnia porcja pusta (też możliwe), ale może być i < limit
+        when(notificationRepository.findForUser(eq(userId), any(Pageable.class)))
+                .thenAnswer(inv -> new SliceImpl<>(chunk, inv.getArgument(1), false));
+
+        // When
+        SliceResponse<Notification> resp = notificationService.getForUserOffset(userId, offset, limit);
+
+        // Then
+        assertNotNull(resp);
+        assertFalse(resp.hasNext());
+        assertEquals(-1, resp.nextOffset());
+        assertEquals(0, resp.items().size());
+    }
+
+    @Test
+    void getForUserOffset_shouldCalculatePageFromOffsetAndLimit() {
+        // Given
+        String userId = "42";
+        int offset = 40;
+        int limit = 20; // => page = 2
+
+        when(notificationRepository.findForUser(eq(userId), any(Pageable.class)))
+                .thenAnswer(inv -> {
+                    Pageable p = inv.getArgument(1);
+                    // Zwróć slice z dowolnymi danymi; ważny jest Pageable
+                    return new SliceImpl<>(List.of(new Notification()), p, true);
+                });
+
+        // When
+        notificationService.getForUserOffset(userId, offset, limit);
+
+        // Then
+        ArgumentCaptor<Pageable> cap = ArgumentCaptor.forClass(Pageable.class);
+        verify(notificationRepository).findForUser(eq(userId), cap.capture());
+        Pageable used = cap.getValue();
+        assertEquals(2, used.getPageNumber());
+        assertEquals(20, used.getPageSize());
     }
 }

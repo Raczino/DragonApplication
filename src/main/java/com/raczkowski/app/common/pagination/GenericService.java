@@ -1,4 +1,4 @@
-package com.raczkowski.app.common;
+package com.raczkowski.app.common.pagination;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

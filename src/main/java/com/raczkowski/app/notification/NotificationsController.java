@@ -1,10 +1,9 @@
 package com.raczkowski.app.notification;
 
+import com.raczkowski.app.common.offset.SliceResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/notification")
@@ -18,7 +17,11 @@ public class NotificationsController {
     }
 
     @GetMapping("/get/user")
-    ResponseEntity<List<Notification>> getNotificationsForUser(@RequestParam String id) {
-        return ResponseEntity.ok(notificationService.getAllNotificationsForUser(id));
+    public ResponseEntity<SliceResponse<Notification>> getForUser(
+            @RequestParam String id,
+            @RequestParam(required = false) Integer offset,
+            @RequestParam(required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(notificationService.getForUserOffset(id, offset, limit));
     }
 }

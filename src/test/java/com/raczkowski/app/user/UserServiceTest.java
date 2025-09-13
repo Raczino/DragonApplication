@@ -1,8 +1,10 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.notification.NotificationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,8 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private UserService userService;
@@ -221,7 +225,6 @@ public class UserServiceTest {
     public void shouldThrowWhenTryingToFollowYourself() {
         // Given
         AppUser current = new AppUser();
-        // getLoggedUser -> SecurityContext email
         when(userRepository.findByEmail(anyString())).thenReturn(current);
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn("me@x.com");
@@ -242,7 +245,9 @@ public class UserServiceTest {
     public void shouldFollowUserAndSaveCurrentUser() {
         // Given
         AppUser current = spy(new AppUser());
+        current.setId(5L);
         AppUser target = new AppUser();
+        target.setId(2L);
         when(userRepository.findByEmail(anyString())).thenReturn(current);
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn("me@x.com");
@@ -256,7 +261,17 @@ public class UserServiceTest {
         userService.followUser(2L);
 
         // Then
+        verify(current).followUser(target);
         verify(userRepository).save(current);
+
+        verify(notificationService).sendNotification(
+                eq(NotificationType.USER_FOLLOWED),
+                eq(String.valueOf(target.getId())),
+                same(current),
+                eq("obserwuje Cię!"),
+                eq(""),
+                eq("profile/5")
+        );
     }
 
     @Test

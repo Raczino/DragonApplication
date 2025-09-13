@@ -1,14 +1,13 @@
 package com.raczkowski.app.user;
 
 import com.raczkowski.app.accountPremium.service.SubscriptionService;
+import com.raczkowski.app.common.offset.SliceResponse;
 import com.raczkowski.app.dto.UserDto;
 import com.raczkowski.app.dto.UserDtoAssembler;
 import com.raczkowski.app.enums.PremiumAccountRange;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -35,21 +34,32 @@ public class userController {
         userService.followUser(userId);
     }
 
+    @GetMapping("/is-following/{userId}")
+    ResponseEntity<Boolean> isUserFollowing(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.isUserFollowing(userId));
+    }
+
     @PostMapping("/{userId}/unfollow")
     public void unfollowUser(@PathVariable Long userId) {
         userService.unfollowUser(userId);
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<UserDto>> getFollowers(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getFollowersCount(userId).stream()
-                .map(userDtoAssembler::assemble).toList());
+    public ResponseEntity<SliceResponse<UserDto>> getFollowers(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Integer offset,
+            @RequestParam(required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(userService.getFollowersListForUser(userId, offset, limit));
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<List<UserDto>> getFollowing(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getFollowingUsersByUserCount(userId).stream()
-                .map(userDtoAssembler::assemble).toList());
+    public ResponseEntity<SliceResponse<UserDto>> getFollowing(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Integer offset,
+            @RequestParam(required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(userService.getFollowingUsersPerUser(userId, offset, limit));
     }
 
     @PostMapping("/save")

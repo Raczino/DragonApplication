@@ -28,6 +28,7 @@ public class ArticleDtoMapper {
                 .commentsCount(article.getCommentsCount())
                 .author(authorDtoMapper.toAuthorDto(article.getAppUser()))
                 .updatedAt(article.getUpdatedAt())
+                .isLiked(article.isLiked())
                 .isUpdated(article.isUpdated())
                 .status(article.getStatus())
                 .acceptedAt(article.getAcceptedAt())

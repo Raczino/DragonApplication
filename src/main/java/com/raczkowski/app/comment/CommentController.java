@@ -1,6 +1,6 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

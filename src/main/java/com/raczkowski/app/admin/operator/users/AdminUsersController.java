@@ -1,6 +1,8 @@
 package com.raczkowski.app.admin.operator.users;
 
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ModeratorStatisticDto;
+import com.raczkowski.app.dto.UserDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +32,13 @@ public class AdminUsersController {
     @GetMapping("/moderator/stats")
     public ResponseEntity<ModeratorStatisticDto> getStatisticForModerator(@RequestParam Long id) {
         return ResponseEntity.ok(moderationStatisticService.getStatisticsForUser(id));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<PageResponse<UserDto>> getAllUsers(
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "1") int page
+    ) {
+        return ResponseEntity.ok(adminUserService.getAllUsers(size, page));
     }
 }

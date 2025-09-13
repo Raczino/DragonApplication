@@ -9,8 +9,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -41,22 +41,23 @@ public class ArticleToConfirm {
     @Column(nullable = false)
     private ZonedDateTime postedDate;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private AppUser appUser;
 
     @Enumerated(EnumType.STRING)
     private ArticleStatus status;
 
+    @Column
     ZonedDateTime scheduledForDate;
 
-    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "article_to_confirm_hashtag",
             joinColumns = @JoinColumn(name = "article_to_confirm_id"),
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
-    private List<Hashtag> hashtags = new ArrayList<>();
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     public ArticleToConfirm(
             String title,

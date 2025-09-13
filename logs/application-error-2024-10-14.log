@@ -141,7 +141,7 @@ org.springframework.dao.InvalidDataAccessApiUsageException: org.hibernate.QueryE
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
 	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:215)
 	at jdk.proxy2/jdk.proxy2.$Proxy135.findAllWithPinnedFirst(Unknown Source)
-	at com.raczkowski.app.common.GenericService.paginationOfArticle(GenericService.java:32)
+	at com.raczkowski.app.common.pagination.GenericService.paginationOfArticle(GenericService.java:32)
 	at com.raczkowski.app.article.ArticleService.getAllArticles(ArticleService.java:79)
 	at com.raczkowski.app.article.ArticleController.getAllArticles(ArticleController.java:31)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -45,9 +46,9 @@ public class RedditPostServiceTest {
         when(userService.getUserById(22L)).thenReturn(redditUser);
 
         Article a1 = new Article();
-        a1.setHashtags(List.of(new Hashtag("java"), new Hashtag("spring")));
+        a1.setHashtags(Set.of(new Hashtag("java"), new Hashtag("spring")));
         Article a2 = new Article();
-        a2.setHashtags(List.of(new Hashtag("testing")));
+        a2.setHashtags(Set.of(new Hashtag("testing")));
         when(articleService.getAllArticles()).thenReturn(List.of(a1, a2));
 
         RedditPost p1 = new RedditPost(
@@ -112,9 +113,9 @@ public class RedditPostServiceTest {
         when(userService.getUserById(22L)).thenReturn(redditUser);
 
         Article withNoTags = new Article();
-        withNoTags.setHashtags(List.of());
+        withNoTags.setHashtags(Set.of());
         Article withTagButNoPosts = new Article();
-        withTagButNoPosts.setHashtags(List.of(new Hashtag("empty")));
+        withTagButNoPosts.setHashtags(Set.of(new Hashtag("empty")));
 
         when(articleService.getAllArticles()).thenReturn(List.of(withNoTags, withTagButNoPosts));
         when(redditClient.searchPostsOnSubreddit("empty")).thenReturn(List.of());
@@ -134,7 +135,7 @@ public class RedditPostServiceTest {
         when(userService.getUserById(22L)).thenReturn(redditUser);
 
         Article a = new Article();
-        a.setHashtags(List.of(new Hashtag("fail")));
+        a.setHashtags(Set.of(new Hashtag("fail")));
         when(articleService.getAllArticles()).thenReturn(List.of(a));
 
         when(redditClient.searchPostsOnSubreddit("fail"))

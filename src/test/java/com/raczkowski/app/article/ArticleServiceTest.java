@@ -3,7 +3,7 @@ package com.raczkowski.app.article;
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
@@ -534,7 +534,7 @@ public class ArticleServiceTest {
         req.setContentHtml("<p>C</p>");
         req.setHashtags("#java #spring");
 
-        List<Hashtag> parsed = List.of(new Hashtag("java"), new Hashtag("spring"));
+        Set<Hashtag> parsed = Set.of(new Hashtag("java"), new Hashtag("spring"));
         when(hashtagService.parseHashtags("#java #spring")).thenReturn(parsed);
 
         // When
