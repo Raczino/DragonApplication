@@ -64,6 +64,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+      RABBITMQ_DEFAULT_VHOST: dragon
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:

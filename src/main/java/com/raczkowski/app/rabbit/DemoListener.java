@@ -1,4 +1,4 @@
-package com.raczkowski.app.messaging;
+package com.raczkowski.app.rabbit;
 
 import com.raczkowski.app.config.RabbitConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,6 @@ public class DemoListener {
 
     @RabbitListener(queues = RabbitConfig.QUEUE)
     public void handleMessage(String payload) {
-        log.info("Received from RabbitMQ: {}", payload);
+        System.out.println("Received from RabbitMQ: {}"+payload);
     }
 }
