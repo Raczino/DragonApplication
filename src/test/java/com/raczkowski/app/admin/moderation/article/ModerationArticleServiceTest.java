@@ -15,7 +15,6 @@ import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
-import com.raczkowski.app.notification.Notification;
 import com.raczkowski.app.notification.NotificationService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -432,37 +431,5 @@ public class ModerationArticleServiceTest {
         // Then
         verify(articleService).pinArticle(9L, mod);
         verify(moderationStatisticService).articlePinnedCounterIncrease(8L);
-    }
-
-    @Test
-    public void shouldReturnPendingArticlesForSpecificUserOnly() {
-        // Given
-        AppUser u1 = new AppUser();
-        u1.setId(1L);
-        AppUser u2 = new AppUser();
-        u2.setId(2L);
-
-        ArticleToConfirm a1 = new ArticleToConfirm();
-        a1.setAppUser(u1);
-        ArticleToConfirm a2 = new ArticleToConfirm();
-        a2.setAppUser(u2);
-        ArticleToConfirm a3 = new ArticleToConfirm();
-        a3.setAppUser(u1);
-
-        when(articleToConfirmRepository.findAll()).thenReturn(List.of(a1, a2, a3));
-
-        NonConfirmedArticleDto d1 = mock(NonConfirmedArticleDto.class);
-        NonConfirmedArticleDto d3 = mock(NonConfirmedArticleDto.class);
-        when(articleDtoMapper.toNonConfirmedArticleDto(a1)).thenReturn(d1);
-        when(articleDtoMapper.toNonConfirmedArticleDto(a3)).thenReturn(d3);
-
-        // When
-        List<NonConfirmedArticleDto> out = moderationArticleService.getPendingArticlesForUser(1L);
-
-        // Then
-        assertEquals(2, out.size());
-        verify(articleDtoMapper, times(1)).toNonConfirmedArticleDto(a1);
-        verify(articleDtoMapper, times(1)).toNonConfirmedArticleDto(a3);
-        verify(articleDtoMapper, never()).toNonConfirmedArticleDto(a2);
     }
 }

@@ -27,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -192,12 +195,15 @@ public class ModerationArticleService {
         moderationStatisticService.articlePinnedCounterIncrease(user.getId());
     }
 
-    public List<NonConfirmedArticleDto> getPendingArticlesForUser(Long id) {
-        return articleToConfirmRepository.findAll()
-                .stream()
-                .filter(articleToConfirm -> articleToConfirm.getAppUser().getId().equals(id))
-                .map(articleDtoMapper::toNonConfirmedArticleDto)
-                .toList();
+    public PageResponse<NonConfirmedArticleDto> getPendingArticlesForUser(Long id, int page, int size, String sortBy, String sortDirection) {
+        return PageMappers.paginateAndMap(
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                pageable -> articleToConfirmRepository.findByAppUser(userService.getLoggedUser(), pageable),
+                articleDtoMapper::toNonConfirmedArticleDto
+        );
     }
 
     private ArticleToConfirm getArticleToConfirmOrThrow(Long id) {

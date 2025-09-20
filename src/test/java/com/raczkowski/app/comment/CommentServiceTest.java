@@ -96,10 +96,12 @@ public class CommentServiceTest {
             when(commentLikeRepository.findLikedCommentIdsByUserAndCommentIds(eq(user), anyList()))
                     .thenReturn(Set.of(11L));
 
-            CommentDto d1 = new CommentDto();
-            CommentDto d2 = new CommentDto();
-            when(commentDtoMapper.toCommentDto(c1)).thenReturn(d1);
-            when(commentDtoMapper.toCommentDto(c2)).thenReturn(d2);
+            when(commentDtoMapper.toCommentDto(any(Comment.class))).thenAnswer(inv -> {
+                Comment c = inv.getArgument(0);
+                CommentDto dto = new CommentDto();
+                dto.setId(c.getId());
+                return dto;
+            });
 
             // When
             PageResponse<CommentDto> out = commentService.getCommentsForArticle(100L, 1, 5);
@@ -419,10 +421,12 @@ public class CommentServiceTest {
             when(commentLikeRepository.findLikedCommentIdsByUserAndCommentIds(eq(user), anyList()))
                     .thenReturn(Set.of(2L));
 
-            CommentDto d1 = new CommentDto();
-            CommentDto d2 = new CommentDto();
-            when(commentDtoMapper.toCommentDto(c1)).thenReturn(d1);
-            when(commentDtoMapper.toCommentDto(c2)).thenReturn(d2);
+            when(commentDtoMapper.toCommentDto(any(Comment.class))).thenAnswer(inv -> {
+                Comment c = inv.getArgument(0);
+                CommentDto dto = new CommentDto();
+                dto.setId(c.getId());
+                return dto;
+            });
 
             // When
             PageResponse<CommentDto> out = commentService.getCommentsForUser(33L, 1, 3);

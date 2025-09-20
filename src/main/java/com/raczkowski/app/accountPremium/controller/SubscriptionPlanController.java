@@ -14,11 +14,11 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/plan")
+@RequestMapping("/api/v1/subscription")
 public class SubscriptionPlanController {
     private final SubscriptionService subscriptionService;
 
-    @GetMapping("/all")
+    @GetMapping("/plan/offers")
     ResponseEntity<List<SubscriptionPlanDto>> getAllSubscriptionPlans(@RequestParam CurrencyCode currencyCode) {
         return ResponseEntity.ok(subscriptionService.getAllSubscriptionPlans(currencyCode));
     }

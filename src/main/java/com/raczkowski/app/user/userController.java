@@ -24,7 +24,7 @@ public class userController {
         return ResponseEntity.ok(userDtoAssembler.assemble(user));
     }
 
-    @GetMapping("/get/login")
+    @GetMapping("/get/logged")
     ResponseEntity<AppUser> getLoggedUser() {
         return ResponseEntity.ok(userService.getLoggedUser());
     }
@@ -36,7 +36,7 @@ public class userController {
 
     @GetMapping("/is-following/{userId}")
     ResponseEntity<Boolean> isUserFollowing(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.isUserFollowing(userId));
+        return ResponseEntity.ok(userService.isUserFollowingProvidedUser(userId));
     }
 
     @PostMapping("/{userId}/unfollow")
@@ -67,7 +67,7 @@ public class userController {
         subscriptionService.createSubscriptionForUser(id, type);
     }
 
-    @PostMapping("/activate")
+    @PostMapping("/activate/subscription")
     public void activate(@RequestParam Long id) {
         subscriptionService.activateSubscription(id);
     }

@@ -81,15 +81,13 @@ public class ArticleService {
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        AppUser user = userService.getLoggedUser();
-
         return paginateAndMapWithLikes(
                 pageNumber,
                 pageSize,
                 sortBy,
                 sortDirection,
                 articleRepository::findAllWithPinnedFirst,
-                user
+                userService.getLoggedUser()
         );
     }
 
@@ -251,6 +249,17 @@ public class ArticleService {
                         }
                     }
                 }
+        );
+    }
+
+    public PageResponse<ArticleDto> getContentForUser(Long userId, int page, int size, String sortBy, String sortDirection) {
+        return paginateAndMapWithLikes(
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                pageable -> articleRepository.findArticlesByAuthorsIFollow(userId, pageable),
+                userService.getLoggedUser()
         );
     }
 }

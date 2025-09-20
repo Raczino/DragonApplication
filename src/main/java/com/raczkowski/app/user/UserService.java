@@ -141,8 +141,8 @@ public class UserService implements UserDetailsService {
         notificationService.sendNotification(NotificationType.USER_FOLLOWED,
                 String.valueOf(userToFollow.getId()),
                 currentUser,
-                "obserwuje Cię!",
-                "",
+                "Masz nowego obserwującego!",
+                "obserwuje Cie!",
                 "profile/" + currentUser.getId());
     }
 
@@ -167,7 +167,7 @@ public class UserService implements UserDetailsService {
         userRepository.unBlockUser(userId);
     }
 
-    public boolean isUserFollowing(Long userId) {
+    public boolean isUserFollowingProvidedUser(Long userId) {
         AppUser user = getLoggedUser();
         return userRepository.findFollowUserById(user.getId(), userId);
     }

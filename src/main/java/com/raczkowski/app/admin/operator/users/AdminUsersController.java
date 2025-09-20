@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/webapi/v1/users")
+@RequestMapping("/api/v1/admin/users")
 @AllArgsConstructor
 public class AdminUsersController {
     private final AdminUserService adminUserService;

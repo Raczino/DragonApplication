@@ -61,4 +61,20 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Modifying
     @Query("UPDATE Article a SET a.likesCount = a.likesCount + :likesNumber  WHERE a.id = :id")
     void updateArticleLikesCount(@Param("id") Long id, @Param("likesNumber") int likesNumber);
+
+    /**
+     * Artykuły autorów, których DANY UŻYTKOWNIK obserwuje.
+     * (follower = :userId  →  bierzemy followed → ich artykuły)
+     */
+    @Query("""
+        select a
+        from Article a
+        where a.appUser in (
+            select fu
+            from AppUser u
+            join u.followedUsers fu
+            where u.id = :userId
+        )
+    """)
+    Page<Article> findArticlesByAuthorsIFollow(@Param("userId") Long userId, Pageable pageable);
 }

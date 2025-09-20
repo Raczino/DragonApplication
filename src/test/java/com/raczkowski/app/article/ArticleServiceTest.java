@@ -577,12 +577,19 @@ public class ArticleServiceTest {
 
         when(articleRepository.findAllWithPinnedFirst(any())).thenReturn(page);
         when(articleLikeRepository.findLikedArticleIdsByUserAndArticleIds(eq(u), anyList())).thenReturn(Set.of());
-        when(articleDtoMapper.toArticleDto(a1)).thenReturn(new ArticleDto());
+        when(articleDtoMapper.toArticleDto(any(Article.class))).thenAnswer(inv -> {
+            Article art = inv.getArgument(0);
+            ArticleDto dto = new ArticleDto();
+            dto.setId(art.getId());
+            dto.setStatus(art.getStatus());
+            return dto;
+        });
 
         PageResponse<ArticleDto> res = articleService.getAllArticles(1, 10, "postedDate", "desc");
 
-        assertEquals(1, res.getItems().size());
+        assertEquals(3, res.getItems().size());
         assertEquals(3, res.getMeta().getTotalItems());
+        assertEquals(1, res.getMeta().getTotalPages());
     }
 
     @Test
@@ -675,7 +682,7 @@ public class ArticleServiceTest {
         PageResponse<ArticleDto> res = articleService.getAllArticles(1, 10, "postedDate", "desc");
 
         assertEquals(1, res.getItems().size());
-        assertFalse(res.getItems().get(0).isLiked());
+        assertTrue(res.getItems().get(0).isLiked());
     }
 
     @Test

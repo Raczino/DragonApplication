@@ -268,8 +268,8 @@ public class UserServiceTest {
                 eq(NotificationType.USER_FOLLOWED),
                 eq(String.valueOf(target.getId())),
                 same(current),
-                eq("obserwuje Cię!"),
-                eq(""),
+                eq("Masz nowego obserwującego!"),
+                eq("obserwuje Cie!"),
                 eq("profile/5")
         );
     }

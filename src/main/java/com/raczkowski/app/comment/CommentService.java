@@ -3,7 +3,7 @@ package com.raczkowski.app.comment;
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.article.ArticleRepository;
 import com.raczkowski.app.common.pagination.GenericService;
-import com.raczkowski.app.common.pagination.MetaData;
+import com.raczkowski.app.common.pagination.PageMappers;
 import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import com.raczkowski.app.dtoMappers.CommentDtoMapper;
@@ -156,13 +156,6 @@ public class CommentService {
         return commentRepository.findAllByAppUser(appUser).size();
     }
 
-    private Set<Long> getLikedCommentIdsByUser(List<Comment> comments, AppUser user) {
-        return commentLikeRepository.findLikedCommentIdsByUserAndCommentIds(
-                user,
-                comments.stream().map(Comment::getId).toList()
-        );
-    }
-
     private PageResponse<CommentDto> paginateAndMapCommentsWithLikes(
             int pageNumber,
             int pageSize,
@@ -171,24 +164,22 @@ public class CommentService {
             AppUser user
     ) {
         Page<Comment> page = GenericService.paginate(pageNumber, pageSize, sortBy, "DESC", pageSupplier);
-        Set<Long> likedCommentIds = getLikedCommentIdsByUser(page.getContent(), user);
 
-        List<CommentDto> commentDtos = page.getContent().stream()
-                .map(comment -> {
-                    CommentDto dto = commentDtoMapper.toCommentDto(comment);
-                    dto.setLiked(likedCommentIds.contains(comment.getId()));
-                    return dto;
-                })
-                .toList();
+        return PageMappers.mapPageAndEnrich(
+                page,
+                commentDtoMapper::toCommentDto,
+                (dtos, entities) -> {
+                    if (user == null || entities.isEmpty()) return;
+                    var ids = entities.stream().map(Comment::getId).toList();
+                    var likedIds = commentLikeRepository.findLikedCommentIdsByUserAndCommentIds(user, ids);
 
-        return new PageResponse<>(
-                commentDtos,
-                new MetaData(
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.getNumber() + 1,
-                        page.getSize()
-                )
+                    for (CommentDto dto : dtos) {
+                        Long id = dto.getId();
+                        if (id != null && likedIds.contains(id)) {
+                            dto.setLiked(true);
+                        }
+                    }
+                }
         );
     }
 }

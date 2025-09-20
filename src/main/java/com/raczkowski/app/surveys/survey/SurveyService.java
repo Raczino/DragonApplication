@@ -1,6 +1,10 @@
 package com.raczkowski.app.surveys.survey;
 
 import com.raczkowski.app.accountPremium.FeatureKeys;
+import com.raczkowski.app.common.pagination.PageMappers;
+import com.raczkowski.app.common.pagination.PageResponse;
+import com.raczkowski.app.dto.SurveyDto;
+import com.raczkowski.app.dtoMappers.SurveyDtoMapper;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.limits.FeatureLimitHelperService;
@@ -23,6 +27,7 @@ public class SurveyService {
     private final UserService userService;
     private final SurveyRequestValidator surveyRequestValidator;
     private final FeatureLimitHelperService featureLimitHelperService;
+    private final SurveyDtoMapper surveyDtoMapper;
 
     @Transactional
     public Survey createNewSurvey(SurveyRequest surveyRequest) {
@@ -78,5 +83,16 @@ public class SurveyService {
 
     public List<Survey> getAllSurveys() {
         return surveyRepository.findAll();
+    }
+
+    public PageResponse<SurveyDto> getFromFollows(Long userId, int page, int size, String sortBy, String sortDirection) {
+        return PageMappers.paginateAndMap(
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                pageable -> surveyRepository.findSurveyByAuthorsIFollow(userId, pageable),
+                surveyDtoMapper::toDTO
+        );
     }
 }

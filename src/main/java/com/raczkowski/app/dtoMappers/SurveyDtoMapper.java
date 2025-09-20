@@ -5,11 +5,10 @@ import com.raczkowski.app.dto.QuestionDto;
 import com.raczkowski.app.dto.SurveyDto;
 import com.raczkowski.app.surveys.questions.Question;
 import com.raczkowski.app.surveys.survey.Survey;
+import com.raczkowski.app.surveys.survey.SurveyTime;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ public class SurveyDtoMapper {
 
     public SurveyDto toDTO(Survey survey) {
         final List<QuestionDto> questionDTOs = mapQuestions(survey);
-        final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        boolean isActive = SurveyTime.isActive(survey.getScheduledFor(), survey.getEndTime());
 
         return SurveyDto.builder()
                 .id(survey.getId())
@@ -32,7 +31,7 @@ public class SurveyDtoMapper {
                 .scheduledFor(survey.getScheduledFor())
                 .author(authorDtoMapper.toAuthorDto(survey.getOwner()))
                 .questions(questionDTOs)
-                .isActive(survey.getScheduledFor().isBefore(now) && survey.getEndTime().isAfter(now))
+                .isActive(isActive)
                 .build();
     }
 
