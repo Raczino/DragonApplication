@@ -23,13 +23,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -190,18 +188,10 @@ public class ArticleService {
         return articleRepository.findAllByAppUser(appUser).size();
     }
 
-    @Scheduled(fixedRate = 900000)
     @Transactional
-    public void publishArticle() {
-        List<Article> articlesToPublish = articleRepository.getAllByStatus(ArticleStatus.SCHEDULED);
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
-
-        for (Article article : articlesToPublish) {
-            if (article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
-                    article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
-                articleRepository.updateArticleStatus(article.getId());
-            }
-        }
+    public int publishArticles() {
+        var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
+        return articleRepository.publishDueUpTo(nowMinute);
     }
 
     public PageResponse<ArticleDto> searchByQuery(String q, int page, int size, String sortBy, String sortDirection) {

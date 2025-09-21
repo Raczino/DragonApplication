@@ -18,6 +18,7 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -446,24 +447,21 @@ public class ArticleServiceTest {
 
     @Test
     void shouldPublishScheduledArticles() {
-        Article article1 = new Article();
-        article1.setId(1L);
-        article1.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1));
-        article1.setStatus(ArticleStatus.SCHEDULED);
+        // given
+        when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(2);
 
-        Article article2 = new Article();
-        article2.setId(2L);
-        article2.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC));
-        article2.setStatus(ArticleStatus.SCHEDULED);
+        // when
+        int changed = articleService.publishArticles();
 
-        List<Article> articles = List.of(article1, article2);
+        // then
+        ArgumentCaptor<ZonedDateTime> captor = ArgumentCaptor.forClass(ZonedDateTime.class);
+        verify(articleRepository, times(1)).publishDueUpTo(captor.capture());
 
-        when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED)).thenReturn(articles);
+        ZonedDateTime passed = captor.getValue();
+        assertEquals(0, passed.getSecond());
+        assertEquals(0, passed.getNano());
 
-        articleService.publishArticle();
-
-        verify(articleRepository, times(1)).updateArticleStatus(article1.getId());
-        verify(articleRepository, times(1)).updateArticleStatus(article2.getId());
+        assertEquals(2, changed);
     }
 
     @Test
@@ -650,7 +648,7 @@ public class ArticleServiceTest {
         when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED))
                 .thenReturn(List.of(future));
 
-        articleService.publishArticle();
+        articleService.publishArticles();
 
         verify(articleRepository, never()).updateArticleStatus(anyLong());
     }

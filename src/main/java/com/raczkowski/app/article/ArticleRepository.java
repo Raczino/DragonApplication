@@ -77,4 +77,14 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         )
     """)
     Page<Article> findArticlesByAuthorsIFollow(@Param("userId") Long userId, Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+              update Article a
+                 set a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+               where a.status = com.raczkowski.app.enums.ArticleStatus.SCHEDULED
+                 and a.scheduledForDate <= :nowMinute
+            """)
+    int publishDueUpTo(@Param("nowMinute") ZonedDateTime nowMinute);
+
 }
