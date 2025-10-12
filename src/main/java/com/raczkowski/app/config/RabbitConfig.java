@@ -1,36 +1,43 @@
 package com.raczkowski.app.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+@Profile("rabbit-events")
+@EnableRabbit
 @Configuration
 public class RabbitConfig {
-    public static final String QUEUE = "dragon.demo.queue";
-    public static final String EXCHANGE = "dragon.demo.exchange";
-    public static final String ROUTING_KEY = "dragon.demo.key";
+    @Value("${events.exchange:dragon.events.x}")
+    private String exchangeName;
+
+    @Value("${events.queue.local:dragon.events.local.q}")
+    private String queueName;
 
     @Bean
-    public Queue demoQueue() {
-        return QueueBuilder.durable(QUEUE).build();
+    TopicExchange eventsExchange() {
+        return ExchangeBuilder.topicExchange(exchangeName).durable(true).build();
     }
 
     @Bean
-    public TopicExchange demoExchange() {
-        return ExchangeBuilder.topicExchange(EXCHANGE).durable(true).build();
+    Queue localQueue() {
+        return QueueBuilder.durable(queueName).build();
     }
 
     @Bean
-    public Binding demoBinding() {
-        return BindingBuilder.bind(demoQueue()).to(demoExchange()).with(ROUTING_KEY);
+    Binding bindAll(Queue localQueue, TopicExchange eventsExchange) {
+        return BindingBuilder.bind(localQueue).to(eventsExchange).with("#");
     }
 
     @Bean
-    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-        admin.setAutoStartup(true);
-        return admin;
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper om) {
+        var c = new Jackson2JsonMessageConverter(om);
+        c.setCreateMessageIds(true);
+        return c;
     }
 }

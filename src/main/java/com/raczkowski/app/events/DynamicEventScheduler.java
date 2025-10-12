@@ -58,7 +58,7 @@ public class DynamicEventScheduler implements SchedulingConfigurer {
                     () -> {
                         boolean enabled = settings.getBoolean(prefix + "enabled", true);
                         if (enabled) {
-                            bus.publishEvent(factory.get());
+                            bus.publish(factory.get());
                         }
                     },
                     ctx -> {

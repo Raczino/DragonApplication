@@ -8,16 +8,16 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests clean package
 
 ## RUNTIME
+## RUNTIME
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# DELAY
-RUN apk add --no-cache curl tar \
- && curl -sSL https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz -o /tmp/dockerize.tar.gz \
- && tar -xzvf /tmp/dockerize.tar.gz -C /usr/local/bin \
+# Pobierz i rozpakuj dockerize bez użycia apk/curl
+ADD https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz /tmp/dockerize.tar.gz
+RUN tar -xzf /tmp/dockerize.tar.gz -C /usr/local/bin \
  && rm /tmp/dockerize.tar.gz
 
 COPY --from=build /workspace/target/*.jar app.jar
-ENV SPRING_PROFILES_ACTIVE=docker
+ENV SPRING_PROFILES_ACTIVE=docker,rabbit-events
 EXPOSE 8080
 ENTRYPOINT ["sh","-c","dockerize -wait tcp://db:5432 -wait tcp://redis:6379 -wait tcp://rabbit:5672 -timeout 90s && exec java -XX:MaxRAMPercentage=75 -jar app.jar"]
