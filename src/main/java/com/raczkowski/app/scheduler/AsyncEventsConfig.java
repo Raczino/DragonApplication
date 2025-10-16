@@ -1,4 +1,4 @@
-package com.raczkowski.app.events;
+package com.raczkowski.app.scheduler;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

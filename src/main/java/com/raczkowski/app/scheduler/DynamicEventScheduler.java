@@ -1,8 +1,10 @@
-package com.raczkowski.app.events;
+package com.raczkowski.app.scheduler;
 
-import com.raczkowski.app.accountPremium.DeactivateSubscriptionEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raczkowski.app.admin.adminSettings.AdminSettingsService;
-import com.raczkowski.app.article.PublishArticleEvent;
+import com.raczkowski.app.rabbit.actions.ArticleAction;
+import com.raczkowski.app.rabbit.common.EventBus;
+import com.raczkowski.app.rabbit.actions.SubscriptionAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +19,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @Slf4j
 @Configuration
@@ -27,16 +28,22 @@ public class DynamicEventScheduler implements SchedulingConfigurer {
 
     private final AdminSettingsService settings;
     private final EventBus bus;
+    private final ObjectMapper mapper;
 
     private static final long DEFAULT_RATE_MS = Duration.ofMinutes(15).toMillis();
     private static final long DISABLED_POLL_MS = Duration.ofSeconds(30).toMillis();
 
-    private Map<String, Supplier<DomainEvent>> events() {
+    private Map<String, Runnable> events() {
         return Map.of(
-                "publishArticles", PublishArticleEvent::new,
-                "deactivateExpiredSubscriptions", DeactivateSubscriptionEvent::new
+                "publishArticles", () ->
+                        bus.publish("article", ArticleAction.PUBLISH, mapper.nullNode()),
+
+                "deactivateExpiredSubscriptions", () ->
+                        bus.publish("subscription", SubscriptionAction.DEACTIVATE,
+                                mapper.createObjectNode().put("runAt", System.currentTimeMillis()))
         );
     }
+
 
     @Bean
     public TaskScheduler taskScheduler() {
@@ -58,7 +65,7 @@ public class DynamicEventScheduler implements SchedulingConfigurer {
                     () -> {
                         boolean enabled = settings.getBoolean(prefix + "enabled", true);
                         if (enabled) {
-                            bus.publish(factory.get());
+                            factory.run();
                         }
                     },
                     ctx -> {

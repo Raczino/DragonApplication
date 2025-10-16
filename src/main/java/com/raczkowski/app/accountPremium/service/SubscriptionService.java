@@ -124,9 +124,9 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public int checkDeactivatedSubscription() {
+    public void checkDeactivatedSubscription() {
         var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
-        return subscriptionRepository.deactivateExpiredSubscription(nowMinute);
+        subscriptionRepository.deactivateExpiredSubscription(nowMinute);
     }
 
     public boolean isSubscriptionActive(Long userId) {

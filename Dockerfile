@@ -8,11 +8,9 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests clean package
 
 ## RUNTIME
-## RUNTIME
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Pobierz i rozpakuj dockerize bez użycia apk/curl
 ADD https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz /tmp/dockerize.tar.gz
 RUN tar -xzf /tmp/dockerize.tar.gz -C /usr/local/bin \
  && rm /tmp/dockerize.tar.gz

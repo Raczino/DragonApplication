@@ -451,7 +451,7 @@ public class ArticleServiceTest {
         when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(2);
 
         // when
-        int changed = articleService.publishArticles();
+        articleService.publishArticles();
 
         // then
         ArgumentCaptor<ZonedDateTime> captor = ArgumentCaptor.forClass(ZonedDateTime.class);
@@ -460,8 +460,8 @@ public class ArticleServiceTest {
         ZonedDateTime passed = captor.getValue();
         assertEquals(0, passed.getSecond());
         assertEquals(0, passed.getNano());
-
-        assertEquals(2, changed);
+        assertEquals(ZoneOffset.UTC, passed.getOffset());
+        verifyNoMoreInteractions(articleRepository);
     }
 
     @Test

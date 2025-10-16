@@ -189,9 +189,9 @@ public class ArticleService {
     }
 
     @Transactional
-    public int publishArticles() {
+    public void publishArticles() {
         var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
-        return articleRepository.publishDueUpTo(nowMinute);
+        articleRepository.publishDueUpTo(nowMinute);
     }
 
     public PageResponse<ArticleDto> searchByQuery(String q, int page, int size, String sortBy, String sortDirection) {

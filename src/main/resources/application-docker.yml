@@ -9,11 +9,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
@@ -42,3 +42,13 @@ reddit:
   user:
     agent: ${REDDIT_USER_AGENT}
     subreddit: ${REDDIT_SUBREDDIT}
+
+logging:
+  level:
+    com.raczkowski.app.article.ArticleQueueConsumer: INFO
+    com.raczkowski.app.rabbit: INFO
+    org.springframework.amqp: WARN
+
+events:
+  deduplication:
+    ttlSeconds: 86400
