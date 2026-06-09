@@ -446,24 +446,11 @@ public class ArticleServiceTest {
 
     @Test
     void shouldPublishScheduledArticles() {
-        Article article1 = new Article();
-        article1.setId(1L);
-        article1.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1));
-        article1.setStatus(ArticleStatus.SCHEDULED);
+        when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(2);
 
-        Article article2 = new Article();
-        article2.setId(2L);
-        article2.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC));
-        article2.setStatus(ArticleStatus.SCHEDULED);
+        articleService.publishArticles();
 
-        List<Article> articles = List.of(article1, article2);
-
-        when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED)).thenReturn(articles);
-
-        articleService.publishArticle();
-
-        verify(articleRepository, times(1)).updateArticleStatus(article1.getId());
-        verify(articleRepository, times(1)).updateArticleStatus(article2.getId());
+        verify(articleRepository, times(1)).publishDueUpTo(any(ZonedDateTime.class));
     }
 
     @Test
@@ -635,17 +622,12 @@ public class ArticleServiceTest {
 
     @Test
     public void shouldNotPublishWhenScheduledAfterNow() {
-        Article future = new Article();
-        future.setId(1L);
-        future.setStatus(ArticleStatus.SCHEDULED);
-        future.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(2));
+        when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(0);
 
-        when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED))
-                .thenReturn(List.of(future));
-
-        articleService.publishArticle();
+        articleService.publishArticles();
 
         verify(articleRepository, never()).updateArticleStatus(anyLong());
+        verify(articleRepository, times(1)).publishDueUpTo(any(ZonedDateTime.class));
     }
 
     @Test

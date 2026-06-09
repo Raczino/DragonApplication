@@ -21,7 +21,6 @@ import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -188,18 +187,10 @@ public class ArticleService {
         return articleRepository.findAllByAppUser(appUser).size();
     }
 
-    @Scheduled(fixedRate = 900000)
     @Transactional
-    public void publishArticle() {
-        List<Article> articlesToPublish = articleRepository.getAllByStatus(ArticleStatus.SCHEDULED);
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
-
-        for (Article article : articlesToPublish) {
-            if (article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
-                    article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
-                articleRepository.updateArticleStatus(article.getId());
-            }
-        }
+    public void publishArticles() {
+        ZonedDateTime nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+        articleRepository.publishDueUpTo(nowMinute);
     }
 
     private PageResponse<ArticleDto> paginateAndMapWithLikes(

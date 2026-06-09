@@ -9,12 +9,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: docker,rabbit-events
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dragon
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
       # Redis
       SPRING_REDIS_URL: redis://redis:6379
+      # Rabbit
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASS: ${RABBIT_PASS}
       REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID}
       REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET}
       REDDIT_USER_AGENT: ${REDDIT_USER_AGENT}
@@ -23,6 +26,8 @@ services:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbit:
         condition: service_healthy
     restart: unless-stopped
 
@@ -52,5 +57,24 @@ services:
       timeout: 3s
       retries: 20
 
+  rabbit:
+    image: rabbitmq:3.13-management
+    container_name: dragon-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+      RABBITMQ_DEFAULT_VHOST: dragon
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
+  rabbitmq_data:

@@ -55,4 +55,14 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Modifying
     @Query("UPDATE Article a SET a.likesCount = a.likesCount + :likesNumber  WHERE a.id = :id")
     void updateArticleLikesCount(@Param("id") Long id, @Param("likesNumber") int likesNumber);
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+              update Article a
+                 set a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+               where a.status = com.raczkowski.app.enums.ArticleStatus.SCHEDULED
+                 and a.scheduledForDate <= :nowMinute
+            """)
+    int publishDueUpTo(@Param("nowMinute") ZonedDateTime nowMinute);
 }
