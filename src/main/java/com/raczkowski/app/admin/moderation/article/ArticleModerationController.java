@@ -81,7 +81,7 @@ public class ArticleModerationController {
     public ResponseEntity<PageResponse<NonConfirmedArticleDto>> getPendingArticlesForUser(
             @RequestParam Long id, @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortBy", defaultValue = "deletedAt") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "postedDate") String sortBy,
             @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
         return ResponseEntity.ok(moderationArticleService.getPendingArticlesForUser(id, page, size, sortBy, sortDirection));
     }

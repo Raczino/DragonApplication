@@ -550,7 +550,7 @@ public class ArticleServiceTest {
     }
 
     @Test
-    public void shouldFilterOnlyApprovedInGetAllArticles() {
+    public void shouldReturnApprovedArticlesFromRepository() {
         AppUser u = new AppUser();
         u.setId(1L);
         when(userService.getLoggedUser()).thenReturn(u);
@@ -558,17 +558,11 @@ public class ArticleServiceTest {
         Article a1 = new Article();
         a1.setId(1L);
         a1.setStatus(ArticleStatus.APPROVED);
-        Article a2 = new Article();
-        a2.setId(2L);
-        a2.setStatus(ArticleStatus.PENDING);
-        Article a3 = new Article();
-        a3.setId(3L);
-        a3.setStatus(ArticleStatus.SCHEDULED);
 
         @SuppressWarnings("unchecked")
         Page<Article> page = mock(Page.class);
-        when(page.getContent()).thenReturn(List.of(a1, a2, a3));
-        when(page.getTotalElements()).thenReturn(3L);
+        when(page.getContent()).thenReturn(List.of(a1));
+        when(page.getTotalElements()).thenReturn(1L);
         when(page.getTotalPages()).thenReturn(1);
         when(page.getNumber()).thenReturn(0);
         when(page.getSize()).thenReturn(10);
@@ -585,8 +579,8 @@ public class ArticleServiceTest {
 
         PageResponse<ArticleDto> res = articleService.getAllArticles(1, 10, "postedDate", "desc");
 
-        assertEquals(3, res.getItems().size());
-        assertEquals(3, res.getMeta().getTotalItems());
+        assertEquals(1, res.getItems().size());
+        assertEquals(1, res.getMeta().getTotalItems());
         assertEquals(1, res.getMeta().getTotalPages());
     }
 

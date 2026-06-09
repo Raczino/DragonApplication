@@ -196,12 +196,17 @@ public class ModerationArticleService {
     }
 
     public PageResponse<NonConfirmedArticleDto> getPendingArticlesForUser(Long id, int page, int size, String sortBy, String sortDirection) {
+        AppUser user = userService.getUserById(id);
+        if (user == null) {
+            throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
+        }
+
         return PageMappers.paginateAndMap(
                 page,
                 size,
                 sortBy,
                 sortDirection,
-                pageable -> articleToConfirmRepository.findByAppUser(userService.getLoggedUser(), pageable),
+                pageable -> articleToConfirmRepository.findByAppUser(user, pageable),
                 articleDtoMapper::toNonConfirmedArticleDto
         );
     }

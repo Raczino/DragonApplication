@@ -85,7 +85,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findFollowersByUserId(userId);
     }
 
-    public SliceResponse<UserDto> getFollowersListForUser(Long userId, int offset, int limit) {
+    public SliceResponse<UserDto> getFollowersListForUser(Long userId, Integer offset, Integer limit) {
         return OffsetPagination.fetch(
                 offset,
                 limit,
@@ -108,7 +108,7 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public SliceResponse<UserDto> getFollowingUsersPerUser(Long userId, int offset, int limit) {
+    public SliceResponse<UserDto> getFollowingUsersPerUser(Long userId, Integer offset, Integer limit) {
         return OffsetPagination.fetch(
                 offset,
                 limit,

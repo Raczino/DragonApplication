@@ -432,4 +432,39 @@ public class ModerationArticleServiceTest {
         verify(articleService).pinArticle(9L, mod);
         verify(moderationStatisticService).articlePinnedCounterIncrease(8L);
     }
+
+    @Test
+    public void shouldReturnPendingArticlesForProvidedUser() {
+        AppUser user = new AppUser();
+        user.setId(21L);
+        when(userService.getUserById(21L)).thenReturn(user);
+
+        ArticleToConfirm article = new ArticleToConfirm();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ArticleToConfirm> page = new PageImpl<>(List.of(article), pageable, 1);
+
+        when(articleToConfirmRepository.findByAppUser(eq(user), any(Pageable.class))).thenReturn(page);
+
+        NonConfirmedArticleDto dto = mock(NonConfirmedArticleDto.class);
+        when(articleDtoMapper.toNonConfirmedArticleDto(article)).thenReturn(dto);
+
+        PageResponse<NonConfirmedArticleDto> result =
+                moderationArticleService.getPendingArticlesForUser(21L, 1, 10, "postedDate", "desc");
+
+        assertEquals(1, result.getItems().size());
+        assertSame(dto, result.getItems().get(0));
+        verify(articleToConfirmRepository).findByAppUser(eq(user), any(Pageable.class));
+        verify(userService, never()).getLoggedUser();
+    }
+
+    @Test
+    public void shouldThrowWhenPendingArticlesUserNotFound() {
+        when(userService.getUserById(404L)).thenReturn(null);
+
+        ResponseException ex = assertThrows(ResponseException.class,
+                () -> moderationArticleService.getPendingArticlesForUser(404L, 1, 10, "postedDate", "desc"));
+
+        assertEquals(ErrorMessages.USER_NOT_EXITS, ex.getMessage());
+        verifyNoInteractions(articleToConfirmRepository);
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,13 +21,17 @@ import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
-public interface ArticleRepository extends JpaRepository<Article, Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpecificationExecutor<Article> {
     @NonNull Page<Article> findAll(@NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = "appUser")
     Page<Article> findAll(@Nullable Specification<Article> spec, Pageable pageable);
 
-    @Query("SELECT a FROM Article a ORDER BY a.isPinned DESC")
+    @Query("""
+            SELECT a FROM Article a
+            WHERE a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+            ORDER BY a.isPinned DESC
+            """)
     Page<Article> findAllWithPinnedFirst(Pageable pageable);
 
     Article findArticleById(Long id);
@@ -75,6 +80,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             join u.followedUsers fu
             where u.id = :userId
         )
+        and a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
     """)
     Page<Article> findArticlesByAuthorsIFollow(@Param("userId") Long userId, Pageable pageable);
 
