@@ -50,5 +50,12 @@ logging:
     org.springframework.amqp: WARN
 
 events:
-  deduplication:
-    ttlSeconds: 86400
+  exchange: dragon.events.x
+  retry:
+    maxAttempts: 5
+    article:
+      delays: 10000,60000,300000
+    subscription:
+      delays: 10000,60000,300000
+  dedup:
+    ttl-sec: 3600

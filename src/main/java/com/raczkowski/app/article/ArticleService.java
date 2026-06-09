@@ -192,6 +192,7 @@ public class ArticleService {
     public void publishArticles() {
         var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
         articleRepository.publishDueUpTo(nowMinute);
+        throw new RuntimeException("TEST_FAIL");
     }
 
     public PageResponse<ArticleDto> searchByQuery(String q, int page, int size, String sortBy, String sortDirection) {

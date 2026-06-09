@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Profile("rabbit-events")
 @EnableRabbit
@@ -15,6 +19,12 @@ import org.springframework.context.annotation.Profile;
 public class RabbitConfig {
     @Value("${events.exchange:dragon.events.x}")
     private String exchangeName;
+
+    @Value("${events.retry.article.delays:10000,60000,300000}")
+    private List<Long> articleDelays;
+
+    @Value("${events.retry.subscription.delays:10000,60000,300000}")
+    private List<Long> subscriptionDelays;
 
     @Bean
     TopicExchange eventsExchange() {
@@ -70,5 +80,43 @@ public class RabbitConfig {
     @Bean
     Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper om) {
         return new Jackson2JsonMessageConverter(om);
+    }
+
+    @Bean
+    Declarables articleRetry(TopicExchange eventsExchange, @Qualifier("articleQueue") Queue articleQueue) {
+        List<Declarable> decl = new ArrayList<>();
+
+        for (Long d : articleDelays) {
+            String qName = "article.retry." + d + "ms";
+            Queue q = QueueBuilder.durable(qName)
+                    .withArgument("x-message-ttl", d)
+                    .withArgument("x-dead-letter-exchange", exchangeName)
+                    .withArgument("x-dead-letter-routing-key", "article")
+                    .build();
+            Binding b = BindingBuilder.bind(q).to(eventsExchange).with("article.retry." + d + "ms");
+            decl.add(q);
+            decl.add(b);
+        }
+
+        decl.add(BindingBuilder.bind(articleQueue).to(eventsExchange).with("article"));
+        return new Declarables(decl);
+    }
+
+    @Bean
+    Declarables subscriptionRetry(TopicExchange eventsExchange, @Qualifier("subscriptionQueue") Queue subscriptionQueue) {
+        List<Declarable> decl = new ArrayList<>();
+        for (Long d : subscriptionDelays) {
+            String qName = "subscription.retry." + d + "ms";
+            Queue q = QueueBuilder.durable(qName)
+                    .withArgument("x-message-ttl", d)
+                    .withArgument("x-dead-letter-exchange", exchangeName)
+                    .withArgument("x-dead-letter-routing-key", "subscription")
+                    .build();
+            Binding b = BindingBuilder.bind(q).to(eventsExchange).with("subscription.retry." + d + "ms");
+            decl.add(q);
+            decl.add(b);
+        }
+        decl.add(BindingBuilder.bind(subscriptionQueue).to(eventsExchange).with("subscription"));
+        return new Declarables(decl);
     }
 }
