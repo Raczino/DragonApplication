@@ -1,6 +1,6 @@
 package com.raczkowski.app.article;
 
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import lombok.AllArgsConstructor;
@@ -48,6 +48,17 @@ public class ArticleController {
         return ResponseEntity.ok(articleDtoMapper.toArticleDto(article));
     }
 
+    @GetMapping("/search")
+    public PageResponse<ArticleDto> search(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "postedDate") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "DESC") String sortDirection
+    ) {
+        return articleService.searchByQuery(q, page, size, sortBy, sortDirection);
+    }
+
     @DeleteMapping("/delete")
     public void removeArticle(@RequestParam Long id) {
         articleService.removeArticle(id);
@@ -61,5 +72,16 @@ public class ArticleController {
     @PutMapping("/update")
     void updateArticle(@RequestBody ArticleRequest articleRequest) {
         articleService.updateArticle(articleRequest);
+    }
+
+    @GetMapping("/get/articles/from/follows")
+    public PageResponse<ArticleDto> getContentForUser(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "postedDate") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "DESC") String sortDirection
+    ) {
+        return articleService.getContentForUser(userId, page, size, sortBy, sortDirection);
     }
 }

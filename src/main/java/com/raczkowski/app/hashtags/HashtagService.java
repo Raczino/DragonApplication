@@ -1,11 +1,10 @@
 package com.raczkowski.app.hashtags;
 
-import com.raczkowski.app.article.Article;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,11 +14,11 @@ public class HashtagService {
 
     private final HashtagRepository hashtagRepository;
 
-    public List<Hashtag> parseHashtags(String hashtagString) {
+    public Set<Hashtag> parseHashtags(String hashtagString) {
         Pattern pattern = Pattern.compile("#\\w+");
         Matcher matcher = pattern.matcher(hashtagString);
 
-        List<Hashtag> hashtags = new ArrayList<>();
+        Set<Hashtag> hashtags = new HashSet<>();
 
         while (matcher.find()) {
             String name = matcher.group();
@@ -30,7 +29,7 @@ public class HashtagService {
         return hashtags;
     }
 
-    private Hashtag findOrCreateHashtag(String tag) {
+    public Hashtag findOrCreateHashtag(String tag) {
         Hashtag hashtag = hashtagRepository.findByTag(tag);
         if (hashtag == null) {
             hashtag = new Hashtag(tag);

@@ -1,13 +1,17 @@
 package com.raczkowski.app.notification;
 
+import com.raczkowski.app.common.offset.OffsetPagination;
+import com.raczkowski.app.common.offset.SliceResponse;
+import com.raczkowski.app.enums.NotificationType;
+import com.raczkowski.app.user.AppUser;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -29,7 +33,31 @@ public class NotificationService {
         notificationRepository.markNotificationAsRead(id, ZonedDateTime.now(ZoneOffset.UTC));
     }
 
-    public List<Notification> getAllNotificationsForUser(String id) {
-        return notificationRepository.getAllNotificationsForUser(id);
+    public SliceResponse<Notification> getForUserOffset(String userId, Integer offset, Integer limit) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id"));
+
+        return OffsetPagination.fetch(
+                offset,
+                limit,
+                sort,
+                20,
+                200,
+                pageable -> notificationRepository.findForUser(userId, pageable)
+        );
+    }
+
+    @Transactional
+    public void sendNotification(NotificationType type, String userId, AppUser createdBy, String title, String message, String targetUrl) {
+        Notification notification = new Notification(
+                userId,
+                type,
+                title,
+                message,
+                ZonedDateTime.now(ZoneOffset.UTC),
+                createdBy.getFirstName(),
+                targetUrl
+        );
+        saveNotification(notification);
+        sendNotification(userId, notification);
     }
 }

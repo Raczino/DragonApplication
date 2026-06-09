@@ -27,6 +27,7 @@ public class UserDtoMapper {
                 .followersCount(followersCount)
                 .followingCount(followingCount)
                 .accountType(user.getAccountType())
+                .registeredDate(user.getRegistrationDate())
                 .build();
     }
 }

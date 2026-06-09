@@ -7,8 +7,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class HashtagServiceTest {
@@ -29,12 +31,11 @@ class HashtagServiceTest {
         when(hashtagRepository.findByTag("#hashtag1")).thenReturn(null);
 
         String input = "#hashtag1";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
         assertEquals(1, hashtags.size());
-        assertEquals("#hashtag1", hashtags.get(0).getTag());
-
-        verify(hashtagRepository, times(1)).save(any(Hashtag.class));
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag1".equals(h.getTag())));
+        verify(hashtagRepository).save(any(Hashtag.class));
     }
 
     @Test
@@ -43,12 +44,11 @@ class HashtagServiceTest {
         when(hashtagRepository.findByTag("#hashtag2")).thenReturn(null);
 
         String input = "#hashtag1#hashtag2";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
         assertEquals(2, hashtags.size());
-        assertEquals("#hashtag1", hashtags.get(0).getTag());
-        assertEquals("#hashtag2", hashtags.get(1).getTag());
-
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag1".equals(h.getTag())));
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag2".equals(h.getTag())));
         verify(hashtagRepository, times(2)).save(any(Hashtag.class));
     }
 
@@ -58,12 +58,11 @@ class HashtagServiceTest {
         when(hashtagRepository.findByTag("#hashtag2")).thenReturn(null);
 
         String input = "#hashtag1 #hashtag2";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
         assertEquals(2, hashtags.size());
-        assertEquals("#hashtag1", hashtags.get(0).getTag());
-        assertEquals("#hashtag2", hashtags.get(1).getTag());
-
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag1".equals(h.getTag())));
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag2".equals(h.getTag())));
         verify(hashtagRepository, times(2)).save(any(Hashtag.class));
     }
 
@@ -73,12 +72,11 @@ class HashtagServiceTest {
         when(hashtagRepository.findByTag("#hashtag2")).thenReturn(null);
 
         String input = "#hashtag1#hashtag2#hashtag1";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
-        assertEquals(3, hashtags.size());
-        assertEquals("#hashtag1", hashtags.get(0).getTag());
-        assertEquals("#hashtag2", hashtags.get(1).getTag());
-        assertEquals("#hashtag1", hashtags.get(2).getTag());
+        assertEquals(2, hashtags.size());
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag1".equals(h.getTag())));
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag2".equals(h.getTag())));
 
         verify(hashtagRepository, times(1)).save(any(Hashtag.class));
         verify(hashtagRepository, times(2)).findByTag("#hashtag1");
@@ -88,7 +86,7 @@ class HashtagServiceTest {
     @Test
     void shouldHandleEmptyString() {
         String input = "";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
         assertEquals(0, hashtags.size());
 
@@ -100,13 +98,12 @@ class HashtagServiceTest {
         when(hashtagRepository.findByTag("#hashtag2")).thenReturn(null);
 
         String input = "hashtag1 #hashtag2";
-        List<Hashtag> hashtags = hashtagService.parseHashtags(input);
+        Set<Hashtag> hashtags = hashtagService.parseHashtags(input);
 
         assertEquals(1, hashtags.size(), "Powinien być tylko jeden hashtag");
-        assertEquals("#hashtag2", hashtags.get(0).getTag(), "Powinien być zapisany tylko #hashtag2");
+        assertTrue(hashtags.stream().anyMatch(h -> "#hashtag2".equals(h.getTag())));
 
         verify(hashtagRepository, never()).findByTag("hashtag1");
-
         verify(hashtagRepository, times(1)).findByTag("#hashtag2");
         verify(hashtagRepository, times(1)).save(any(Hashtag.class));
     }

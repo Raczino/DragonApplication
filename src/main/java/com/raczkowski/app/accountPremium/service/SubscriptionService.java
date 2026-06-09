@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -128,16 +127,8 @@ public class SubscriptionService {
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void checkDeactivatedSubscription() {
-        List<Subscription> subscriptions = subscriptionRepository.findAll();
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
-
-        for (Subscription subscription : subscriptions) {
-            if (subscription.getEndDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
-                    subscription.getEndDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
-                subscription.setActive(false);
-                subscriptionRepository.save(subscription);
-            }
-        }
+        var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
+        subscriptionRepository.deactivateExpiredSubscription(nowMinute);
     }
 
     public boolean isSubscriptionActive(Long userId) {

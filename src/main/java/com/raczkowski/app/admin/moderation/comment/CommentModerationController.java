@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/webapi/v1/comment")
+@RequestMapping("/api/v1/moderator/comment")
 @AllArgsConstructor
 public class CommentModerationController {
     private final ModerationCommentService moderationCommentService;

@@ -1,6 +1,6 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.addComment(commentRequest));
     }
 
-    @GetMapping("/article")
+    @GetMapping("/for/article")
     ResponseEntity<PageResponse<CommentDto>> getAllCommentsByArticleId(
             @RequestParam Long articleId,
             @RequestParam(name = "page", defaultValue = "1") int page,
@@ -27,7 +27,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsForArticle(articleId, page, size));
     }
 
-    @GetMapping("/user")
+    @GetMapping("/for/user")
     ResponseEntity<PageResponse<CommentDto>> getAllCommentsForUser(
             @RequestParam Long userId,
             @RequestParam(name = "page", defaultValue = "1") int page,

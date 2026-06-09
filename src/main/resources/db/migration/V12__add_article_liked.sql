@@ -1,0 +1,1 @@
+ALTER TABLE article ADD COLUMN IF NOT EXISTS liked boolean;

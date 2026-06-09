@@ -3,7 +3,7 @@ package com.raczkowski.app.article;
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
@@ -18,6 +18,7 @@ import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -446,24 +447,21 @@ public class ArticleServiceTest {
 
     @Test
     void shouldPublishScheduledArticles() {
-        Article article1 = new Article();
-        article1.setId(1L);
-        article1.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1));
-        article1.setStatus(ArticleStatus.SCHEDULED);
+        // given
+        when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(2);
 
-        Article article2 = new Article();
-        article2.setId(2L);
-        article2.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC));
-        article2.setStatus(ArticleStatus.SCHEDULED);
+        // when
+        articleService.publishArticles();
 
-        List<Article> articles = List.of(article1, article2);
+        // then
+        ArgumentCaptor<ZonedDateTime> captor = ArgumentCaptor.forClass(ZonedDateTime.class);
+        verify(articleRepository, times(1)).publishDueUpTo(captor.capture());
 
-        when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED)).thenReturn(articles);
-
-        articleService.publishArticle();
-
-        verify(articleRepository, times(1)).updateArticleStatus(article1.getId());
-        verify(articleRepository, times(1)).updateArticleStatus(article2.getId());
+        ZonedDateTime passed = captor.getValue();
+        assertEquals(0, passed.getSecond());
+        assertEquals(0, passed.getNano());
+        assertEquals(ZoneOffset.UTC, passed.getOffset());
+        verifyNoMoreInteractions(articleRepository);
     }
 
     @Test
@@ -534,7 +532,7 @@ public class ArticleServiceTest {
         req.setContentHtml("<p>C</p>");
         req.setHashtags("#java #spring");
 
-        List<Hashtag> parsed = List.of(new Hashtag("java"), new Hashtag("spring"));
+        Set<Hashtag> parsed = Set.of(new Hashtag("java"), new Hashtag("spring"));
         when(hashtagService.parseHashtags("#java #spring")).thenReturn(parsed);
 
         // When
@@ -552,7 +550,7 @@ public class ArticleServiceTest {
     }
 
     @Test
-    public void shouldFilterOnlyApprovedInGetAllArticles() {
+    public void shouldReturnApprovedArticlesFromRepository() {
         AppUser u = new AppUser();
         u.setId(1L);
         when(userService.getLoggedUser()).thenReturn(u);
@@ -560,29 +558,30 @@ public class ArticleServiceTest {
         Article a1 = new Article();
         a1.setId(1L);
         a1.setStatus(ArticleStatus.APPROVED);
-        Article a2 = new Article();
-        a2.setId(2L);
-        a2.setStatus(ArticleStatus.PENDING);
-        Article a3 = new Article();
-        a3.setId(3L);
-        a3.setStatus(ArticleStatus.SCHEDULED);
 
         @SuppressWarnings("unchecked")
         Page<Article> page = mock(Page.class);
-        when(page.getContent()).thenReturn(List.of(a1, a2, a3));
-        when(page.getTotalElements()).thenReturn(3L);
+        when(page.getContent()).thenReturn(List.of(a1));
+        when(page.getTotalElements()).thenReturn(1L);
         when(page.getTotalPages()).thenReturn(1);
         when(page.getNumber()).thenReturn(0);
         when(page.getSize()).thenReturn(10);
 
         when(articleRepository.findAllWithPinnedFirst(any())).thenReturn(page);
         when(articleLikeRepository.findLikedArticleIdsByUserAndArticleIds(eq(u), anyList())).thenReturn(Set.of());
-        when(articleDtoMapper.toArticleDto(a1)).thenReturn(new ArticleDto());
+        when(articleDtoMapper.toArticleDto(any(Article.class))).thenAnswer(inv -> {
+            Article art = inv.getArgument(0);
+            ArticleDto dto = new ArticleDto();
+            dto.setId(art.getId());
+            dto.setStatus(art.getStatus());
+            return dto;
+        });
 
         PageResponse<ArticleDto> res = articleService.getAllArticles(1, 10, "postedDate", "desc");
 
         assertEquals(1, res.getItems().size());
-        assertEquals(3, res.getMeta().getTotalItems());
+        assertEquals(1, res.getMeta().getTotalItems());
+        assertEquals(1, res.getMeta().getTotalPages());
     }
 
     @Test
@@ -643,7 +642,7 @@ public class ArticleServiceTest {
         when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED))
                 .thenReturn(List.of(future));
 
-        articleService.publishArticle();
+        articleService.publishArticles();
 
         verify(articleRepository, never()).updateArticleStatus(anyLong());
     }
@@ -675,7 +674,7 @@ public class ArticleServiceTest {
         PageResponse<ArticleDto> res = articleService.getAllArticles(1, 10, "postedDate", "desc");
 
         assertEquals(1, res.getItems().size());
-        assertFalse(res.getItems().get(0).isLiked());
+        assertTrue(res.getItems().get(0).isLiked());
     }
 
     @Test

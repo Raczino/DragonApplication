@@ -3,9 +3,10 @@ package com.raczkowski.app.article;
 import com.raczkowski.app.accountPremium.FeatureKeys;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirm;
 import com.raczkowski.app.admin.moderation.article.ArticleToConfirmRepository;
-import com.raczkowski.app.common.GenericService;
-import com.raczkowski.app.common.MetaData;
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.GenericService;
+import com.raczkowski.app.common.pagination.MetaData;
+import com.raczkowski.app.common.pagination.PageMappers;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dtoMappers.ArticleDtoMapper;
 import com.raczkowski.app.enums.ArticleStatus;
@@ -21,13 +22,13 @@ import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -64,7 +65,7 @@ public class ArticleService {
         );
 
         if (request.getHashtags() != null) {
-            List<Hashtag> hashtags = hashtagService.parseHashtags(request.getHashtags());
+            Set<Hashtag> hashtags = hashtagService.parseHashtags(request.getHashtags());
             articleToConfirm.setHashtags(hashtags);
         }
 
@@ -79,15 +80,13 @@ public class ArticleService {
     }
 
     public PageResponse<ArticleDto> getAllArticles(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        AppUser user = userService.getLoggedUser();
-
         return paginateAndMapWithLikes(
                 pageNumber,
                 pageSize,
                 sortBy,
                 sortDirection,
                 articleRepository::findAllWithPinnedFirst,
-                user
+                userService.getLoggedUser()
         );
     }
 
@@ -115,9 +114,11 @@ public class ArticleService {
 
     public Article getArticleByID(Long id) {
         Article article = articleRepository.findArticleById(id);
+        AppUser user = userService.getLoggedUser();
         if (article == null) {
             throw new ResponseException(ErrorMessages.ARTICLE_ID_NOT_EXISTS);
         }
+        article.setLiked(articleLikeRepository.existsArticleLikesByAppUserAndArticle(user, article));
         return article;
     }
 
@@ -190,16 +191,29 @@ public class ArticleService {
 
     @Scheduled(fixedRate = 900000)
     @Transactional
-    public void publishArticle() {
-        List<Article> articlesToPublish = articleRepository.getAllByStatus(ArticleStatus.SCHEDULED);
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+    public void publishArticles() {
+        var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
+        articleRepository.publishDueUpTo(nowMinute);
+    }
 
-        for (Article article : articlesToPublish) {
-            if (article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).isBefore(currentTime) ||
-                    article.getScheduledForDate().truncatedTo(ChronoUnit.MINUTES).equals(currentTime)) {
-                articleRepository.updateArticleStatus(article.getId());
-            }
+    public PageResponse<ArticleDto> searchByQuery(String q, int page, int size, String sortBy, String sortDirection) {
+        if (q == null || q.isBlank()) {
+            return new PageResponse<>(List.of(), new MetaData(0, 0, page, size));
         }
+
+        AppUser user = userService.getLoggedUser();
+        Specification<Article> spec = Specification
+                .where(ArticleSpecs.titleOrAuthorContainsIgnoreCase(q))
+                .and(ArticleSpecs.statusEquals(ArticleStatus.APPROVED));
+
+        return paginateAndMapWithLikes(
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                pageable -> articleRepository.findAll(spec, pageable),
+                user
+        );
     }
 
     private PageResponse<ArticleDto> paginateAndMapWithLikes(
@@ -211,34 +225,33 @@ public class ArticleService {
             AppUser user
     ) {
         Page<Article> page = GenericService.paginate(pageNumber, pageSize, sortBy, sortDirection, pageSupplier);
-        Set<Long> likedArticleIds = getLikedArticlesByUser(page, user);
 
-        List<ArticleDto> articleDtos = page.getContent().stream()
-                .filter(article -> article.getStatus() == ArticleStatus.APPROVED)
-                .map(article -> {
-                    ArticleDto dto = articleDtoMapper.toArticleDto(article);
-                    dto.setLiked(likedArticleIds.contains(article.getId()));
-                    return dto;
-                })
-                .toList();
+        return PageMappers.mapPageAndEnrich(
+                page,
+                articleDtoMapper::toArticleDto,
+                (dtos, entities) -> {
+                    if (user == null || entities.isEmpty()) return;
+                    var ids = entities.stream().map(Article::getId).toList();
+                    var likedIds = articleLikeRepository.findLikedArticleIdsByUserAndArticleIds(user, ids);
 
-        return new PageResponse<>(
-                articleDtos,
-                new MetaData(
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.getNumber() + 1,
-                        page.getSize()
-                )
+                    for (ArticleDto dto : dtos) {
+                        Long id = dto.getId();
+                        if (id != null && likedIds.contains(id)) {
+                            dto.setLiked(true);
+                        }
+                    }
+                }
         );
     }
 
-    private Set<Long> getLikedArticlesByUser(Page<Article> articlePage, AppUser user) {
-        List<Article> articles = articlePage.getContent();
-
-        return articleLikeRepository.findLikedArticleIdsByUserAndArticleIds(
-                user,
-                articles.stream().map(Article::getId).toList()
+    public PageResponse<ArticleDto> getContentForUser(Long userId, int page, int size, String sortBy, String sortDirection) {
+        return paginateAndMapWithLikes(
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                pageable -> articleRepository.findArticlesByAuthorsIFollow(userId, pageable),
+                userService.getLoggedUser()
         );
     }
 }

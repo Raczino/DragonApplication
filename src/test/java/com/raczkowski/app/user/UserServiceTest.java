@@ -1,8 +1,13 @@
 package com.raczkowski.app.user;
 
+import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
+import com.raczkowski.app.common.offset.SliceResponse;
+import com.raczkowski.app.dto.UserDto;
+import com.raczkowski.app.dto.UserDtoAssembler;
+import com.raczkowski.app.notification.NotificationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +19,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -29,6 +36,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Mock
+    private NotificationService notificationService;
+    @Mock
+    private UserDtoAssembler userDtoAssembler;
 
     @InjectMocks
     private UserService userService;
@@ -197,6 +208,42 @@ public class UserServiceTest {
     }
 
     @Test
+    public void shouldUseDefaultPaginationWhenFollowersOffsetAndLimitAreMissing() {
+        AppUser follower = new AppUser();
+        UserDto dto = new UserDto();
+
+        when(userRepository.findFollowersSliceByUserId(eq(9L), any(Pageable.class)))
+                .thenAnswer(inv -> new SliceImpl<>(List.of(follower), inv.getArgument(1), false));
+        when(userDtoAssembler.assemble(follower)).thenReturn(dto);
+
+        SliceResponse<UserDto> response = userService.getFollowersListForUser(9L, null, null);
+
+        assertEquals(1, response.items().size());
+        assertSame(dto, response.items().get(0));
+        verify(userRepository).findFollowersSliceByUserId(eq(9L), argThat(pageable ->
+                pageable.getPageNumber() == 0 && pageable.getPageSize() == 20
+        ));
+    }
+
+    @Test
+    public void shouldUseDefaultPaginationWhenFollowingOffsetAndLimitAreMissing() {
+        AppUser followed = new AppUser();
+        UserDto dto = new UserDto();
+
+        when(userRepository.findFollowingSliceByUserId(eq(8L), any(Pageable.class)))
+                .thenAnswer(inv -> new SliceImpl<>(List.of(followed), inv.getArgument(1), false));
+        when(userDtoAssembler.assemble(followed)).thenReturn(dto);
+
+        SliceResponse<UserDto> response = userService.getFollowingUsersPerUser(8L, null, null);
+
+        assertEquals(1, response.items().size());
+        assertSame(dto, response.items().get(0));
+        verify(userRepository).findFollowingSliceByUserId(eq(8L), argThat(pageable ->
+                pageable.getPageNumber() == 0 && pageable.getPageSize() == 20
+        ));
+    }
+
+    @Test
     public void shouldThrowWhenFollowTargetNotFound() {
         // Given
         AppUser current = new AppUser();
@@ -221,7 +268,6 @@ public class UserServiceTest {
     public void shouldThrowWhenTryingToFollowYourself() {
         // Given
         AppUser current = new AppUser();
-        // getLoggedUser -> SecurityContext email
         when(userRepository.findByEmail(anyString())).thenReturn(current);
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn("me@x.com");
@@ -242,7 +288,9 @@ public class UserServiceTest {
     public void shouldFollowUserAndSaveCurrentUser() {
         // Given
         AppUser current = spy(new AppUser());
+        current.setId(5L);
         AppUser target = new AppUser();
+        target.setId(2L);
         when(userRepository.findByEmail(anyString())).thenReturn(current);
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn("me@x.com");
@@ -256,7 +304,17 @@ public class UserServiceTest {
         userService.followUser(2L);
 
         // Then
+        verify(current).followUser(target);
         verify(userRepository).save(current);
+
+        verify(notificationService).sendNotification(
+                eq(NotificationType.USER_FOLLOWED),
+                eq(String.valueOf(target.getId())),
+                same(current),
+                eq("Masz nowego obserwującego!"),
+                eq("obserwuje Cie!"),
+                eq("profile/5")
+        );
     }
 
     @Test

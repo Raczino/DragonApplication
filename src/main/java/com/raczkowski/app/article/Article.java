@@ -5,12 +5,16 @@ import com.raczkowski.app.enums.ArticleStatus;
 import com.raczkowski.app.hashtags.Hashtag;
 import com.raczkowski.app.likes.ArticleLike;
 import com.raczkowski.app.user.AppUser;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -42,7 +46,7 @@ public class Article {
 
     private ZonedDateTime scheduledForDate;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             nullable = false
     )
@@ -71,25 +75,27 @@ public class Article {
 
     private ZonedDateTime acceptedAt;
 
-    @OneToOne
+    @ManyToOne
     private AppUser acceptedBy;
 
     @Column(columnDefinition = "boolean default false")
     private boolean isPinned;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "pinned_by")
     private AppUser pinnedBy;
 
-    @ManyToMany(cascade = {CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "article_hashtag",
             joinColumns = @JoinColumn(name = "article_id"),
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
-    private List<Hashtag> hashtags = new ArrayList<>();
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     private int likesCount;
+
+    private boolean liked;
 
     private int commentsCount;
 

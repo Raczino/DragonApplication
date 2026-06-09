@@ -5,10 +5,14 @@ import com.raczkowski.app.user.AppUser;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +21,17 @@ import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
-public interface ArticleRepository extends JpaRepository<Article, Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpecificationExecutor<Article> {
     @NonNull Page<Article> findAll(@NonNull Pageable pageable);
 
-    @Query("SELECT a FROM Article a ORDER BY a.isPinned DESC")
+    @EntityGraph(attributePaths = "appUser")
+    Page<Article> findAll(@Nullable Specification<Article> spec, Pageable pageable);
+
+    @Query("""
+            SELECT a FROM Article a
+            WHERE a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+            ORDER BY a.isPinned DESC
+            """)
     Page<Article> findAllWithPinnedFirst(Pageable pageable);
 
     Article findArticleById(Long id);
@@ -55,4 +66,31 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Modifying
     @Query("UPDATE Article a SET a.likesCount = a.likesCount + :likesNumber  WHERE a.id = :id")
     void updateArticleLikesCount(@Param("id") Long id, @Param("likesNumber") int likesNumber);
+
+    /**
+     * Artykuły autorów, których DANY UŻYTKOWNIK obserwuje.
+     * (follower = :userId  →  bierzemy followed → ich artykuły)
+     */
+    @Query("""
+        select a
+        from Article a
+        where a.appUser in (
+            select fu
+            from AppUser u
+            join u.followedUsers fu
+            where u.id = :userId
+        )
+        and a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+    """)
+    Page<Article> findArticlesByAuthorsIFollow(@Param("userId") Long userId, Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+              update Article a
+                 set a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+               where a.status = com.raczkowski.app.enums.ArticleStatus.SCHEDULED
+                 and a.scheduledForDate <= :nowMinute
+            """)
+    int publishDueUpTo(@Param("nowMinute") ZonedDateTime nowMinute);
+
 }

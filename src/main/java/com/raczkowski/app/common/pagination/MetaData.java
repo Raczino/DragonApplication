@@ -1,4 +1,4 @@
-package com.raczkowski.app.common;
+package com.raczkowski.app.common.pagination;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableScheduling
 public class DragonApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(DragonApplication.class, args);
     }
-
 }

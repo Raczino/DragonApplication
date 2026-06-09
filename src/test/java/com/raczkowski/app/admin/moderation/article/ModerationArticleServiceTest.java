@@ -3,8 +3,8 @@ package com.raczkowski.app.admin.moderation.article;
 import com.raczkowski.app.admin.common.PermissionValidator;
 import com.raczkowski.app.admin.operator.users.ModerationStatisticService;
 import com.raczkowski.app.article.*;
-import com.raczkowski.app.common.GenericService;
-import com.raczkowski.app.common.PageResponse;
+import com.raczkowski.app.common.pagination.GenericService;
+import com.raczkowski.app.common.pagination.PageResponse;
 import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.DeletedArticleDto;
 import com.raczkowski.app.dto.NonConfirmedArticleDto;
@@ -15,7 +15,6 @@ import com.raczkowski.app.enums.NotificationType;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.hashtags.Hashtag;
-import com.raczkowski.app.notification.Notification;
 import com.raczkowski.app.notification.NotificationService;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserService;
@@ -33,7 +32,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -132,7 +133,7 @@ public class ModerationArticleServiceTest {
         atc.setContentHtml("<p>C</p>");
         atc.setPostedDate(ZonedDateTime.now(ZoneOffset.UTC).minusDays(1));
         atc.setAppUser(author);
-        atc.setHashtags(List.of(new Hashtag("tag")));
+        atc.setHashtags(Set.of(new Hashtag("tag")));
 
         when(permissionValidator.validateIfUserIsAdminOrModerator()).thenReturn(approver);
         when(userService.getLoggedUser()).thenReturn(approver);
@@ -142,6 +143,12 @@ public class ModerationArticleServiceTest {
         when(articleDtoMapper.toArticleDto(any(Article.class))).thenReturn(mapped);
 
         ArgumentCaptor<Article> articleCaptor = ArgumentCaptor.forClass(Article.class);
+
+        doAnswer(inv -> {
+            Article a = inv.getArgument(0);
+            a.setId(123L);
+            return null;
+        }).when(articleService).saveArticle(any(Article.class));
 
         // When
         ArticleDto result = moderationArticleService.confirmArticle(1L);
@@ -157,8 +164,14 @@ public class ModerationArticleServiceTest {
         assertNotNull(saved.getAcceptedAt());
 
         verify(articleToConfirmRepository).deleteArticleToConfirmById(1L);
-        verify(notificationService).saveNotification(any(Notification.class));
-        verify(notificationService).sendNotification(eq(String.valueOf(author.getId())), any(Notification.class));
+        verify(notificationService).sendNotification(
+                eq(NotificationType.ARTICLE_PUBLISH),
+                eq(String.valueOf(author.getId())),
+                eq(approver),
+                eq("Your article has been accepted!"),
+                eq("Accepted By"),
+                eq("article/123")
+        );
         verify(moderationStatisticService).articleApprovedCounterIncrease(approver.getId());
     }
 
@@ -179,6 +192,7 @@ public class ModerationArticleServiceTest {
         atc.setPostedDate(ZonedDateTime.now(ZoneOffset.UTC).minusDays(2));
         atc.setAppUser(author);
         atc.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).plusDays(3));
+        atc.setHashtags(new HashSet<>());
 
         when(permissionValidator.validateIfUserIsAdminOrModerator()).thenReturn(approver);
         when(userService.getLoggedUser()).thenReturn(approver);
@@ -241,8 +255,14 @@ public class ModerationArticleServiceTest {
         assertSame(dto, res);
         verify(articleToConfirmRepository).deleteArticleToConfirmById(9L);
         verify(rejectedArticleRepository).save(any(RejectedArticle.class));
-        verify(notificationService).saveNotification(any(Notification.class));
-        verify(notificationService).sendNotification(eq(String.valueOf(author.getId())), any(Notification.class));
+        verify(notificationService).sendNotification(
+                eq(NotificationType.ARTICLE_REJECT),
+                eq(String.valueOf(author.getId())),
+                eq(moderator),
+                eq("Your article has been rejected!"),
+                eq("Rejected By"),
+                isNull()
+        );
         verify(moderationStatisticService).articleRejectedCounterIncrease(moderator.getId());
     }
 
@@ -414,63 +434,37 @@ public class ModerationArticleServiceTest {
     }
 
     @Test
-    public void shouldSaveAndSendNotification() {
-        // Given
-        AppUser by = new AppUser();
-        by.setFirstName("Kate");
+    public void shouldReturnPendingArticlesForProvidedUser() {
+        AppUser user = new AppUser();
+        user.setId(21L);
+        when(userService.getUserById(21L)).thenReturn(user);
 
-        // When
-        moderationArticleService.sendNotification(
-                NotificationType.ARTICLE_PUBLISH,
-                "7",
-                by,
-                "t", "m", "/article/1"
-        );
+        ArticleToConfirm article = new ArticleToConfirm();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ArticleToConfirm> page = new PageImpl<>(List.of(article), pageable, 1);
 
-        // Then
-        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-        verify(notificationService).saveNotification(captor.capture());
-        verify(notificationService).sendNotification(eq("7"), any(Notification.class));
+        when(articleToConfirmRepository.findByAppUser(eq(user), any(Pageable.class))).thenReturn(page);
 
-        Notification n = captor.getValue();
-        assertEquals("7", n.getUserId());
-        assertEquals(NotificationType.ARTICLE_PUBLISH, n.getType());
-        assertEquals("t", n.getTitle());
-        assertEquals("m", n.getMessage());
-        assertEquals("Kate", n.getCreatedBy());
-        assertEquals("/article/1", n.getTargetUrl());
-        assertNotNull(n.getCreatedAt());
+        NonConfirmedArticleDto dto = mock(NonConfirmedArticleDto.class);
+        when(articleDtoMapper.toNonConfirmedArticleDto(article)).thenReturn(dto);
+
+        PageResponse<NonConfirmedArticleDto> result =
+                moderationArticleService.getPendingArticlesForUser(21L, 1, 10, "postedDate", "desc");
+
+        assertEquals(1, result.getItems().size());
+        assertSame(dto, result.getItems().get(0));
+        verify(articleToConfirmRepository).findByAppUser(eq(user), any(Pageable.class));
+        verify(userService, never()).getLoggedUser();
     }
 
     @Test
-    public void shouldReturnPendingArticlesForSpecificUserOnly() {
-        // Given
-        AppUser u1 = new AppUser();
-        u1.setId(1L);
-        AppUser u2 = new AppUser();
-        u2.setId(2L);
+    public void shouldThrowWhenPendingArticlesUserNotFound() {
+        when(userService.getUserById(404L)).thenReturn(null);
 
-        ArticleToConfirm a1 = new ArticleToConfirm();
-        a1.setAppUser(u1);
-        ArticleToConfirm a2 = new ArticleToConfirm();
-        a2.setAppUser(u2);
-        ArticleToConfirm a3 = new ArticleToConfirm();
-        a3.setAppUser(u1);
+        ResponseException ex = assertThrows(ResponseException.class,
+                () -> moderationArticleService.getPendingArticlesForUser(404L, 1, 10, "postedDate", "desc"));
 
-        when(articleToConfirmRepository.findAll()).thenReturn(List.of(a1, a2, a3));
-
-        NonConfirmedArticleDto d1 = mock(NonConfirmedArticleDto.class);
-        NonConfirmedArticleDto d3 = mock(NonConfirmedArticleDto.class);
-        when(articleDtoMapper.toNonConfirmedArticleDto(a1)).thenReturn(d1);
-        when(articleDtoMapper.toNonConfirmedArticleDto(a3)).thenReturn(d3);
-
-        // When
-        List<NonConfirmedArticleDto> out = moderationArticleService.getPendingArticlesForUser(1L);
-
-        // Then
-        assertEquals(2, out.size());
-        verify(articleDtoMapper, times(1)).toNonConfirmedArticleDto(a1);
-        verify(articleDtoMapper, times(1)).toNonConfirmedArticleDto(a3);
-        verify(articleDtoMapper, never()).toNonConfirmedArticleDto(a2);
+        assertEquals(ErrorMessages.USER_NOT_EXITS, ex.getMessage());
+        verifyNoInteractions(articleToConfirmRepository);
     }
 }

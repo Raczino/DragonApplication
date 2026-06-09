@@ -1,16 +1,24 @@
 package com.raczkowski.app.admin.operator.users;
 
 import com.raczkowski.app.admin.common.PermissionValidator;
+import com.raczkowski.app.common.pagination.GenericService;
+import com.raczkowski.app.common.pagination.MetaData;
+import com.raczkowski.app.common.pagination.PageResponse;
+import com.raczkowski.app.dto.UserDto;
+import com.raczkowski.app.dto.UserDtoAssembler;
 import com.raczkowski.app.enums.UserRole;
 import com.raczkowski.app.exceptions.ErrorMessages;
 import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
+import com.raczkowski.app.user.UserRepository;
 import com.raczkowski.app.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -18,6 +26,8 @@ public class AdminUserService {
     private final PermissionValidator permissionValidator;
     private final ModerationStatisticService moderatorStatisticService;
     private final UserService userService;
+    private final UserDtoAssembler userDtoAssembler;
+    private final UserRepository userRepository;
 
     public void changeUserPermission(PermissionRequest permissionRequest) {
         boolean isUserAdmin = permissionValidator.validateAdmin();
@@ -68,5 +78,24 @@ public class AdminUserService {
             throw new ResponseException(ErrorMessages.USER_NOT_EXITS);
         }
         return user.getUserRole();
+    }
+
+    public PageResponse<UserDto> getAllUsers(
+            int pageSize,
+            int pageNumber
+    ) {
+        permissionValidator.validateOperatorOrAdmin();
+        Page<AppUser> page = GenericService.paginate(pageNumber, pageSize, "id", "asc", userRepository::findAll);
+        List<UserDto> users = page.getContent().stream().map(userDtoAssembler::assemble).toList();
+
+        return new PageResponse<>(
+                users,
+                new MetaData(
+                        page.getTotalElements(),
+                        page.getTotalPages(),
+                        page.getNumber() + 1,
+                        page.getSize()
+                )
+        );
     }
 }

@@ -1,6 +1,8 @@
 package com.raczkowski.app.user;
 
 import com.raczkowski.app.enums.UserRole;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -42,8 +44,28 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     @Query("SELECT uf FROM AppUser u JOIN u.followers uf WHERE u.id = :userId")
     List<AppUser> findFollowersByUserId(@Param("userId") Long userId);
 
+    @Query("""
+            SELECT uf FROM AppUser u JOIN u.followers uf
+            WHERE u.id = :userId
+            """)
+    Slice<AppUser> findFollowersSliceByUserId(@Param("userId") Long userId, Pageable pageable);
+
 
     @Query("SELECT uf FROM AppUser u JOIN u.followedUsers uf WHERE u.id = :userId")
     List<AppUser> findFollowingByUserId(@Param("userId") Long userId);
 
+    @Query("""
+             SELECT uf FROM AppUser u JOIN u.followedUsers uf
+             WHERE u.id = :userId
+            """)
+    Slice<AppUser> findFollowingSliceByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("""
+            SELECT CASE WHEN COUNT(fu) > 0 THEN TRUE ELSE FALSE END
+            FROM AppUser u
+            JOIN u.followedUsers fu
+            WHERE u.id = :loggedUserId AND fu.id = :userId
+            """)
+    boolean findFollowUserById(@Param("loggedUserId") Long loggedUserId,
+                               @Param("userId") Long userId);
 }

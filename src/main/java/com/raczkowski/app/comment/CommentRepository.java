@@ -1,6 +1,5 @@
 package com.raczkowski.app.comment;
 
-import com.raczkowski.app.article.Article;
 import com.raczkowski.app.user.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

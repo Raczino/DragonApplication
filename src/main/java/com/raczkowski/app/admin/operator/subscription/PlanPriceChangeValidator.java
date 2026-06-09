@@ -25,7 +25,7 @@ public class PlanPriceChangeValidator {
         if (request.getCurrency() == null) {
             throw new ResponseException(ErrorMessages.CURRENCY_REQUIRED);
         }
-        if (request.getCurrency() != CurrencyCode.EUR && request.getCurrency() != CurrencyCode.USD) {
+        if (request.getCurrency() != CurrencyCode.EUR && request.getCurrency() != CurrencyCode.USD && request.getCurrency() != CurrencyCode.PLN) {
             throw new ResponseException(ErrorMessages.UNSUPPORTED_CURRENCY);
         }
     }

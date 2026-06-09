@@ -20,9 +20,8 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     url: jdbc:postgresql://localhost:5432/dragon
-    password: Hasl0123
     user: postgres
-  spring:
-    redis:
-      host: localhost
-      port: 6379
+    password: Hasl0123
+  redis:
+    host: localhost
+    port: 6379
