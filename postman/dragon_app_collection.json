@@ -18,7 +18,7 @@
 								{
 									"key": "token",
 									"value": "{{token}}",
-									"type": "string",
+									"type": "string"
 								}
 							]
 						},
