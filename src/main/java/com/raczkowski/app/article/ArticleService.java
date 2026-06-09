@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -188,11 +189,11 @@ public class ArticleService {
         return articleRepository.findAllByAppUser(appUser).size();
     }
 
+    @Scheduled(fixedRate = 900000)
     @Transactional
     public void publishArticles() {
         var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
         articleRepository.publishDueUpTo(nowMinute);
-        throw new RuntimeException("TEST_FAIL");
     }
 
     public PageResponse<ArticleDto> searchByQuery(String q, int page, int size, String sortBy, String sortDirection) {

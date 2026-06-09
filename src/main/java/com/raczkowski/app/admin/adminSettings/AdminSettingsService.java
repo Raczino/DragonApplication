@@ -58,23 +58,4 @@ public class AdminSettingsService {
 
         redisService.setValue(setting.getSettingKey(), setting.getSettingValue(), 1, TimeUnit.DAYS);
     }
-
-    public String getString(String key, String def) {
-        AdminSetting s = getSetting(key);
-        return (s != null && s.getSettingValue() != null) ? s.getSettingValue() : def;
-    }
-
-    public boolean getBoolean(String key, boolean def) {
-        String v = getString(key, null);
-        return v != null ? Boolean.parseBoolean(v) : def;
-    }
-
-    public long getLong(String key, long def) {
-        try {
-            String v = getString(key, null);
-            return v != null ? Long.parseLong(v) : def;
-        } catch (NumberFormatException e) {
-            return def;
-        }
-    }
 }

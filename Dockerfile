@@ -16,6 +16,6 @@ RUN tar -xzf /tmp/dockerize.tar.gz -C /usr/local/bin \
  && rm /tmp/dockerize.tar.gz
 
 COPY --from=build /workspace/target/*.jar app.jar
-ENV SPRING_PROFILES_ACTIVE=docker,rabbit-events
+ENV SPRING_PROFILES_ACTIVE=docker
 EXPOSE 8080
-ENTRYPOINT ["sh","-c","dockerize -wait tcp://db:5432 -wait tcp://redis:6379 -wait tcp://rabbit:5672 -timeout 90s && exec java -XX:MaxRAMPercentage=75 -jar app.jar"]
+ENTRYPOINT ["sh","-c","dockerize -wait tcp://db:5432 -wait tcp://redis:6379 -timeout 60s && exec java -XX:MaxRAMPercentage=75 -jar app.jar"]
