@@ -4,6 +4,7 @@ import com.raczkowski.app.config.EventsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.context.annotation.Profile;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Message;
@@ -21,6 +22,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Profile("rabbit-events")
 @Component
 @RequiredArgsConstructor
 public class RetryHelper {
