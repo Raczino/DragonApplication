@@ -19,6 +19,7 @@ import com.raczkowski.app.exceptions.ResponseException;
 import com.raczkowski.app.user.AppUser;
 import com.raczkowski.app.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -124,6 +125,7 @@ public class SubscriptionService {
         subscriptionRepository.save(subscription);
     }
 
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void checkDeactivatedSubscription() {
         ZonedDateTime nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);

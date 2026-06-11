@@ -2,10 +2,10 @@ package com.raczkowski.app.rabbit.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raczkowski.app.config.EventsProperties;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +18,7 @@ import java.util.UUID;
 public class RabbitEventBus implements EventBus {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper mapper;
-    @Value("${events.exchange:dragon.events.x}")
-    String exchange;
+    private final EventsProperties events;
 
     @Override
     public void publish(String domain, Enum<?> eventType, JsonNode payload) {
@@ -34,7 +33,7 @@ public class RabbitEventBus implements EventBus {
         );
 
         String rk = domain + "." + eventType.name();
-        rabbitTemplate.convertAndSend(exchange, rk, message, m -> {
+        rabbitTemplate.convertAndSend(events.getExchange(), rk, message, m -> {
             m.getMessageProperties().setHeader("eventEnum", eventType.getClass().getName());
             return m;
         });
