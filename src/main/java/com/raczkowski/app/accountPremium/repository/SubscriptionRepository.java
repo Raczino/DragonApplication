@@ -20,5 +20,4 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
                where s.endDate <= :nowMinute and s.active = true
             """)
     int deactivateExpiredSubscription(@Param("nowMinute") ZonedDateTime nowMinute);
-
 }

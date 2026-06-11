@@ -634,17 +634,12 @@ public class ArticleServiceTest {
 
     @Test
     public void shouldNotPublishWhenScheduledAfterNow() {
-        Article future = new Article();
-        future.setId(1L);
-        future.setStatus(ArticleStatus.SCHEDULED);
-        future.setScheduledForDate(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(2));
-
-        when(articleRepository.getAllByStatus(ArticleStatus.SCHEDULED))
-                .thenReturn(List.of(future));
+        when(articleRepository.publishDueUpTo(any(ZonedDateTime.class))).thenReturn(0);
 
         articleService.publishArticles();
 
         verify(articleRepository, never()).updateArticleStatus(anyLong());
+        verify(articleRepository, times(1)).publishDueUpTo(any(ZonedDateTime.class));
     }
 
     @Test

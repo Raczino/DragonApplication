@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -192,7 +193,7 @@ public class ArticleService {
     @Scheduled(fixedRate = 900000)
     @Transactional
     public void publishArticles() {
-        var nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
+        ZonedDateTime nowMinute = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
         articleRepository.publishDueUpTo(nowMinute);
     }
 
