@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("webapi/v1/moderator/survey")
+@RequestMapping("api/v1/moderator/survey")
 @AllArgsConstructor
 public class ModerationSurveyController {
     private final ModerationSurveyService moderationSurveyService;
 
-    @PostMapping("survey/delete")
+    @PostMapping("/delete")
     public void deleteSurvey(@RequestParam Long id) {
         moderationSurveyService.deleteSurvey(id);
     }

@@ -18,7 +18,7 @@
 								{
 									"key": "token",
 									"value": "{{token}}",
-									"type": "string"
+									"type": "string",
 								}
 							]
 						},
@@ -819,13 +819,7 @@
 								"18",
 								"follow"
 							],
-							"query": [
-								{
-									"key": "",
-									"value": null,
-									"disabled": true
-								}
-							]
+							"query": []
 						}
 					},
 					"response": []
@@ -1349,7 +1343,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/webapi/v1/article/deleted/get?&page=10&size=1&sortBy=postedDate&sort=desc",
+							"raw": "localhost:8080/webapi/v1/article/deleted/get?page=10&size=1&sortBy=postedDate&sort=desc",
 							"host": [
 								"localhost"
 							],
@@ -1362,10 +1356,6 @@
 								"get"
 							],
 							"query": [
-								{
-									"key": null,
-									"value": null
-								},
 								{
 									"key": "page",
 									"value": "10"

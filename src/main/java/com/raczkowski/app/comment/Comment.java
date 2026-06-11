@@ -57,6 +57,8 @@ public class Comment {
 
     private int likesCount;
 
+    private boolean isLiked;
+
     public Comment(
             String content,
             ZonedDateTime postedDate,

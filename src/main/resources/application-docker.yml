@@ -6,14 +6,16 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/dragon}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -21,6 +23,7 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/dragon}
     user: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
   redis:
     host: ${SPRING_REDIS_HOST:redis}
     port: ${SPRING_REDIS_PORT:6379}
@@ -39,19 +42,3 @@ reddit:
   user:
     agent: ${REDDIT_USER_AGENT}
     subreddit: ${REDDIT_SUBREDDIT}
-
-logging:
-  level:
-    com.raczkowski.app.rabbit: INFO
-    org.springframework.amqp: WARN
-
-events:
-  exchange: dragon.events.x
-  retry:
-    maxAttempts: 5
-    article:
-      delays: 10000,60000,300000
-    subscription:
-      delays: 10000,60000,300000
-  dedup:
-    ttl-sec: 3600

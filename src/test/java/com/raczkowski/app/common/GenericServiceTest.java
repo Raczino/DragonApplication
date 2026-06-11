@@ -1,5 +1,6 @@
 package com.raczkowski.app.common;
 
+import com.raczkowski.app.common.pagination.GenericService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

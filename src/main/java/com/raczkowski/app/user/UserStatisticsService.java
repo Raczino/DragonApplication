@@ -1,30 +1,30 @@
 package com.raczkowski.app.user;
 
-import com.raczkowski.app.article.ArticleService;
-import com.raczkowski.app.comment.CommentService;
-import org.springframework.stereotype.Service;
+import com.raczkowski.app.article.ArticleRepository;
+import com.raczkowski.app.comment.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserStatisticsService {
-    private final ArticleService articleService;
-    private final CommentService commentService;
-    private final UserService userService;
+    private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     public int getArticlesCount(AppUser user) {
-        return articleService.getArticlesCountForUser(user);
+        return articleRepository.findAllByAppUser(user).size();
     }
 
     public int getCommentsCount(AppUser user) {
-        return commentService.getCommentsCountForUser(user);
+        return commentRepository.findAllByAppUser(user).size();
     }
 
     public int getFollowersCount(AppUser user) {
-        return userService.userFollowersCount(user);
+        return userRepository.findFollowersByUserId(user.getId()).size();
     }
 
     public int getFollowingCount(AppUser user) {
-        return userService.userFollowingCount(user);
+        return userRepository.findFollowingByUserId(user.getId()).size();
     }
 }

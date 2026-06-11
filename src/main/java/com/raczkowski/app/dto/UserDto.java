@@ -27,4 +27,5 @@ public class UserDto {
     private int followersCount;
     private int followingCount;
     private AccountType accountType;
+    private ZonedDateTime registeredDate;
 }

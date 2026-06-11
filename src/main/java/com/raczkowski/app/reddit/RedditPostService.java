@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -28,7 +29,7 @@ public class RedditPostService {
         List<Article> articles = articleService.getAllArticles();
         AppUser user = userService.getUserById(REDDIT_USER_ID);
         for (Article article : articles) {
-            List<Hashtag> hashtags = article.getHashtags();
+            Set<Hashtag> hashtags = article.getHashtags();
 
             for (Hashtag hashtag : hashtags) {
                 String hashtagName = hashtag.getTag();

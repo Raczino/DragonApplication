@@ -39,7 +39,7 @@ public class RejectedArticle {
     @Column(nullable = false)
     private ZonedDateTime postedDate;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private AppUser appUser;
 
@@ -48,7 +48,7 @@ public class RejectedArticle {
 
     private ZonedDateTime rejectedAt;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private AppUser rejectedBy;
 
     public RejectedArticle(

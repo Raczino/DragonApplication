@@ -3,6 +3,12 @@
 	"name": "dragon_env",
 	"values": [
 		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
 			"key": "token",
 			"value": "",
 			"type": "default",

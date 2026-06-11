@@ -56,7 +56,23 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("UPDATE Article a SET a.likesCount = a.likesCount + :likesNumber  WHERE a.id = :id")
     void updateArticleLikesCount(@Param("id") Long id, @Param("likesNumber") int likesNumber);
 
-    @Transactional
+    /**
+     * Artykuły autorów, których DANY UŻYTKOWNIK obserwuje.
+     * (follower = :userId  →  bierzemy followed → ich artykuły)
+     */
+    @Query("""
+        select a
+        from Article a
+        where a.appUser in (
+            select fu
+            from AppUser u
+            join u.followedUsers fu
+            where u.id = :userId
+        )
+        and a.status = com.raczkowski.app.enums.ArticleStatus.APPROVED
+    """)
+    Page<Article> findArticlesByAuthorsIFollow(@Param("userId") Long userId, Pageable pageable);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
               update Article a
@@ -65,4 +81,5 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
                  and a.scheduledForDate <= :nowMinute
             """)
     int publishDueUpTo(@Param("nowMinute") ZonedDateTime nowMinute);
+
 }

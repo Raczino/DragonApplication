@@ -11,10 +11,8 @@ RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests clean package
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# DELAY
-RUN apk add --no-cache curl tar \
- && curl -sSL https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz -o /tmp/dockerize.tar.gz \
- && tar -xzvf /tmp/dockerize.tar.gz -C /usr/local/bin \
+ADD https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz /tmp/dockerize.tar.gz
+RUN tar -xzf /tmp/dockerize.tar.gz -C /usr/local/bin \
  && rm /tmp/dockerize.tar.gz
 
 COPY --from=build /workspace/target/*.jar app.jar

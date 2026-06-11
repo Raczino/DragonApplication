@@ -1,5 +1,7 @@
 package com.raczkowski.app.surveys.survey;
 
+import com.raczkowski.app.common.pagination.PageResponse;
+import com.raczkowski.app.dto.ArticleDto;
 import com.raczkowski.app.dto.SurveyDto;
 import com.raczkowski.app.dtoMappers.SurveyDtoMapper;
 import lombok.AllArgsConstructor;
@@ -28,5 +30,16 @@ public class SurveyController {
     @GetMapping("/getAll")
     ResponseEntity<List<SurveyDto>> getAllSurveys(){
         return ResponseEntity.ok(surveyService.getAllSurveys().stream().map(surveyDtoMapper::toDTO).toList());
+    }
+
+    @GetMapping("/get/from/follows")
+    public PageResponse<SurveyDto> getContentForUser(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(name = "sort", defaultValue = "DESC") String sortDirection
+    ) {
+        return surveyService.getFromFollows(userId, page, size, sortBy, sortDirection);
     }
 }
