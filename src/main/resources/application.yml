@@ -4,10 +4,12 @@ server:
     include-binding-errors: always
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    password: Hasl0123
-    url: jdbc:postgresql://localhost:5432/dragon
-    username: postgres
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/dragon}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,9 +21,9 @@ spring:
   flyway:
     locations: classpath:db/migration
     baseline-on-migrate: true
-    url: jdbc:postgresql://localhost:5432/dragon
-    user: postgres
-    password: Hasl0123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/dragon}
+    user: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   redis:
-    host: localhost
-    port: 6379
+    host: ${SPRING_REDIS_HOST:localhost}
+    port: ${SPRING_REDIS_PORT:6379}
