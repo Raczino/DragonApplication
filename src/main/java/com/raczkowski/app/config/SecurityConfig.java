@@ -29,7 +29,8 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/**/auth/**",
-            "/**/registration/**"
+            "/**/registration/**",
+            "/api/stripe/webhook"
     };
 
     @Bean
